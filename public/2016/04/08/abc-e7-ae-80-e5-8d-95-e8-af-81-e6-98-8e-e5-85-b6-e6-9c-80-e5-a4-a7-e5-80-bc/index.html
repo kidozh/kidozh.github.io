@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [A^B%C]简单证明其最大值 · kidozh</title><meta name="description" content="[A^B%C]简单证明其最大值 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[A^B%C]简单证明其最大值</h1><div class="post-info">2016年4月8日</div><div class="post-content"><h1 id="命题"><a href="#命题" class="headerlink" title="命题"></a>命题</h1><p>给定( A,B,x \in N )，问( A^{x}modB )的最大值。</p>
+<h1 id="证明"><a href="#证明" class="headerlink" title="证明"></a>证明</h1><h2 id="欧拉定理"><a href="#欧拉定理" class="headerlink" title="欧拉定理"></a>欧拉定理</h2><p>欧拉定理的一个结论。</p>
+<h2 id="费马小定理"><a href="#费马小定理" class="headerlink" title="费马小定理"></a>费马小定理</h2><p>这个比较麻烦，也是欧拉定理的一个特殊情况。</p>
+<p>首先假定(A=Bx+y , x,y \in N)，则</p>
+<p>[ A^{z} = (Bx+y)^{2} ]</p>
+<p>通过二项式展开，并且已知( c*B^{x} \% B \equiv 0 , x \geq 1)</p>
+<p>则可以知道的是( (y^{x} \% B)<em>{max} \equiv (A^{x} \% B)</em>{max} )，且y，B互质</p>
+<p>由<a href="http://baike.baidu.com/link?url=xy6MQ_LENwJkiYsfmdxG_5WirCzF5OPW9Htbewlr9Dhw-oJk-IETz6VziBiL_Tv-sdta5idSG2sSYRY3DANHma" target="_blank" rel="external">费马小定理</a>( y^(B-1)\% B \equiv 1 )，则令( f(x) = y^{x}%B )，则有</p>
+<p>( f(0) = 1 )  <span style="line-height: 22.8571px;">( f(B-1) = 1 )</span></p>
+<p>这里使用数学归纳法即可证明出其具有循环节，并且循环节为( B )。</p>
+<p>更严格的从<a href="http://baike.baidu.com/link?url=-wOLB4YDOO5rJuJeTyxLKpuduwDLwuTp5RjflCQKd_6vX3X8nm96-ZvNViZdbAx5g7cMgtK0nF9gDWDvqBrHJa#2_1" target="_blank" rel="external">欧拉定理</a>出发，这里的循环节准确的来讲是( \phi{B} )。</p>
+<p>而这里由于求出欧拉函数( \phi{B} )较为繁琐，所以还是使用时间复杂度为( O(n) )的算法。</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>很简单，就是直接对B循环内的进行一次遍历即可。</p>
+<h2 id="源代码（C-）"><a href="#源代码（C-）" class="headerlink" title="源代码（C++）"></a>源代码（C++）</h2><pre class="lang:c decode:true crayon-selected"># include &lt;cstdio&gt;
+# include &lt;algorithm&gt;
+# include &lt;cmath&gt;
+using namespace std;
+
+#define max(a, b)  (((a) &gt; (b)) ? (a) : (b))
+
+int main()
+{
+    int a,b,res;
+    long long n;
+    while (~scanf("%d %d",&amp;a,&amp;b)){
+        n = 1;
+        res = -1;
+        for (int i=0;i&lt;b;i++){
+            res = max(res,n%b);
+            n = n*a;// first mi
+        }
+        printf("%d\n",res);
+    }
+
+    return 0;
+}</pre>
+
+<p> 这里可以使用空间换时间的方法先计算出<span style="line-height: 22.8571px;">( \phi{B} )来降低循环次数，例如：</span>A = 10,B =12时，</p>
+<p>此时<span style="line-height: 22.8571px;">( \phi{B}=4 )，所以只要计算4次，而不是12次就可以得到结果了。</span></p>
+<h2 id="源代码（Python）"><a href="#源代码（Python）" class="headerlink" title="源代码（Python）"></a>源代码（Python）</h2><pre class="lang:python decode:true">__author__ = 'kidozh'
+# -*- coding: UTF-8 -*-
+
+a = raw_input("A")
+b = raw_input("B")
+a = int(a)
+b = int(b)
+res = 0
+caculate = 1
+for i in range(0,a):
+    res = max(res,caculate%b)
+    caculate *=a
+print res</pre>
+
+<p> 也可以使用numpy加速计算，这里就不演示了。。。</p>
+<h1 id="后话"><a href="#后话" class="headerlink" title="后话"></a>后话</h1><p>有什么问题欢迎评论区指正！</p>
+<p>还有就是欧拉定理真是无孔不入。。。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/05/08/e6-9c-b4-e7-b4-a0-e8-b4-9d-e5-8f-b6-e6-96-af/" class="prev">上一篇</a><a href="/2016/03/30/ansys-e7-bb-8f-e5-85-b8-e7-95-8c-e9-9d-a2-e7-9a-84-e6-8e-a5-e8-a7-a6-e5-88-86-e6-9e-90-e4-be-8b-e5-ad-90-e5-b9-b2-e6-b6-89-e9-85-8d-e5-90-88-e5-ad-94-e8-be-b9-e7-9a-84-e5-ba-94-e5-8a-9b/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

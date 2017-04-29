@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> WordPress主题模板和目录结构 · kidozh</title><meta name="description" content="WordPress主题模板和目录结构 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">WordPress主题模板和目录结构</h1><div class="post-info">2016年11月3日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于WordPress而言，WordPress主题可能只需要一个<code>index.php</code>模板和一个<code>style.css</code>的文件。但是大多数的WordPress主题还是需要一些更为坚实的东西。</p>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>让我们创建一些文件和目录来装饰我们基于<code>_s</code>的主题，shape。</p>
+<p>在wp-content/themes/目录下创建你的主题，在这个指南中，我们称之为shape。当然，这也可以是你想要的任何文件，接下来我们将会创建下面的空白文件和文件夹。</p>
+<ul>
+<li>inc (folder)</li>
+<li>js (folder)</li>
+<li>languages (folder)</li>
+<li>layouts (folder)</li>
+<li>404.php</li>
+<li>archive.php</li>
+<li>comments.php</li>
+<li>content.php</li>
+<li>content-aside.php</li>
+<li>content-page.php</li>
+<li>content-single.php</li>
+<li>footer.php</li>
+<li>functions.php</li>
+<li>header.php</li>
+<li>index.php</li>
+<li>no-results.php</li>
+<li>page.php</li>
+<li>search.php</li>
+<li>searchform.php</li>
+<li>sidebar.php</li>
+<li>single.php</li>
+<li>license.txt</li>
+<li>rtl.css</li>
+<li>style.css</li>
+</ul>
+<p>现在让我们在文本编辑器里打开我们创建的最后的文件<code>style.css</code>。我们需要做的第一件事情就是在CSS文件的头几行内加入CSS注释（以<code>/* */</code>开头和结尾）。在这里，我们将会把一些信息写入CSS文件中，这些信息将会告知WordPress你的主题。没有这个，你的主题将不会在主题栏之中显示。</p>
+<p>我将会使用Shape作为主题名称，但是你想用啥名字都无所谓。同时，你需要填入author（作者），URLs（地址栏）和你的主题的说明信息。</p>
+<pre class="lang:css decode:true ">/*
+Theme Name: Shape
+Theme URI: https://themeshaper.com/
+Author: ThemeShaper
+Author URI: https://themeshaper.com/
+Description: The Shape theme is a simple, minimalist theme based on Underscores and the original Shape Theme by Ian Stewart. It was created especially as a learning theme for The ThemeShaper WordPress Theme Tutorial: 2nd Edition.
+Version: 2.0
+License: GNU General Public License
+License URI: license.txt
+Tags: light, white, one-column, two-columns, left-sidebar, right-sidebar, flexible-width, custom-backgroud, custom-header, custom-menu, featured-images, flexible-header, microformats, post-formats, rtl-language-support, threaded-comments, translation-ready
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+*/</pre>
+
+<p>让我们挨个看这些元素，这样你就会知道他们在说什么了。</p>
+<ul>
+<li>Theme Name - 你的主题名称</li>
+<li>Theme URL - 你主题主页在网络中的地址。这可以是你网站的某一部分。举个例子，许多的主题作者都可能使用类似于这样的地址：<a href="http://yourgroovydomain.com/your-theme/&amp;#8221" target="_blank" rel="external">http://yourgroovydomain.com/your-theme/&amp;#8221</a></li>
+<li>Author - 自我说明，当然也就是你的名字咯</li>
+<li>Author URL - 连接到你的网站</li>
+<li>Description - 提供一个你主题的简短而清晰的说明，你可以用几句话总结你创建主题的目的以及主题的特性。当用户搜索主题的时候，这个说明将会出现在用户的仪表盘（Dashboard）之中，当然也有可能出现在WordPress.org免费主题库之中</li>
+<li>Version - 你主题的版本号。这取决于你是如何对你的版本进行编号，倘若主题是全新的，你也可以从1.0开始命名主题版本号。如果你已经释出了更新，你就能够相应的更改版本号。</li>
+<li>License - 你的主题协议。如果你想发布你的主题，你就必须要使用GPL协议了，这也正是WordPress使用的。</li>
+<li>License URL - 提供一个用户能找到协议文本的链接。我们的主题将会包含一个<code>license.txt</code>文件，这个文件我们将会在如何分发WordPress主题那一节上提到</li>
+<li>Tags - 这些文字（标签）将会描述你主题的特性，颜色和主题。如果你想分发你的主题的话，他们就是必要的。这些标签允许人们去按照颜色主题等来检索主题。<a href="http://wordpress.org/extend/themes/about/" target="_blank" rel="external">这里是一些支持的标签</a>。</li>
+</ul>
+<p>需要注意的事情：这些东西很多都是可选的。事实上，你只需要主题名称就够了。但是一旦你计划要发布你的主题或者你想为某个人做一个自定义的注意的话，你就需要包含上面的东西了。最后，我希望你不要对这些琐事感到一头雾水。</p>
+<p>一旦你做到这些之后，你就可以激活你的注意并且访问你的测试站点了。我们已经完成了我们的空主题了。事情将会开始变得有趣。</p>
+<h1 id="构建你的HTML结构"><a href="#构建你的HTML结构" class="headerlink" title="构建你的HTML结构"></a>构建你的HTML结构</h1><p>现在我们将会从前面的教程中使用我们的HTML结构。但是让我们还是学一点关于WordPress和模板的东西吧。</p>
+<p>WordPress真的只需要一个模板文件，<code>index.php</code>。我们能够并且将会针对一些特殊的场合使用一系列模板文件（单个文章，归档，页面等）而不是<code>index.php</code>。但是在最开始，<code>index.php</code>才是我们所需要的。</p>
+<p>现在，<code>index.php</code>和所有相关的文件都构成了我们在浏览器看到的种种。他们是由一些HTML和PHP渲染而成的。</p>
+<p>让我们想想一些类似小说的网页，其包含了开头中间和结尾。当我们写入我们的index.php文件的时候（接下来就是我们的<code>single.php</code>，<code>category.php</code>等文件），我们将只会留心与中间的部分。但是我们将会直接引用开头和结尾的那一部分。我们可能需要复写我们的中间部分因为我们只想一次性的搞定开头和结尾的网页页面。</p>
+<h2 id="Header-php和Footer-php"><a href="#Header-php和Footer-php" class="headerlink" title="Header.php和Footer.php"></a>Header.php和Footer.php</h2><p>在我们之前的创建的HTML结构查看并且把所有的代码粘贴到这里并且在<code>header.php</code>之中应该包含<code>&amp;lt;div id=&quot;main&quot;&amp;gt;</code>。它看起来应该像这样：</p>
+<pre class="lang:xhtml decode:true ">&lt;div id="page" class="hfeed site"&gt;
+     &lt;header id="masthead" class="site-header" role="banner"&gt;
+         &lt;hgroup&gt;&lt;/hgroup&gt;
+         &lt;nav role="navigation" class="site-navigation main-navigation"&gt;&lt;/nav&gt;&lt;!-- .site-navigation .main-navigation --&gt;
+     &lt;/header&gt;&lt;!-- #masthead .site-header --&gt;
+&lt;div id="main" class="site-main"&gt;</pre>
+
+<p>现在在后面复制所有事情，包含<span class="lang:xhtml decode:true crayon-inline">&lt;/div&gt;&lt;!– #main –&gt;</span>在<code>footer.php</code>之中，它看起来可能是这样：</p>
+<pre class="lang:xhtml decode:true ">&lt;/div&gt;&lt;!-- #main .site-main --&gt;
+     &lt;footer id="colophon" class="site-footer" role="contentinfo"&gt;
+          &lt;div class="site-info"&gt;&lt;/div&gt;&lt;!-- .site-info --&gt;
+     &lt;/footer&gt;&lt;!-- #colophon .site-footer --&gt;
+&lt;/div&gt;&lt;!-- #page .hfeed .site --&gt;</pre>
+
+<h2 id="sidebar-php"><a href="#sidebar-php" class="headerlink" title="sidebar.php"></a>sidebar.php</h2><p>把下面的代码复制到<code>sidebar.php</code>之中：</p>
+<pre class="lang:xhtml decode:true ">&lt;div id="secondary" class="widget-area"&gt;
+&lt;/div&gt;&lt;!-- #secondary .widget-area --&gt;
+
+&lt;div id="tertiary" class="widget-area"&gt;
+&lt;/div&gt;&lt;!-- #tertiary .widget-area --&gt;</pre>
+
+<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><p>我猜你们已经知道我们要做什么了。把下面的代码复制到#main div 之中而在#primary 闭合之前，那么差不多看成这样：</p>
+<pre class="lang:xhtml decode:true ">&lt;div id="primary" class="content-area"&gt;
+    &lt;div id="content" class="site-content" role="main"&gt;
+    &lt;/div&gt;&lt;!-- #content .site-content --&gt;
+&lt;/div&gt;&lt;!-- #primary .content-area --&gt;</pre>
+
+<p>只需要两个很小几部，我们就会有一个完美的WordPress主题。我们需要在<code>header</code>，<code>sidebar</code>和<code>footer</code>之中调用这些函数。</p>
+<p>在<code>index.php</code>的页首，我们需要添加模板标签：</p>
+<pre class="lang:php decode:true ">&lt;?php get_header(); ?&gt;</pre>
+
+<p>很好！那么在页尾，我们需要添加</p>
+<pre class="lang:php decode:true ">&lt;?php get_sidebar(); ?&gt;
+&lt;?php get_footer(); ?&gt;</pre>
+
+<p>是的，现在我们就能够看到WordPress的主要文件index.php了。其有在页首调用了开始页，而在页尾也会调用函数。</p>
+<p>重新加载页面并且检出代码，这样就是你的代码了！</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/11/05/sqlalchemy-e4-bb-8b-e7-bb-8d/" class="prev">上一篇</a><a href="/2016/10/30/e5-88-9b-e5-bb-ba-e4-b8-80-e4-b8-aawordpress-e7-9a-84-e4-b8-bb-e9-a2-98html-e7-bb-93-e6-9e-84/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

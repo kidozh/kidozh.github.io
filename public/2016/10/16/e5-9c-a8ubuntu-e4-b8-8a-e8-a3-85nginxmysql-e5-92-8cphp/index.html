@@ -1,0 +1,140 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 在Ubuntu上装Nginx，MySQL和PHP · kidozh</title><meta name="description" content="在Ubuntu上装Nginx，MySQL和PHP - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">在Ubuntu上装Nginx，MySQL和PHP</h1><div class="post-info">2016年10月16日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近倒腾tornado以及这个网站从SAE迁回了腾讯云，花了不少时间和nginx打交道。所以准备记录一下我怎么倒腾Nginx的过程。（同时控诉一下Apache2的恶心）</p>
+<h1 id="安装Nginx服务器"><a href="#安装Nginx服务器" class="headerlink" title="安装Nginx服务器"></a>安装Nginx服务器</h1><p>为了展现一个动态网页，我们现在就部署Nginx，Nginx是一款现代和高效的网络服务器。</p>
+<p>下面所有的命令都是基于Ubuntu自带的默认源，也就是说，你只需要巧妙的使用<code>apt</code>来安装就可以了。</p>
+<p>因为我们这是第一次使用apt来安装，所以我们需要先更新源。</p>
+<pre class="lang:sh decode:true ">sudo apt-get update
+sudo apt-get install nginx</pre>
+
+<p>在Ubuntu 14.04这个版本里，Nginx会根据安装时候的配置来决定启动方式。</p>
+<p>你可以直接通过访问IP或者域名来观察Nginx是否启动完毕了。</p>
+<p>如果你不知道的话，很简单，运行下面的命令就可以知道自己服务器公共的IP地址了。</p>
+<pre class="lang:sh decode:true">ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'</pre>
+<pre class="lang:default decode:true">111.111.111.111
+fe80::601:17ff:fe61:9801</pre>
+
+<p>或者你觉得麻烦，这样也可以：</p>
+<pre class="lang:sh decode:true ">curl http://icanhazip.com</pre>
+<pre class="lang:default decode:true">111.111.111.111</pre>
+
+<p>这样就知道了地址。这里由于我在的RWTH-Aachen屏蔽了这个网站，所以就查不到，具体情况你可以联系网管。</p>
+<p>直接输入IP或者域名。</p>
+<pre class="lang:default highlight:0 decode:true ">http://server_domain_name_or_IP</pre>
+
+<p>&nbsp;</p>
+<p><img src="http://kidozh.com/wp-content/uploads/2016/10/nginx_default.png" alt="nginx_default"></p>
+<p>如果你看到了Nginx的欢迎页面，那么恭喜您，Ngnix就装好了。</p>
+<h1 id="安装MySQL来储存数据"><a href="#安装MySQL来储存数据" class="headerlink" title="安装MySQL来储存数据"></a>安装MySQL来储存数据</h1><p>现在我们已经安装好了网络服务器了，那么我们就需要一个数据库来支撑我们整个网站的数据储存业务了。</p>
+<p>最简单的就是输入下面的命令：</p>
+<pre class="lang:sh decode:true ">sudo apt-get install mysql-server</pre>
+
+<p>在此期间，你会被要求输入一个MySQL管理员的密码。</p>
+<p>这样，MySQL就安装好了，但是需要我们来配置。</p>
+<p>首先，我们需要让MySQL生成一个可以存储信息和数据结构的目录，我们只需要键入下面的命令：</p>
+<pre class="lang:sh decode:true ">sudo mysql_install_db</pre>
+
+<p>接下来，你可以运行一个安全脚本来引导你做一些安全的配置，你需要输入命令：</p>
+<pre class="lang:sh decode:true ">sudo mysql_secure_installation</pre>
+
+<p>在这个过程中，你需要在安装过程中提供您MySQL管理员的密码。</p>
+<p>接着，他会询问您是否想变更密码，如果您对您现在的MySQL密码很满意的话，输入<code>N</code>然后按下<code>Enter</code>键就可以了，接着，您需要移除测试的数据库和用户。在这个过程中，您只需要一路按<code>Enter</code>来继续就可以了。</p>
+<p>一旦脚本跑完了，那么MySQL就对数据饥渴难耐了。</p>
+<h1 id="安装PHP"><a href="#安装PHP" class="headerlink" title="安装PHP"></a>安装PHP</h1><p>现在，我们已经安装好了承载页面的Nginx服务器和存储数据的MySQL数据库，但是我们还是需要一些东西来串接这两个东西并且生成动态界面。这样我们就可以使用PHP来完成这个任务。</p>
+<p>因为Nginx和其他服务器不同，其并不包含原生的PHP处理模块，所以我们需要安装<code>php5-fpm</code>（fastCGI process manager）。我们会指定Nginx将PHP请求给这个软件用于处理。</p>
+<p>我们可以安装这个模块并且还需要一个安装一个能够让PHP和我们后台数据库交互的包。这次安装会放入所有必要的PHP核心文件。你需要键入：</p>
+<pre class="lang:sh decode:true ">sudo apt-get install php5-fpm php5-mysql</pre>
+
+<h2 id="配置PHP处理模块"><a href="#配置PHP处理模块" class="headerlink" title="配置PHP处理模块"></a>配置PHP处理模块</h2><p>现在我们已经安装了PHP，但是我们还是要做一些细微的调整来让我们的安装更为安全。</p>
+<p>使用root权限来打开<code>php5-fpm</code>的配置文件：</p>
+<pre class="lang:sh decode:true">sudo vim /etc/php5/fpm/php.ini</pre>
+
+<p>在这个文件中，我们找到第一个参数<code>cgi.fix_pathinfo</code>，这个被一个<code>;</code>所注释掉，并且默认设置为1。</p>
+<p>这个是一个非常危险的设定，因为其告诉PHP对于那些没有办法完全匹配的请求执行最为接近的文件。这样就可能使得用户能够执行一些他们并不能被允许执行的脚本。</p>
+<p>我们就需要关闭这个设定：</p>
+<pre class="lang:sh decode:true ">cgi.fix_pathinfo=0</pre>
+
+<p>保存这个文件，并且完成设定。</p>
+<p>现在，我们就需要重启我们的PHP处理器：</p>
+<pre class="lang:sh decode:true ">sudo service php5-fpm restart</pre>
+
+<p>这样我们的设定就会应用了。</p>
+<h1 id="配置Nginx使用我们的PHP处理器"><a href="#配置Nginx使用我们的PHP处理器" class="headerlink" title="配置Nginx使用我们的PHP处理器"></a>配置Nginx使用我们的PHP处理器</h1><p>现在，我们啥都安装好了，现在我们唯一要做的就是配置Nginx来使用我们的PHP来处理动态界面。</p>
+<p>我们需要在服务器层次上配置。如果我们想要Nginx默认的话，只需要这样：</p>
+<pre class="lang:sh decode:true ">sudo vim /etc/nginx/sites-available/default</pre>
+
+<p>移除掉注释之后，整个文件就会像这样：</p>
+<pre class="lang:default decode:true ">server {
+    listen 80 default_server;
+    listen [::]:80 default_server ipv6only=on;
+
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+
+    server_name localhost;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}</pre>
+
+<p>当然，我们需要为我们的网站做一些细微的调整：</p>
+<ul>
+<li>首先，我们需要添加一个<code>index.php</code>的选项来置于我们索引页。这样当处理一些针对目录的请求的时候，就会自动寻找这个目录下的<code>index.php</code>文件来加载动态页面。</li>
+<li>我们同样需要修改server_name来指出我们服务器的域名或者是IP地址</li>
+<li>事实上，一些配置文件有一些被注释掉的定义处理错误行为的函数，我们需要消掉这些注释，以便于我们能够支持这些行为。</li>
+<li>对于每一个PHP的请求，我们需要消掉其他的部分的注释。并且我们还需要添加<code>add_files</code>来使得我们的Nginx不会向PHP处理器传递太多的错误请求。</li>
+</ul>
+<p>所以说，现在我们要变成这样（注意高亮）</p>
+<pre class="lang:default mark:6,8,14-28 decode:true ">server {
+    listen 80 default_server;
+    listen [::]:80 default_server ipv6only=on;
+
+    root /usr/share/nginx/html;
+    index index.php index.html index.htm;
+
+    server_name server_domain_name_or_IP;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}</pre>
+
+<p>当修改好了之后，你就可以保存文件了。</p>
+<p>然后重启Nginx服务器：</p>
+<pre class="lang:sh decode:true ">sudo service nginx restart</pre>
+
+<h1 id="创建一个PHP文件来测试配置"><a href="#创建一个PHP文件来测试配置" class="headerlink" title="创建一个PHP文件来测试配置"></a>创建一个PHP文件来测试配置</h1><p>你的LEMP环境就这样被配置好了，但是我们还是要测试来确保Nginx能够正确的处理<code>.php</code>文件。</p>
+<p>就上面所述，我们可以直接在文件夹中创建一个PHP文件。打开一个名为info.php的新文件。</p>
+<pre class="lang:sh decode:true ">sudo vim /usr/share/nginx/html/info.php</pre>
+
+<p>我们可以把下面的内容键入到文件之中，这个有效的PHP代码就能够反映我们服务器的一些情况。</p>
+<pre class="lang:php decode:true ">&lt;?php
+phpinfo();
+?&gt;</pre>
+
+<p>保存并且关闭文件。</p>
+<p>现在你可以在浏览器中访问这个界面：</p>
+<pre class="lang:default decode:true ">http://server_domain_name_or_IP/info.php</pre>
+
+<p>这样你就可以看见一个被PHP创建的反映你情况的界面。</p>
+<p><img src="http://kidozh.com/wp-content/uploads/2016/10/php_info.png" alt="php_info"></p>
+<p>如果你看见了一个像这样的页面，那么你的Nginx的PHP环境就配置完毕了。</p>
+<p>接着，为了防止我们信息的泄露，删除这个文件就可以了。</p>
+<pre class="lang:sh decode:true ">sudo rm /usr/share/nginx/html/info.php</pre>
+
+<p>&nbsp;</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/10/17/dpkg-e5-a4-84-e7-90-86-xxx-configure-e6-97-b6-e5-87-ba-e9-94-99-e8-a7-a3-e5-86-b3-e5-8a-9e-e6-b3-95/" class="prev">上一篇</a><a href="/2016/10/12/python-configparser-e9-85-8d-e7-bd-ae-e6-96-87-e4-bb-b6-e8-a7-a3-e6-9e-90/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

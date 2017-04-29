@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> python读取网页产生的octet-stream文件 · kidozh</title><meta name="description" content="python读取网页产生的octet-stream文件 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">python读取网页产生的octet-stream文件</h1><div class="post-info">2016年7月30日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在爬取Vjudge的导出代码的时候，之前我们采用的是纯正则一个个抓取，速度很慢，当时Vjudge官方向我们提供了一种解决方法就是从URL中获得比赛源代码。</p>
+<h1 id="获得验证"><a href="#获得验证" class="headerlink" title="获得验证"></a>获得验证</h1><p>众所周知，Vjudge获取比赛源代码需要登陆拉题人的账号密码，所以我使用了<code>Request</code>这个库来处理含有cookie的请求。所以首先需要模拟登陆这个过程：</p>
+<pre class="lang:python decode:true ">def login(self,username=None,password=None):
+
+        #username = raw_input('Your username : ')
+        #password = raw_input('Your password : ')
+        #username = 'ArrowLLL'
+        #password = 'lll1314'
+        VJheaders = {
+            'Host':'acm.hust.edu.cn',
+            'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0',
+            'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language':'en-US,en;q=0.5',
+            'Accept-Encoding':'deflate',
+            #'Cookie':'ga=GA1.3.1416134436.1469179876',
+        }
+
+        postData = {
+            'username':username,
+            'password':password
+        }
+
+        postData = urllib.urlencode(postData)
+        print postData
+        req = urllib2.Request(
+            #url = 'http://acm.hust.edu.cn/vjudge/contest/fetchStatus.action?cid=88638',
+            url='http://acm.hust.edu.cn/vjudge/user/login',
+            headers=VJheaders,
+            data=postData
+        )
+        res = self.opener.open(req).read()
+        print res
+        if res == '"success"':
+            return True
+        else:
+            return False</pre>
+
+<h1 id="获得流"><a href="#获得流" class="headerlink" title="获得流"></a>获得流</h1><p>下一步是爬虫中常见的，使用<code>opener.open</code>来访问这个URL并且获得结果，需要注意的是，这个过程需要带一个合适的<code>header</code>。</p>
+<p>接着我从浏览器中发现其<code>Content-Type</code>为<code>application/octet-stream</code>，而<code>request</code>返回的数据中<code>fp</code>正是<code>CStringIO</code>类型，所以我们需要通过这个数据结构来获得我们需要的文件。</p>
+<pre class="lang:default decode:true ">def getExportedSourceCode(self,cid='121125'):
+        VJheaders = {
+            'Host':'acm.hust.edu.cn',
+            'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0',
+            'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language':'en-US,en;q=0.5',
+            'Accept-Encoding':'deflate',
+            #'Cookie':'ga=GA1.3.1416134436.1469179876',
+        }
+        exportUrl ='http://acm.hust.edu.cn/vjudge/contest/exportSource/%s'%cid
+        tarReq= urllib2.Request(
+            #url = 'http://acm.hust.edu.cn/vjudge/contest/fetchStatus.action?cid=88638',
+            url=exportUrl,
+            headers=VJheaders,
+            #data=postData
+        )
+        res = self.opener.open(tarReq)
+        f = cStringIO.StringIO(res.read())
+        #f.read()
+        now = datetime.datetime.now()
+        tarName ='%s%s.zip' %(now.strftime('%Y-%m-%d'),cid)
+        #print '#',res.fp,res.code
+        with open(tarName,'wb') as tarFile:
+            tarFile.write(f.read())
+        print 'TAR File has been Downloaded..'</pre>
+
+<p>这样就能够正确的把导出的zip文件存储到本地磁盘之中了。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/10/12/python-configparser-e9-85-8d-e7-bd-ae-e6-96-87-e4-bb-b6-e8-a7-a3-e6-9e-90/" class="prev">上一篇</a><a href="/2016/07/27/phpstorm-e5-bc-80-e5-8f-91wordpress/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

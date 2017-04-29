@@ -1,0 +1,1359 @@
+---
+title: '[linux]Linux下的多线程多进程通信'
+tags:
+  - C++
+  - linux
+  - 多线程通讯
+id: 327
+categories:
+  - 深度学习
+date: 2015-05-02 17:33:40
+---
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  进程（fork）
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  什么是一个进程？进程这个概念是针对系统而不是针对用户的，对用户来说，他面对的概念是程序。当用户敲入命令执行一个程序的时候，对系统而言，它将启动一个进程。但和程序不同的是，在这个进程中，系统可能需要再启动一个或多个进程来完成独立的多个任务。多进程编程的主要内容包括进程控制和进程间通信，在了解这些之前，我们先要简单知道进程的结构。
+
+1-2\.  Linux下进程的结构
+Linux下一个进程在内存里有三部分的数据，就是"代码段"、"堆栈段"和"数据段"。其实学过汇编语言的人一定知道，一般的CPU都有上述三种段寄存器，以方便操作系统的运行。这三个部分也是构成一个完整的执行序列的必要的部分。
+"代码段"，顾名思义，就是存放了程序代码的数据，假如机器中有数个进程运行相同的一个程序，那么它们就可以使用相同的代码段。"堆栈段"存放的就是子程序的返回地址、子程序的参数以及程序的局部变量。而数据段则存放程序的全局变量，常数以及动态数据分配的数据空间（比如用malloc之类的函数取得的空间）。这其中有许多细节问题，这里限于篇幅就不多介绍了。系统如果同时运行数个相同的程序，它们之间就不能使用同一个堆栈段和数据段。
+2.  Linux下的进程控制在传统的Unix环境下，有两个基本的操作用于创建和修改进程：函数fork( )用来创建一个新的进程，该进程几乎是当前进程的一个完全拷贝；函数族exec( )用来启动另外的进程以取代当前运行的进程。Linux的进程控制和传统的Unix进程控制基本一致，只在一些细节的地方有些区别，例如在Linux系统中调用vfork和fork完全相同，而在有些版本的Unix系统中，vfork调用有不同的功能。由于这些差别几乎不影响我们大多数的编程，在这里我们不予考虑。
+
+1-2.1 fork( )
+fork在英文中是"分叉"的意思。为什么取这个名字呢？因为一个进程在运行中，如果使用了fork，就产生了另一个进程，于是进程就"分叉"了，所以这个名字取得很形象。下面就看看如何具体使用fork，这段程序演示了使用fork的基本框架：
+
+[cpp][/cpp]
+
+ [<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> main(){   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">    </span><span style="color: #000000;">int</span>**<span style="color: #000000;"> i;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">    </span><span style="color: #000000;">if</span>**<span style="color: #000000;"> ( fork() == 0 ) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span><span style="color: #000000;">    </span><span style="color: #000000;">/* </span><span style="color: #000000;">子进程程序</span><span style="color: #000000;"> */   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">    </span><span style="color: #000000;">for</span>**<span style="color: #000000;"> ( i = 1; i &lt;1000; i ++ ) printf("This is child process/n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span><span style="color: #000000;">    </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">    </span><span style="color: #000000;">else</span>**<span style="color: #000000;"> {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span><span style="color: #000000;">    </span><span style="color: #000000;">/* </span><span style="color: #000000;">父进程程序</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">        </span><span style="color: #000000;">for</span>**<span style="color: #000000;"> ( i = 1; i &lt;1000; i ++ ) printf("This is process process/n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span><span style="color: #000000;">    </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;"> </span><span style="color: #000000;">程序运行后，你就能看到屏幕上交替出现子进程与父进程各打印出的一千条信息了。如果程序还在运行中，你用</span><span style="color: #000000;">ps</span><span style="color: #000000;">命令就能看到系统中有两个它在运行了。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　 那么调用这个</span><span style="color: #000000;">fork</span><span style="color: #000000;">函数时发生了什么呢？</span><span style="color: #000000;">fork</span><span style="color: #000000;">函数启动一个新的进程，前面我们说过，这个进程几乎是当前进程的一个拷贝：子进程和父进程使用相同的代码段；子进程复制父进程的堆栈段和数据段。这样，父进程的所有数据都可以留给子进程，但是，子进程一旦开始运行，虽然它继承了父进程的一切数据，但实际上数据却已经分开，相互之间不再有影响了，也就是说，它们之间不再共享任何数据了。它们再要交互信息时，只有通过进程间通信来实现，这将是我们下面的内容。既然它们如此相象，系统如何来区分它们呢？这是由函数的返回值来决定的。对于父进程，</span><span style="color: #000000;">fork</span><span style="color: #000000;">函数返回了子程序的进程号，而对于子程序，</span><span style="color: #000000;">fork</span><span style="color: #000000;">函数则返回零。在操作系统中，我们用</span><span style="color: #000000;">ps</span><span style="color: #000000;">函数就可以看到不同的进程号，对父进程而言，它的进程号是由比它更低层的系统调用赋予的，而对于子进程而言，它的进程号即是</span><span style="color: #000000;">fork</span><span style="color: #000000;">函数对父进程的返回值。在程序设计中，父进程和子进程都要调用函数</span><span style="color: #000000;">fork</span><span style="color: #000000;">（）下面的代码，而我们就是利用</span><span style="color: #000000;">fork</span><span style="color: #000000;">（）函数对父子进程的不同返回值用</span><span style="color: #000000;">if...else...</span><span style="color: #000000;">语句来实现让父子进程完成不同的功能，正如我们上面举的例子一样。我们看到，上面例子执行时两条信息是交互无规则的打印出来的，这是父子进程独立执行的结果，虽然我们的代码似乎和串行的代码没有什么区别。</span>
+<span style="color: #000000;">　　 读者也许会问，如果一个大程序在运行中，它的数据段和堆栈都很大，一次</span><span style="color: #000000;">fork</span><span style="color: #000000;">就要复制一次，那么</span><span style="color: #000000;">fork</span><span style="color: #000000;">的系统开销不是很大吗？其实</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">自有其解决的办法，大家知道，一般</span><span style="color: #000000;">CPU</span><span style="color: #000000;">都是以</span><span style="color: #000000;">"</span><span style="color: #000000;">页</span><span style="color: #000000;">"</span><span style="color: #000000;">为单位来分配内存空间的，每一个页都是实际物理内存的一个映像，比如</span><span style="color: #000000;">INTEL</span><span style="color: #000000;">的</span><span style="color: #000000;">CPU</span><span style="color: #000000;">，其一页在通常情况下是</span><span style="color: #000000;">4086</span><span style="color: #000000;">字节大小，而无论是数据段还是堆栈段都是由许多</span><span style="color: #000000;">"</span><span style="color: #000000;">页</span><span style="color: #000000;">"</span><span style="color: #000000;">构成的，</span><span style="color: #000000;">fork</span><span style="color: #000000;">函数复制这两个段，只是</span><span style="color: #000000;">"</span><span style="color: #000000;">逻辑</span><span style="color: #000000;">"</span><span style="color: #000000;">上的，并非</span><span style="color: #000000;">"</span><span style="color: #000000;">物理</span><span style="color: #000000;">"</span><span style="color: #000000;">上的，也就是说，实际执行</span><span style="color: #000000;">fork</span><span style="color: #000000;">时，物理空间上两个进程的数据段和堆栈段都还是共享着的，当有一个进程写了某个数据时，这时两个进程之间的数据才有了区别，系统就将有区别的</span><span style="color: #000000;">"</span><span style="color: #000000;">页</span><span style="color: #000000;">"</span><span style="color: #000000;">从物理上也分开。系统在空间上的开销就可以达到最小。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;"> </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">1.2-2 exec( )</span><span style="color: #000000;">函数族</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　 下面我们来看看一个进程如何来启动另一个程序的执行。在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">中要使用</span><span style="color: #000000;">exec</span><span style="color: #000000;">函数族。系统调用</span><span style="color: #000000;">execve</span><span style="color: #000000;">（）对当前进程进行替换，替换者为一个指定的程序，其参数包括文件名（</span><span style="color: #000000;">filename</span><span style="color: #000000;">）、参数列表（</span><span style="color: #000000;">argv</span><span style="color: #000000;">）以及环境变量（</span><span style="color: #000000;">envp</span><span style="color: #000000;">）。</span><span style="color: #000000;">exec</span><span style="color: #000000;">函数族当然不止一个，但它们大致相同，在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">中，它们分别是：</span><span style="color: #000000;">execl</span><span style="color: #000000;">，</span><span style="color: #000000;">execlp</span><span style="color: #000000;">，</span><span style="color: #000000;">execle</span><span style="color: #000000;">，</span><span style="color: #000000;">execv</span><span style="color: #000000;">，</span><span style="color: #000000;">execve</span><span style="color: #000000;">和</span><span style="color: #000000;">execvp</span><span style="color: #000000;">，下面我只以</span><span style="color: #000000;">execlp</span><span style="color: #000000;">为例，其它函数究竟与</span><span style="color: #000000;">execlp</span><span style="color: #000000;">有何区别，请通过</span><span style="color: #000000;">manexec</span><span style="color: #000000;">命令来了解它们的具体情况。</span>
+<span style="color: #000000;">　　 一个进程一旦调用</span><span style="color: #000000;">exec</span><span style="color: #000000;">类函数，它本身就</span><span style="color: #000000;">"</span><span style="color: #000000;">死亡</span><span style="color: #000000;">"</span><span style="color: #000000;">了，系统把代码段替换成新的程序的代码，废弃原有的数据段和堆栈段，并为新程序分配新的数据段与堆栈段，唯一留下的，就是进程号，也就是说，对系统而言，还是同一个进程，不过已经是另一个程序了。（不过</span><span style="color: #000000;">exec</span><span style="color: #000000;">类函数中有的还允许继承环境变量之类的信息。）</span>
+<span style="color: #000000;">　　 那么如果我的程序想启动另一程序的执行但自己仍想继续运行的话，怎么办呢？那就是结合</span><span style="color: #000000;">fork</span><span style="color: #000000;">与</span><span style="color: #000000;">exec</span><span style="color: #000000;">的使用。下面一段代码显示如何启动运行其它程序：</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+[cpp][/cpp]
+
+<span style="color: #000000;"> </span>[<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">char</span>**<span style="color: #000000;"> command[256];   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> main()   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span><span style="color: #000000;">{   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">    </span><span style="color: #000000;">int</span>**<span style="color: #000000;"> rtn; /*</span><span style="color: #000000;">子进程的返回数值</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">    </span><span style="color: #000000;">while</span>**<span style="color: #000000;">(1) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span><span style="color: #000000;">/* </span><span style="color: #000000;">从终端读取要执行的命令</span><span style="color: #000000;"> */   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span><span style="color: #000000;">        </span><span style="color: #000000;">printf( "&gt;" );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span><span style="color: #000000;">        </span><span style="color: #000000;">fgets( command, 256, stdin );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span><span style="color: #000000;">        </span><span style="color: #000000;">command[strlen(command)-1] = 0;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">        </span><span style="color: #000000;">if</span>**<span style="color: #000000;"> ( fork() == 0 ) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span><span style="color: #000000;">        </span><span style="color: #000000;">/* </span><span style="color: #000000;">子进程执行此命令</span><span style="color: #000000;"> */   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">            </span><span style="color: #000000;">execlp( command, command );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">13.</span><span style="color: #000000;">  </span><span style="color: #000000;">        </span><span style="color: #000000;">/* </span><span style="color: #000000;">如果</span><span style="color: #000000;">exec</span><span style="color: #000000;">函数返回，表明没有正常执行命令，打印错误信息</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">14.</span><span style="color: #000000;">  </span><span style="color: #000000;">            </span><span style="color: #000000;">perror( command );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">15.</span><span style="color: #000000;">  </span><span style="color: #000000;">            </span><span style="color: #000000;">exit( errorno );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">16.</span><span style="color: #000000;">  </span><span style="color: #000000;">        </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">17.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">        </span><span style="color: #000000;">else</span>**<span style="color: #000000;"> {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">18.</span><span style="color: #000000;">  </span><span style="color: #000000;">        </span><span style="color: #000000;">/* </span><span style="color: #000000;">父进程，</span><span style="color: #000000;"> </span><span style="color: #000000;">等待子进程结束，并打印子进程的返回值</span><span style="color: #000000;"> */   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">19.</span><span style="color: #000000;">  </span><span style="color: #000000;">            </span><span style="color: #000000;">wait ( &amp;rtn );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">20.</span><span style="color: #000000;">  </span><span style="color: #000000;">            </span><span style="color: #000000;">printf( " child process return %d/n",. rtn );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">21.</span><span style="color: #000000;">  </span><span style="color: #000000;">        </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">22.</span><span style="color: #000000;">  </span><span style="color: #000000;">    </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">23.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">此程序从终端读入命令并执行之，执行完成后，父进程继续等待从终端读入命令。熟悉</span><span style="color: #000000;">DOS</span><span style="color: #000000;">和</span><span style="color: #000000;">WINDOWS</span><span style="color: #000000;">系统调用的朋友一定知道</span><span style="color: #000000;">DOS/WINDOWS</span><span style="color: #000000;">也有</span><span style="color: #000000;">exec</span><span style="color: #000000;">类函数，其使用方法是类似的，但</span><span style="color: #000000;">DOS/WINDOWS</span><span style="color: #000000;">还有</span><span style="color: #000000;">spawn</span><span style="color: #000000;">类函数，因为</span><span style="color: #000000;">DOS</span><span style="color: #000000;">是单任务的系统，它只能将</span><span style="color: #000000;">"</span><span style="color: #000000;">父进程</span><span style="color: #000000;">"</span><span style="color: #000000;">驻留在机器内再执行</span><span style="color: #000000;">"</span><span style="color: #000000;">子进程</span><span style="color: #000000;">"</span><span style="color: #000000;">，这就是</span><span style="color: #000000;">spawn</span><span style="color: #000000;">类的函数。</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">已经是多任务的系统了，但还保留了</span><span style="color: #000000;">spawn</span><span style="color: #000000;">类函数，</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">中实现</span><span style="color: #000000;">spawn</span><span style="color: #000000;">函数的方法同前述</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">中的方法差不多，开设子进程后父进程等待子进程结束后才继续运行。</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">在其一开始就是多任务的系统，所以从核心角度上讲不需要</span><span style="color: #000000;">spawn</span><span style="color: #000000;">类函数。</span>
+<span style="color: #000000;">　　 在这一节里，我们还要讲讲</span><span style="color: #000000;">system</span><span style="color: #000000;">（）和</span><span style="color: #000000;">popen</span><span style="color: #000000;">（）函数。</span><span style="color: #000000;">system</span><span style="color: #000000;">（）函数先调用</span><span style="color: #000000;">fork</span><span style="color: #000000;">（），然后再调用</span><span style="color: #000000;">exec</span><span style="color: #000000;">（）来执行用户的登录</span><span style="color: #000000;">shell</span><span style="color: #000000;">，通过它来查找可执行文件的命令并分析参数，最后它么使用</span><span style="color: #000000;">wait</span><span style="color: #000000;">（）函数族之一来等待子进程的结束。函数</span><span style="color: #000000;">popen</span><span style="color: #000000;">（）和函数</span><span style="color: #000000;">system</span><span style="color: #000000;">（）相似，不同的是它调用</span><span style="color: #000000;">pipe</span><span style="color: #000000;">（）函数创建一个管道，通过它来完成程序的标准输入和标准输出。这两个函数是为那些不太勤快的程序员设计的，在效率和安全方面都有相当的缺陷，在可能的情况下，应该尽量避免。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">     </span><span style="color: #000000;">1-3 Linux</span><span style="color: #000000;">下的进程间通信</span><span style="color: #000000;"> </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">首先，进程间通信至少可以通过传送打开文件来实现，不同的进程通过一个或多个文件来传递信息，事实上，在很多应用系统里，都使用了这种方法。但一般说来，进程间通信</span><span style="color: #000000;">      </span><span style="color: #000000;">（</span><span style="color: #000000;">IPC</span><span style="color: #000000;">：</span><span style="color: #000000;">InterProcess Communication</span><span style="color: #000000;">）不包括这种似乎比较低级的通信方法。</span><span style="color: #000000;">Unix</span><span style="color: #000000;">系统中实现进程间通信的方法很多，而且不幸的是，极少方法能在所有的</span><span style="color: #000000;">Unix</span><span style="color: #000000;">系统中进行移植</span><span style="color: #000000;">       </span><span style="color: #000000;">（唯一一种是半双工的管道，这也是最原始的一种通信方式）。而</span><span style="color: #000000;">Linux</span><span style="color: #000000;">作为一种新兴的操作系统，几乎支持所有的</span><span style="color: #000000;">Unix</span><span style="color: #000000;">下常用的进程间通信方法：管道、消息队列、共享内存、信</span><span style="color: #000000;">        </span><span style="color: #000000;">号量、套接口等等。下面我们将逐一介绍。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">2.3.1 </span><span style="color: #000000;">管道</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　 </span><span style="color: #000000;">           </span><span style="color: #000000;">管道是进程间通信中最古老的方式，它包括无名管道和有名管道两种，前者用于父进程和子进程间的通信，后者用于运行于同一台机器上的任意两个进程间的通信。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　 </span><span style="color: #000000;">           </span><span style="color: #000000;">无名管道由</span><span style="color: #000000;">pipe</span><span style="color: #000000;">（）函数创建：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">            </span><span style="color: #000000;"> #include &lt;unistd.h&gt;
+</span><span style="color: #000000;">　　 </span><span style="color: #000000;">           </span><span style="color: #000000;">int pipe(int filedis[2])</span><span style="color: #000000;">；</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　 </span><span style="color: #000000;">           </span><span style="color: #000000;">参数</span><span style="color: #000000;">filedis</span><span style="color: #000000;">返回两个文件描述符：</span><span style="color: #000000;">filedes[0]</span><span style="color: #000000;">为读而打开，</span><span style="color: #000000;">filedes[1]</span><span style="color: #000000;">为写而打开。</span><span style="color: #000000;">filedes[1]</span><span style="color: #000000;">的输出是</span><span style="color: #000000;">filedes[0]</span><span style="color: #000000;">的输入。下面的例子示范了如何在父进程和子进程间实现通信。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+[cpp][/cpp]
+
+<span style="color: #000000;"> </span>[<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span><span style="color: #000000;">#define INPUT 0   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span><span style="color: #000000;">#define OUTPUT 1   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> main() {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> file_descriptors[2];   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span><span style="color: #000000;">/*</span><span style="color: #000000;">定义子进程号</span><span style="color: #000000;"> */   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span><span style="color: #000000;">pid_t pid;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">char</span>**<span style="color: #000000;"> buf[256];   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> returned_count;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">/*</span><span style="color: #000000;">创建无名管道</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">pipe(file_descriptors);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">/*</span><span style="color: #000000;">创建子进程</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">13.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">if</span>**<span style="color: #000000;">((pid = fork()) == -1) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">14.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">printf("Error in fork/n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">15.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">exit(1);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">16.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">17.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">/*</span><span style="color: #000000;">执行子进程</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">18.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">if</span>**<span style="color: #000000;">(pid == 0) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">19.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">printf("in the spawned (child) process.../n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">20.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">/*</span><span style="color: #000000;">子进程向父进程写数据，关闭管道的读端</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">21.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">close(file_descriptors[INPUT]);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">22.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">write(file_descriptors[OUTPUT], "test data", strlen("test data"));   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">23.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">exit(0);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">24.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">}</span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">25.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;"> </span>**<span style="color: #000000;">else</span>**<span style="color: #000000;"> {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">26.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">/*</span><span style="color: #000000;">执行父进程</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">27.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">printf("in the spawning (parent) process.../n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">28.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">/*</span><span style="color: #000000;">父进程从管道读取子进程写的数据，关闭管道的写端</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">29.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">close(file_descriptors[OUTPUT]);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">30.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">returned_count = read(file_descriptors[INPUT], buf, </span>**<span style="color: #000000;">sizeof</span>**<span style="color: #000000;">(buf));   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">31.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">printf("%d bytes of data received from spawned process: %s/n",   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">32.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">returned_count, buf);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">33.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">34.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">系统下，有名管道可由两种方式创建：命令行方式</span><span style="color: #000000;">mknod</span><span style="color: #000000;">系统调用和函数</span><span style="color: #000000;">mkfifo</span><span style="color: #000000;">。下面的两种途径都在当前目录下生成了一个名为</span><span style="color: #000000;">myfifo</span><span style="color: #000000;">的有名管道：</span>
+<span style="color: #000000;">　　　　 </span><span style="color: #000000;">     </span><span style="color: #000000;">方式一：</span><span style="color: #000000;">mkfifo("myfifo","rw");
+</span><span style="color: #000000;">　　　　 </span><span style="color: #000000;">     </span><span style="color: #000000;">方式二：</span><span style="color: #000000;">mknod myfifo p
+</span><span style="color: #000000;">　　 </span><span style="color: #000000;">      </span><span style="color: #000000;">生成了有名管道后，就可以使用一般的文件</span><span style="color: #000000;">I/O</span><span style="color: #000000;">函数如</span><span style="color: #000000;">open</span><span style="color: #000000;">、</span><span style="color: #000000;">close</span><span style="color: #000000;">、</span><span style="color: #000000;">read</span><span style="color: #000000;">、</span><span style="color: #000000;">write</span><span style="color: #000000;">等来对它进行操作。下面即是一个简单的例子，假设我们已经创建了一个名为</span><span style="color: #000000;">myfifo</span><span style="color: #000000;">的有名管道。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+[cpp][/cpp]
+
+<span style="color: #000000;"> </span>[<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span><span style="color: #000000;">/* </span><span style="color: #000000;">进程一：读有名管道</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include &lt;stdio.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include &lt;unistd.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> main() {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">FILE</span>**<span style="color: #000000;"> * in_file;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> count = 1;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">char</span>**<span style="color: #000000;"> buf[80];   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span><span style="color: #000000;">in_file = fopen("mypipe", "r");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">if</span>**<span style="color: #000000;"> (in_file == NULL) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">printf("Error in fdopen./n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">exit(1);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">13.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">while</span>**<span style="color: #000000;"> ((count = fread(buf, 1, 80, in_file)) &gt; 0)   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">14.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">printf("received from pipe: %s/n", buf);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">15.</span><span style="color: #000000;">  </span><span style="color: #000000;">         </span><span style="color: #000000;">fclose(in_file);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">16.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">17.</span><span style="color: #000000;">  </span><span style="color: #000000;">　</span><span style="color: #000000;"> /* </span><span style="color: #000000;">进程二：写有名管道</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">18.</span><span style="color: #000000;">  </span><span style="color: #000000;">#include &lt;stdio.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">19.</span><span style="color: #000000;">  </span><span style="color: #000000;">#include &lt;unistd.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">20.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">void</span>**<span style="color: #000000;"> main() {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">21.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">FILE</span>**<span style="color: #000000;"> * out_file;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">22.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">int</span>**<span style="color: #000000;"> count = 1;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">23.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">char</span>**<span style="color: #000000;"> buf[80];   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">24.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">out_file = fopen("mypipe", "w");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">25.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">     </span><span style="color: #000000;">if</span>**<span style="color: #000000;"> (out_file == NULL) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">26.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">printf("Error opening pipe.");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">27.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">exit(1);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">28.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">29.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">sprintf(buf,"this is test data for the named pipe example/n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">30.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">fwrite(buf, 1, 80, out_file);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">31.</span><span style="color: #000000;">  </span><span style="color: #000000;">     </span><span style="color: #000000;">fclose(out_file);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">32.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">the following is self-study &gt;&gt;</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">2.3.2 </span><span style="color: #000000;">消息队列</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">消息队列用于运行于同一台机器上的进程间通信，它和管道很相似，事实上，它是一种正逐渐被淘汰的通信方式，我们可以用流管道或者套接口的方式来取代它，所以，我们对此方式也不再解释，也建议读者忽略这种方式。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">2.3.3 </span><span style="color: #000000;">共享内存</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">共享内存是运行在同一台机器上的进程间通信最快的方式，因为数据不需要在不同的进程间复制。通常由一个进程创建一块共享内存区，其余进程对这块内存区进行读写。得到共享内存有两种方式：映射</span><span style="color: #000000;">/dev/mem</span><span style="color: #000000;">设备和内存映像文件。前一种方式不给系统带来额外的开销，但在现实中并不常用，因为它控制存取的将是实际的物理内存，在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">系统下，这只有通过限制</span><span style="color: #000000;">Linux</span><span style="color: #000000;">系统存取的内存才可以做到，这当然不太实际。常用的方式是通过</span><span style="color: #000000;">shmXXX</span><span style="color: #000000;">函数族来实现利用共享内存进行存储的。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">首先要用的函数是</span><span style="color: #000000;">shmget</span><span style="color: #000000;">，它获得一个共享存储标识符。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　　　</span><span style="color: #000000;">     </span><span style="color: #000000;">#include &lt;sys/types.h&gt;
+</span><span style="color: #000000;">　　　　</span><span style="color: #000000;">     </span><span style="color: #000000;">#include &lt;sys/ipc.h&gt;
+</span><span style="color: #000000;">　　　　</span><span style="color: #000000;">     </span><span style="color: #000000;">#include &lt;sys/shm.h&gt;
+</span><span style="color: #000000;">　　　　　</span><span style="color: #000000;">int shmget(key_t key, int size, int flag);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">这个函数有点类似大家熟悉的</span><span style="color: #000000;">malloc</span><span style="color: #000000;">函数，系统按照请求分配</span><span style="color: #000000;">size</span><span style="color: #000000;">大小的内存用作共享内存。</span><span style="color: #000000;">Linux</span><span style="color: #000000;">系统内核中每个</span><span style="color: #000000;">IPC</span><span style="color: #000000;">结构都有的一个非负整数的标识符，这样对一个消息队列发送消息时只要引用标识符就可以了。这个标识符是内核由</span><span style="color: #000000;">IPC</span><span style="color: #000000;">结构的关键字得到的，这个关键字，就是上面第一个函数的</span><span style="color: #000000;">key</span><span style="color: #000000;">。数据类型</span><span style="color: #000000;">key_t</span><span style="color: #000000;">是在头文件</span><span style="color: #000000;">sys/types.h</span><span style="color: #000000;">中定义的，它是一个长整形的数据。在我们后面的章节中，还会碰到这个关键字。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">当共享内存创建后，其余进程可以调用</span><span style="color: #000000;">shmat</span><span style="color: #000000;">（）将其连接到自身的地址空间中。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">void *shmat(int shmid, void *addr, int flag);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">shmid</span><span style="color: #000000;">为</span><span style="color: #000000;">shmget</span><span style="color: #000000;">函数返回的共享存储标识符，</span><span style="color: #000000;">addr</span><span style="color: #000000;">和</span><span style="color: #000000;">flag</span><span style="color: #000000;">参数决定了以什么方式来确定连接的地址，函数的返回值即是该进程数据段所连接的实际地址，进程可以对此进程进行读写操作。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;">使用共享存储来实现进程间通信的注意点是对数据存取的同步，必须确保当一个进程去读取数据时，它所想要的数据已经写好了。通常，信号量被要来实现对共享存储数据存取的同步，另外，可以通过使用</span><span style="color: #000000;">shmctl</span><span style="color: #000000;">函数设置共享存储内存的某些标志位如</span><span style="color: #000000;">SHM_LOCK</span><span style="color: #000000;">、</span><span style="color: #000000;">SHM_UNLOCK</span><span style="color: #000000;">等来实现。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;"> 2.3.4 </span><span style="color: #000000;">信号量</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">信号量又称为信号灯，它是用来协调不同进程间的数据对象的，而最主要的应用是前一节的共享内存方式的进程间通信。本质上，信号量是一个计数器，它用来记录对某个资源（如共享内存）的存取状况。一般说来，为了获得共享资源，进程需要执行下列操作：</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">（</span><span style="color: #000000;">1</span><span style="color: #000000;">） 测试控制该资源的信号量。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">（</span><span style="color: #000000;">2</span><span style="color: #000000;">） 若此信号量的值为正，则允许进行使用该资源。进程将进号量减</span><span style="color: #000000;">1</span><span style="color: #000000;">。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">（</span><span style="color: #000000;">3</span><span style="color: #000000;">） 若此信号量为</span><span style="color: #000000;">0</span><span style="color: #000000;">，则该资源目前不可用，进程进入睡眠状态，直至信号量值大于</span><span style="color: #000000;">0</span><span style="color: #000000;">，进程被唤醒，转入步骤（</span><span style="color: #000000;">1</span><span style="color: #000000;">）。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">（</span><span style="color: #000000;">4</span><span style="color: #000000;">） 当进程不再使用一个信号量控制的资源时，信号量值加</span><span style="color: #000000;">1</span><span style="color: #000000;">。如果此时有进程正在睡眠等待此信号量，则唤醒此进程。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">维护信号量状态的是</span><span style="color: #000000;">Linux</span><span style="color: #000000;">内核操作系统而不是用户进程。我们可以从头文件</span><span style="color: #000000;">/usr/src/linux/include</span><span style="color: #000000;">　</span><span style="color: #000000;">/linux</span><span style="color: #000000;">　</span><span style="color: #000000;">/sem.h</span><span style="color: #000000;">中看到内核用来维护信号量状态的各个结构的定义。信号量是一个数据集合，用户可以单独使用这一集合的每个元素。要调用的第一个函数是</span><span style="color: #000000;">semget</span><span style="color: #000000;">，用以获得一个信号量</span><span style="color: #000000;">ID</span><span style="color: #000000;">。</span>
+<span style="color: #000000;">　　</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+[cpp][/cpp]
+
+<span style="color: #000000;"> </span>[<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include <sys /types.h>   </sys></span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;"> #include <sys /ipc.h>   </sys></span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;"> #include <sys /sem.h>   </sys></span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;"> </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> semget(key_t key, </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> nsems, </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> flag);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;"> key</span><span style="color: #000000;">是前面讲过的</span><span style="color: #000000;">IPC</span><span style="color: #000000;">结构的关键字，它将来决定是创建新的信号量集合，还是引用一个现有的信号量集合。</span><span style="color: #000000;">nsems</span><span style="color: #000000;">是该集合中的信号量数。如果是创建新集合（一般在服务器中），则必须指定</span><span style="color: #000000;">nsems</span><span style="color: #000000;">；如果是引用一个现有的信号量集合（一般在客户机中）则将</span><span style="color: #000000;">nsems</span><span style="color: #000000;">指定为</span><span style="color: #000000;">0</span><span style="color: #000000;">。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;"> semctl</span><span style="color: #000000;">函数用来对信号量进行操作。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">int semctl(int semid, int semnum, int cmd, union semun arg);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">不同的操作是通过</span><span style="color: #000000;">cmd</span><span style="color: #000000;">参数来实现的，在头文件</span><span style="color: #000000;">sem.h</span><span style="color: #000000;">中定义了</span><span style="color: #000000;">7</span><span style="color: #000000;">种不同的操作，实际编程时可以参照使用。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">semop</span><span style="color: #000000;">函数自动执行信号量集合上的操作数组。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">int semop(int semid, struct sembuf semoparray[], size_t nops);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;"> semoparray</span><span style="color: #000000;">是一个指针，它指向一个信号量操作数组。</span><span style="color: #000000;">nops</span><span style="color: #000000;">规定该数组中操作的数量。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;">下面，我们看一个具体的例子，它创建一个特定的</span><span style="color: #000000;">IPC</span><span style="color: #000000;">结构的关键字和一个信号量，建立此信号量的索引，修改索引指向的信号量的值，最后我们清除信号量。在下面的代码中，函数</span><span style="color: #000000;">ftok</span><span style="color: #000000;">生成我们上文所说的唯一的</span><span style="color: #000000;">IPC</span><span style="color: #000000;">关键字。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+[cpp][/cpp]
+
+<span style="color: #000000;"> </span>[<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include &lt;stdio.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include &lt;sys/types.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include &lt;sys/sem.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span><span style="color: #000000;">#include &lt;sys/ipc.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> main() {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span><span style="color: #000000;">key_t unique_key; /* </span><span style="color: #000000;">定义一个</span><span style="color: #000000;">IPC</span><span style="color: #000000;">关键字</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> id;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">struct</span>**<span style="color: #000000;"> sembuf lock_it;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">union</span>**<span style="color: #000000;"> semun options;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> i;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">unique_key = ftok(".", 'a'); /* </span><span style="color: #000000;">生成关键字，字符</span><span style="color: #000000;">'a'</span><span style="color: #000000;">是一个随机种子</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">13.</span><span style="color: #000000;">  </span><span style="color: #000000;">/* </span><span style="color: #000000;">创建一个新的信号量集合</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">14.</span><span style="color: #000000;">  </span><span style="color: #000000;">id = semget(unique_key, 1, IPC_CREAT | IPC_EXCL | 0666);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">15.</span><span style="color: #000000;">  </span><span style="color: #000000;">printf("semaphore id=%d/n", id);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">16.</span><span style="color: #000000;">  </span><span style="color: #000000;">options.val = 1; /*</span><span style="color: #000000;">设置变量值</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">17.</span><span style="color: #000000;">  </span><span style="color: #000000;">semctl(id, 0, SETVAL, options); /*</span><span style="color: #000000;">设置索引</span><span style="color: #000000;">0</span><span style="color: #000000;">的信号量</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">18.</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">19.</span><span style="color: #000000;">  </span><span style="color: #000000;">/*</span><span style="color: #000000;">打印出信号量的值</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">20.</span><span style="color: #000000;">  </span><span style="color: #000000;">i = semctl(id, 0, GETVAL, 0);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">21.</span><span style="color: #000000;">  </span><span style="color: #000000;">printf("value of semaphore at index 0 is %d/n", i);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">22.</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">23.</span><span style="color: #000000;">  </span><span style="color: #000000;">/*</span><span style="color: #000000;">下面重新设置信号量</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">24.</span><span style="color: #000000;">  </span><span style="color: #000000;">lock_it.sem_num = 0; /*</span><span style="color: #000000;">设置哪个信号量</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">25.</span><span style="color: #000000;">  </span><span style="color: #000000;">lock_it.sem_op = -1; /*</span><span style="color: #000000;">定义操作</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">26.</span><span style="color: #000000;">  </span><span style="color: #000000;">lock_it.sem_flg = IPC_NOWAIT; /*</span><span style="color: #000000;">操作方式</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">27.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">if</span>**<span style="color: #000000;"> (semop(id, &amp;lock_it, 1) == -1) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">28.</span><span style="color: #000000;">  </span><span style="color: #000000;">printf("can not lock semaphore./n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">29.</span><span style="color: #000000;">  </span><span style="color: #000000;">exit(1);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">30.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">31.</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">32.</span><span style="color: #000000;">  </span><span style="color: #000000;">i = semctl(id, 0, GETVAL, 0);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">33.</span><span style="color: #000000;">  </span><span style="color: #000000;">printf("value of semaphore at index 0 is %d/n", i);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">34.</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">35.</span><span style="color: #000000;">  </span><span style="color: #000000;">/*</span><span style="color: #000000;">清除信号量</span><span style="color: #000000;">*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">36.</span><span style="color: #000000;">  </span><span style="color: #000000;">semctl(id, 0, IPC_RMID, 0);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">37.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+<span style="color: #000000;">  </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">　　 </span><span style="color: #000000;">      </span><span style="color: #000000;">2.3.5 </span><span style="color: #000000;">套接口</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">套接口（</span><span style="color: #000000;">socket</span><span style="color: #000000;">）编程是实现</span><span style="color: #000000;">Linux</span><span style="color: #000000;">系统和其他大多数操作系统中进程间通信的主要方式之一。我们熟知的</span><span style="color: #000000;">WWW</span><span style="color: #000000;">服务、</span><span style="color: #000000;">FTP</span><span style="color: #000000;">服务、</span><span style="color: #000000;">TELNET</span><span style="color: #000000;">服务等都是基于套接口编程来实现的。除了在异地的计算机进程间以外，套接口同样适用于本地同一台计算机内部的进程间通信。关于套接口的经典教材同样是</span><span style="color: #000000;">Richard Stevens</span><span style="color: #000000;">编著的《</span><span style="color: #000000;">Unix</span><span style="color: #000000;">网络编程：联网的</span><span style="color: #000000;">API</span><span style="color: #000000;">和套接字》，清华大学出版社出版了该书的影印版。它同样是</span><span style="color: #000000;">Linux</span><span style="color: #000000;">程序员的必备书籍之一。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">关于这一部分的内容，可以参照本文作者的另一篇文章《设计自己的网络蚂蚁》，那里由常用的几个套接口函数的介绍和示例程序。这一部分或许是</span><span style="color: #000000;">Linux</span><span style="color: #000000;">进程间通信编程中最须关注和最吸引人的一部分，毕竟，</span><span style="color: #000000;">Internet </span><span style="color: #000000;">正在我们身边以不可思议的速度发展着，如果一个程序员在设计编写他下一个程序的时候，根本没有考虑到网络，考虑到</span><span style="color: #000000;">Internet</span><span style="color: #000000;">，那么，可以说，他的设计很难成功。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">3 Linux</span><span style="color: #000000;">的进程和</span><span style="color: #000000;">Win32</span><span style="color: #000000;">的进程</span><span style="color: #000000;">/</span><span style="color: #000000;">线程比较</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">熟悉</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">编程的人一定知道，</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">的进程管理方式与</span><span style="color: #000000;">Linux</span><span style="color: #000000;">上有着很大区别，在</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">里，只有进程的概念，但在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">里却还有一个</span><span style="color: #000000;">"</span><span style="color: #000000;">线程</span><span style="color: #000000;">"</span><span style="color: #000000;">的概念，那么</span><span style="color: #000000;">Linux</span><span style="color: #000000;">和</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">在这里究竟有着什么区别呢？</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">WIN32</span><span style="color: #000000;">里的进程</span><span style="color: #000000;">/</span><span style="color: #000000;">线程是继承自</span><span style="color: #000000;">OS/2</span><span style="color: #000000;">的。在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">里，</span><span style="color: #000000;">"</span><span style="color: #000000;">进程</span><span style="color: #000000;">"</span><span style="color: #000000;">是指一个程序，而</span><span style="color: #000000;">"</span><span style="color: #000000;">线程</span><span style="color: #000000;">"</span><span style="color: #000000;">是一个</span><span style="color: #000000;">"</span><span style="color: #000000;">进程</span><span style="color: #000000;">"</span><span style="color: #000000;">里的一个执行</span><span style="color: #000000;">"</span><span style="color: #000000;">线索</span><span style="color: #000000;">"</span><span style="color: #000000;">。从核心上讲，</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">的多进程与</span><span style="color: #000000;">Linux</span><span style="color: #000000;">并无多大的区别，在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">里的线程才相当于</span><span style="color: #000000;">Linux</span><span style="color: #000000;">的进程，是一个实际正在执行的代码。但是，</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">里同一个进程里各个线程之间是共享数据段的。这才是与</span><span style="color: #000000;">Linux</span><span style="color: #000000;">的进程最大的不同。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">      </span><span style="color: #000000;">下面这段程序显示了</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">下一个进程如何启动一个线程。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+[cpp][/cpp]
+
+<span style="color: #000000;"> </span>[<span style="color: #0563c1; font-family: Microsoft YaHei UI;"><span style="text-decoration: underline;">view plain</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "view plain")[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">copy</span></span>](http://blog.csdn.net/wallwind/article/details/6899330 "copy")
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> g;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">DWORD</span>**<span style="color: #000000;"> WINAPI ChildProcess( </span>**<span style="color: #000000;">LPVOID</span>**<span style="color: #000000;"> lpParameter ){   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> i;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span>**<span style="color: #000000;">for</span>**<span style="color: #000000;"> ( i = 1; i &lt;1000; i ++) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span><span style="color: #000000;">g ++;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span><span style="color: #000000;">printf( "This is Child Thread: %d/n", g );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span><span style="color: #000000;">ExitThread( 0 );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span><span style="color: #000000;">};   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> main()   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">{   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">13.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> threadID;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">14.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> i;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">15.</span><span style="color: #000000;">  </span><span style="color: #000000;">g = 0;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">16.</span><span style="color: #000000;">  </span><span style="color: #000000;">CreateThread( NULL, 0, ChildProcess, NULL, 0, &amp;threadID );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">17.</span><span style="color: #000000;">  </span>**<span style="color: #000000;">for</span>**<span style="color: #000000;"> ( i = 1; i &lt;1000; i ++) {   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">18.</span><span style="color: #000000;">  </span><span style="color: #000000;">g ++;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">19.</span><span style="color: #000000;">  </span><span style="color: #000000;">printf( "This is Parent Thread: %d/n", g );   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">20.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">21.</span><span style="color: #000000;">  </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+<span style="color: #000000;">  </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">　　 </span><span style="color: #000000;">      </span><span style="color: #000000;">在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">下，使用</span><span style="color: #000000;">CreateThread</span><span style="color: #000000;">函数创建线程，与</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下创建进程不同，</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">线程不是从创建处开始运行的，而是由</span><span style="color: #000000;">CreateThread</span><span style="color: #000000;">指定一个函数，线程就从那个函数处开始运行。此程序同前面的</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">程序一样，由两个线程各打印</span><span style="color: #000000;">1000</span><span style="color: #000000;">条信息。</span><span style="color: #000000;">threadID</span><span style="color: #000000;">是子线程的线程号，另外，全局变量</span><span style="color: #000000;">g</span><span style="color: #000000;">是子线程与父线程共享的，这就是与</span><span style="color: #000000;">Linux</span><span style="color: #000000;">最大的不同之处。大家可以看出，</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">的进程</span><span style="color: #000000;">/</span><span style="color: #000000;">线程要比</span><span style="color: #000000;">Linux</span><span style="color: #000000;">复杂，在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">要实现类似</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">的线程并不难，只要</span><span style="color: #000000;">fork</span><span style="color: #000000;">以后，让子进程调用</span><span style="color: #000000;">ThreadProc</span><span style="color: #000000;">函数，并且为全局变量开设共享数据区就行了，但在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">下就无法实现类似</span><span style="color: #000000;">fork</span><span style="color: #000000;">的功能了。所以现在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">下的</span><span style="color: #000000;">C</span><span style="color: #000000;">语言编译器所提供的库函数虽然已经能兼容大多数</span><span style="color: #000000;">Linux/UNIX</span><span style="color: #000000;">的库函数，但却仍无法实现</span><span style="color: #000000;">fork</span><span style="color: #000000;">。</span>
+<span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;">对于多任务系统，共享数据区是必要的，但也是一个容易引起混乱的问题，在</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">下，一个程序员很容易忘记线程之间的数据是共享的这一情况，一个线程修改过一个变量后，另一个线程却又修改了它，结果引起程序出问题。但在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下，由于变量本来并不共享，而由程序员来显式地指定要共享的数据，使程序变得更清晰与安全。</span>
+<span style="color: #000000;">至于</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">的</span><span style="color: #000000;">"</span><span style="color: #000000;">进程</span><span style="color: #000000;">"</span><span style="color: #000000;">概念，其含义则是</span><span style="color: #000000;">"</span><span style="color: #000000;">应用程序</span><span style="color: #000000;">"</span><span style="color: #000000;">，也就是相当于</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">下的</span><span style="color: #000000;">exec</span><span style="color: #000000;">了。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">        </span><span style="color: #000000;"> Linux</span><span style="color: #000000;">也有自己的多线程函数</span><span style="color: #000000;">pthread</span><span style="color: #000000;">，它既不同于</span><span style="color: #000000;">Linux</span><span style="color: #000000;">的进程，也不同于</span><span style="color: #000000;">WIN32</span><span style="color: #000000;">下的进程，关于</span><span style="color: #000000;">pthread</span><span style="color: #000000;">的介绍和如何在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">环境下编写多线程程序我们将在另一篇文章《</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下的多线程编程》中讲述。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">4 </span><span style="color: #000000;">鸣谢</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　 </span><span style="color: #000000;">      </span><span style="color: #000000;">本文部分内容参照</span>[<span style="text-decoration: underline;"><span style="color: #0563c1; font-family: Microsoft YaHei UI;">www.lisoleg.org</span></span>](http://www.lisoleg.org/)<span style="color: #000000;">内的《</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下的多进程编程》，原作者俞磊。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">The part ends in there.&lt;&lt;</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  线程（thread）2-1 介绍
+
+线程（thread）技术早在60年代就被提出，但真正应用多线程到操作系统中去，是在80年代中期，solaris是这方面的佼佼者。传统的Unix也支持线程的概念，但是在一个进程（process）中只允许有一个线程，这样多线程就意味着多进程。现在，多线程技术已经被许多操作系统所支持，包括Windows/NT，当然，也包括Linux。
+为什么有了进程的概念后，还要再引入线程呢？使用多线程到底有哪些好处？什么的系统应该选用多线程？我们首先必须回答这些问题。
+使用多线程的理由之一是和进程相比，它是一种非常"节俭"的多任务操作方式。我们知道，在Linux系统下，启动一个新的进程必须分配给它独立的地址空间，建立众多的数据表来维护它的代码段、堆栈段和数据段，这是一种"昂贵"的多任务工作方式。而运行于一个进程中的多个线程，它们彼此之间使用相同的地址空间，共享大部分数据，启动一个线程所花费的空间远远小于启动一个进程所花费的空间，而且，线程间彼此切换所需的时间也远远小于进程间切换所需要的时间。据统计，总的说来，一个进程的开销大约是一个线程开销的30倍左右，当然，在具体的系统上，这个数据可能会有较大的区别。
+使用多线程的理由之二是线程间方便的通信机制。对不同进程来说，它们具有独立的数据空间，要进行数据的传递只能通过通信的方式进行，这种方式不仅费时，而且很不方便。线程则不然，由于同一进程下的线程之间共享数据空间，所以一个线程的数据可以直接为其它线程所用，这不仅快捷，而且方便。当然，数据的共享也带来其他一些问题，有的变量不能同时被两个线程所修改，有的子程序中声明为static的数据更有可能给多线程程序带来灾难性的打击，这些正是编写多线程程序时最需要注意的地方。
+除了以上所说的优点外，不和进程比较，多线程程序作为一种多任务、并发的工作方式，当然有以下的优点：
+1) 提高应用程序响应。这对图形界面的程序尤其有意义，当一个操作耗时很长时，整个系统都会等待这个操作，此时程序不会响应键盘、鼠标、菜单的操作，而使用多线程技术，将耗时长的操作（time consuming）置于一个新的线程，可以避免这种尴尬的情况。
+2) 使多CPU系统更加有效。操作系统会保证当线程数不大于CPU数目时，不同的线程运行于不同的CPU上。
+3) 改善程序结构。一个既长又复杂的进程可以考虑分为多个线程，成为几个独立或半独立的运行部分，这样的程序会利于理解和修改。
+下面我们先来尝试编写一个简单的多线程程序。
+2 简单的多线程编程
+Linux系统下的多线程遵循POSIX线程接口，称为pthread。编写Linux下的多线程程序，需要使用头文件pthread.h，连接时需要使用库libpthread.a。顺便说一下，Linux下pthread的实现是通过系统调用clone（）来实现的。clone（）是Linux所特有的系统调用，它的使用方式类似fork，关于clone（）的详细情况，有兴趣的读者可以去查看有关文档说明。下面我们展示一个最简单的多线程程序
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">1.</span><span style="color: #000000;">   </span><span style="color: #000000;">/* example.c*/   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">2.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;stdio.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">3.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;stdlib.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">4.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;pthread.h&gt;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">5.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> </span>**<span style="color: #000000;">thread</span>**<span style="color: #000000;">(</span>**<span style="color: #000000;">void</span>**<span style="color: #000000;">)   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">6.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">{   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">7.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">    </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> i;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">8.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">    </span>**<span style="color: #000000;">for</span>**<span style="color: #000000;">(i=0;i&lt;3;i++)   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">9.</span><span style="color: #000000;">   </span><span style="color: #000000;">　　</span><span style="color: #000000;">    </span><span style="color: #000000;">printf("This is a pthread.\n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">10.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">11.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> main(</span>**<span style="color: #000000;">void</span>**<span style="color: #000000;">)   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">12.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">{   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">13.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">pthread_t id;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">14.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span>**<span style="color: #000000;">int</span>**<span style="color: #000000;"> i,ret;   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">15.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">ret=pthread_create(&amp;id,NULL,(</span>**<span style="color: #000000;">void</span>**<span style="color: #000000;"> *) </span>**<span style="color: #000000;">thread</span>**<span style="color: #000000;">,NULL);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">16.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span>**<span style="color: #000000;">if</span>**<span style="color: #000000;">(ret!=0){   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">17.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">printf ("Create pthread error!\n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">18.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">exit (1);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">19.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">}   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">20.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span>**<span style="color: #000000;">for</span>**<span style="color: #000000;">(i=0;i&lt;3;i++)   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">21.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">printf("This is the main process.\n");   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">22.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">pthread_join(id,NULL);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">23.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span>**<span style="color: #000000;">return</span>**<span style="color: #000000;"> (0);   </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">24.</span><span style="color: #000000;">  </span><span style="color: #000000;">　　</span><span style="color: #000000;">} </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+1.  <span style="color: #000000;">25.</span><span style="color: #000000;">  </span><span style="color: #000000;"> </span>
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">我们编译此程序：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">gcc example1.c -lpthread -o example1
+</span><span style="color: #000000;">　　运行</span><span style="color: #000000;">example1</span><span style="color: #000000;">，我们得到如下结果：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is the main process.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is a pthread.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is the main process.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is the main process.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is a pthread.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is a pthread.
+</span><span style="color: #000000;">　　再次运行，我们可能得到如下结果：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is a pthread.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is the main process.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is a pthread.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is the main process.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is a pthread.
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">This is the main process.
+</span><span style="color: #000000;">　　前后两次结果不一样，这是两个线程争夺</span><span style="color: #000000;">CPU</span><span style="color: #000000;">资源的结果。上面的示例中，我们使用到了两个函数，　</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">和</span><span style="color: #000000;">pthread_join</span><span style="color: #000000;">，并声明了一个</span><span style="color: #000000;">pthread_t</span><span style="color: #000000;">型的变量。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_t</span><span style="color: #000000;">在头文件</span><span style="color: #000000;">/usr/include/bits/pthreadtypes.h</span><span style="color: #000000;">中定义：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">typedef unsigned long int pthread_t;
+</span><span style="color: #000000;">　　它是一个线程的标识符。函数</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">用来创建一个线程，它的原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">extern int pthread_create __P ((pthread_t *__thread, __const pthread_attr_t *__attr,
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">void *(*__start_routine) (void *), void *__arg));
+</span><span style="color: #000000;">　　第一个参数为指向线程标识符的指针，第二个参数用来设置线程属性，第三个参数是线程运行函数的起始地址，最后一个参数是运行函数的参数。这里，我们的函数</span><span style="color: #000000;">thread</span><span style="color: #000000;">不需要参数，所以最后一个参数设为空指针。第二个参数我们也设为空指针，这样将生成默认属性的线程。对线程属性的设定和修改我们将在下一节阐述。当创建线程成功时，函数返回</span><span style="color: #000000;">0</span><span style="color: #000000;">，若不为</span><span style="color: #000000;">0</span><span style="color: #000000;">则说明创建线程失败，常见的错误返回代码为</span><span style="color: #000000;">EAGAIN</span><span style="color: #000000;">和</span><span style="color: #000000;">EINVAL</span><span style="color: #000000;">。前者表示系统限制创建新的线程，例如线程数目过多了；后者表示第二个参数代表的线程属性值非法。创建线程成功后，新创建的线程则运行参数三和参数四确定的函数，原来的线程则继续运行下一行代码。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">pthread_join</span><span style="color: #000000;">用来等待一个线程的结束。函数原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">extern int pthread_join __P ((pthread_t __th, void **__thread_return));
+</span><span style="color: #000000;">　　第一个参数为被等待的线程标识符，第二个参数为一个用户定义的指针，它可以用来存储被等待线程的返回值。这个函数是一个线程阻塞的函数，调用它的函数将一直等待到被等待的线程结束为止，当函数返回时，被等待线程的资源被收回。一个线程的结束有两种途径，一种是象我们上面的例子一样，函数结束了，调用它的线程也就结束了；另一种方式是通过函数</span><span style="color: #000000;">pthread_exit</span><span style="color: #000000;">来实现。它的函数原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">   </span><span style="color: #000000;">extern void pthread_exit __P ((void *__retval)) __attribute__ ((__noreturn__));
+</span><span style="color: #000000;">　　唯一的参数是函数的返回代码，只要</span><span style="color: #000000;">pthread_join</span><span style="color: #000000;">中的第二个参数</span><span style="color: #000000;">thread_return</span><span style="color: #000000;">不是</span><span style="color: #000000;">NULL</span><span style="color: #000000;">，这个值将被传递给</span><span style="color: #000000;">thread_return</span><span style="color: #000000;">。最后要说明的是，一个线程不能被多个线程等待，否则第一个接收到信号的线程成功返回，其余调用</span><span style="color: #000000;">pthread_join</span><span style="color: #000000;">的线程则返回错误代码</span><span style="color: #000000;">ESRCH</span><span style="color: #000000;">。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　在这一节里，我们编写了一个最简单的线程，并掌握了最常用的三个函数</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">，</span><span style="color: #000000;">pthread_join</span><span style="color: #000000;">和</span><span style="color: #000000;">pthread_exit</span><span style="color: #000000;">。下面，我们来了解线程的一些常用属性以及如何设置这些属性。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">3 </span><span style="color: #000000;">修改线程的属性</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　在上一节的例子里，我们用</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">函数创建了一个线程，在这个线程中，我们使用了默认参数，即将该函数的第二个参数设为</span><span style="color: #000000;">NULL</span><span style="color: #000000;">。的确，对大多数程序来说，使用默认属性就够了，但我们还是有必要来了解一下线程的有关属性。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　属性结构为</span><span style="color: #000000;">pthread_attr_t</span><span style="color: #000000;">，它同样在头文件</span><span style="color: #000000;">/usr/include/pthread.h</span><span style="color: #000000;">中定义，喜欢追根问底的人可以自己去查看。属性值不能直接设置，须使用相关函数进行操作，初始化的函数为</span><span style="color: #000000;">pthread_attr_init</span><span style="color: #000000;">，这个函数必须在</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">函数之前调用。属性对象主要包括是否绑定、是否分离、堆栈地址、堆栈大小、优先级。默认的属性为非绑定、非分离、缺省</span><span style="color: #000000;">1M</span><span style="color: #000000;">的堆栈、与父进程同样级别的优先级。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　关于线程的绑定，牵涉到另外一个概念：轻进程（</span><span style="color: #000000;">LWP</span><span style="color: #000000;">：</span><span style="color: #000000;">Light Weight Process</span><span style="color: #000000;">）。轻进程可以理解为内核线程，它位于用户层和系统层之间。系统对线程资源的分配、对线程的控制是通过轻进程来实现的，一个轻进程可以控制一个或多个线程。默认状况下，启动多少轻进程、哪些轻进程来控制哪些线程是由系统来控制的，这种状况即称为非绑定的。绑定状况下，则顾名思义，即某个线程固定的</span><span style="color: #000000;">"</span><span style="color: #000000;">绑</span><span style="color: #000000;">"</span><span style="color: #000000;">在一个轻进程之上。被绑定的线程具有较高的响应速度，这是因为</span><span style="color: #000000;">CPU</span><span style="color: #000000;">时间片的调度是面向轻进程的，绑定的线程可以保证在需要的时候它总有一个轻进程可用。通过设置被绑定的轻进程的优先级和调度级可以使得绑定的线程满足诸如实时反应之类的要求。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　设置线程绑定状态的函数为</span><span style="color: #000000;">pthread_attr_setscope</span><span style="color: #000000;">，它有两个参数，第一个是指向属性结构的指针，第二个是绑定类型，它有两个取值：</span><span style="color: #000000;">PTHREAD_SCOPE_SYSTEM</span><span style="color: #000000;">（绑定的）和</span><span style="color: #000000;">PTHREAD_SCOPE_PROCESS</span><span style="color: #000000;">（非绑定的）。下面的代码即创建了一个绑定的线程。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">     </span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;pthread.h&gt;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_t attr;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_t tid;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/*</span><span style="color: #000000;">初始化属性值，均设为默认值</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_init(&amp;attr);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_setscope(&amp;attr, PTHREAD_SCOPE_SYSTEM);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;tid, &amp;attr, (void *) my_function, NULL); </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">
+</span><span style="color: #000000;">　　线程的分离状态决定一个线程以什么样的方式来终止自己。在上面的例子中，我们采用了线程的默认属性，即为非分离状态，这种情况下，原有的线程等待创建的线程结束。只有当</span><span style="color: #000000;">pthread_join</span><span style="color: #000000;">（）函数返回时，创建的线程才算终止，才能释放自己占用的系统资源。而分离线程不是这样子的，它没有被其他的线程所等待，自己运行结束了，线程也就终止了，马上释放系统资源。程序员应该根据自己的需要，选择适当的分离状态。设置线程分离状态的函数为</span><span style="color: #000000;">pthread_attr_setdetachstate</span><span style="color: #000000;">（</span><span style="color: #000000;">pthread_attr_t *attr, int detachstate</span><span style="color: #000000;">）。第二个参数可选为</span><span style="color: #000000;">PTHREAD_CREATE_DETACHED</span><span style="color: #000000;">（分离线程）和</span><span style="color: #000000;"> PTHREAD _CREATE_JOINABLE</span><span style="color: #000000;">（非分离线程）。这里要注意的一点是，如果设置一个线程为分离线程，而这个线程运行又非常快，它很可能在</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">函数返回之前就终止了，它终止以后就可能将线程号和系统资源移交给其他的线程使用，这样调用</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">的线程就得到了错误的线程号。要避免这种情况可以采取一定的同步措施，最简单的方法之一是可以在被创建的线程里调用</span><span style="color: #000000;">pthread_cond_timewait</span><span style="color: #000000;">函数，让这个线程等待一会儿，留出足够的时间让函数</span><span style="color: #000000;">pthread_create</span><span style="color: #000000;">返回。设置一段等待时间，是在多线程编程里常用的方法。但是注意不要使用诸如</span><span style="color: #000000;">wait</span><span style="color: #000000;">（）之类的函数，它们是使整个进程睡眠，并不能解决线程同步的问题。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　另外一个可能常用的属性是线程的优先级，它存放在结构</span><span style="color: #000000;">sched_param</span><span style="color: #000000;">中。用函数</span><span style="color: #000000;">pthread_attr_getschedparam</span><span style="color: #000000;">和函数</span><span style="color: #000000;">pthread_attr_setschedparam</span><span style="color: #000000;">进行存放，一般说来，我们总是先取优先级，对取得的值修改后再存放回去。下面即是一段简单的例子。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">　</span><span style="color: #000000;">  </span><span style="color: #000000;">  </span><span style="color: #000000;">#include &lt;pthread.h&gt;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;sched.h&gt;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_t attr;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_t tid;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sched_param param;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">int newprio=20;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_init(&amp;attr);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_getschedparam(&amp;attr, &amp;param);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">param.sched_priority=newprio;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_attr_setschedparam(&amp;attr, &amp;param);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;tid, &amp;attr, (void *)myfunction, myarg);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">4 </span><span style="color: #000000;">线程的数据处理</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　和进程相比，线程的最大优点之一是数据的共享性，各个进程共享父进程处沿袭的数据段，可以方便的获得、修改数据。但这也给多线程编程带来了许多问题。我们必须当心有多个不同的进程访问相同的变量。许多函数是不可重入的，即同时不能运行一个函数的多个拷贝（除非使用不同的数据段）。在函数中声明的静态变量常常带来问题，函数的返回值也会有问题。因为如果返回的是函数内部静态声明的空间的地址，则在一个线程调用该函数得到地址后使用该地址指向的数据时，别的线程可能调用此函数并修改了这一段数据。在进程中共享的变量必须用关键字</span><span style="color: #000000;">volatile</span><span style="color: #000000;">来定义，这是为了防止编译器在优化时（如</span><span style="color: #000000;">gcc</span><span style="color: #000000;">中使用</span><span style="color: #000000;">-OX</span><span style="color: #000000;">参数）改变它们的使用方式。为了保护变量，我们必须使用信号量、互斥等方法来保证我们对变量的正确使用。下面，我们就逐步介绍处理线程数据时的有关知识。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">4.1 </span><span style="color: #000000;">线程数据</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　在单线程的程序里，有两种基本的数据：全局变量和局部变量。但在多线程程序里，还有第三种数据类型：线程数据（</span><span style="color: #000000;">TSD: Thread-Specific Data</span><span style="color: #000000;">）。它和全局变量很象，在线程内部，各个函数可以象使用全局变量一样调用它，但它对线程外部的其它线程是不可见的。这种数据的必要性是显而易见的。例如我们常见的变量</span><span style="color: #000000;">errno</span><span style="color: #000000;">，它返回标准的出错信息。它显然不能是一个局部变量，几乎每个函数都应该可以调用它；但它又不能是一个全局变量，否则在</span><span style="color: #000000;">A</span><span style="color: #000000;">线程里输出的很可能是</span><span style="color: #000000;">B</span><span style="color: #000000;">线程的出错信息。要实现诸如此类的变量，我们就必须使用线程数据。我们为每个线程数据创建一个键，它和这个键相关联，在各个线程里，都使用这个键来指代线程数据，但在不同的线程里，这个键代表的数据是不同的，在同一个线程里，它代表同样的数据内容。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　和线程数据相关的函数主要有</span><span style="color: #000000;">4</span><span style="color: #000000;">个：创建一个键；为一个键指定线程数据；从一个键读取线程数据；删除键。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　创建键的函数原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int pthread_key_create __P ((pthread_key_t *__key,
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void (*__destr_function) (void *)));
+</span><span style="color: #000000;">　　第一个参数为指向一个键值的指针，第二个参数指明了一个</span><span style="color: #000000;">destructor</span><span style="color: #000000;">函数，如果这个参数不为空，那么当每个线程结束时，系统将调用这个函数来释放绑定在这个键上的内存块。这个函数常和函数</span><span style="color: #000000;">pthread_once ((pthread_once_t*once_control, void (*initroutine) (void)))</span><span style="color: #000000;">一起使用，为了让这个键只被创建一次。函数</span><span style="color: #000000;">pthread_once</span><span style="color: #000000;">声明一个初始化函数，第一次调用</span><span style="color: #000000;">pthread_once</span><span style="color: #000000;">时它执行这个函数，以后的调用将被它忽略。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　在下面的例子中，我们创建一个键，并将它和某个数据相关联。我们要定义一个函数</span><span style="color: #000000;">createWindow</span><span style="color: #000000;">，这个函数定义一个图形窗口（数据类型为</span><span style="color: #000000;">Fl_Window *</span><span style="color: #000000;">，这是图形界面开发工具</span><span style="color: #000000;">FLTK</span><span style="color: #000000;">中的数据类型）。由于各个线程都会调用这个函数，所以我们使用线程数据。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">声明一个键</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_key_t myWinKey;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">函数</span><span style="color: #000000;"> createWindow */
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void createWindow ( void ) {
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Fl_Window * win;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">static pthread_once_t once= PTHREAD_ONCE_INIT;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">调用函数</span><span style="color: #000000;">createMyKey</span><span style="color: #000000;">，创建键</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_once ( &amp; once, createMyKey) ;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/*win</span><span style="color: #000000;">指向一个新建立的窗口</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">win=new Fl_Window( 0, 0, 100, 100, "MyWindow");
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">对此窗口作一些可能的设置工作，如大小、位置、名称等</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">setWindow(win);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">将窗口指针值绑定在键</span><span style="color: #000000;">myWinKey</span><span style="color: #000000;">上</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_setspecific ( myWinKey, win);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">函数</span><span style="color: #000000;"> createMyKey</span><span style="color: #000000;">，创建一个键，并指定了</span><span style="color: #000000;">destructor */
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void createMyKey ( void ) {
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_key_create(&amp;myWinKey, freeWinKey);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">函数</span><span style="color: #000000;"> freeWinKey</span><span style="color: #000000;">，释放空间</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void freeWinKey ( Fl_Window * win){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">delete win;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　这样，在不同的线程中调用函数</span><span style="color: #000000;">createMyWin</span><span style="color: #000000;">，都可以得到在线程内部均可见的窗口变量，这个变量通过函数</span><span style="color: #000000;">pthread_getspecific</span><span style="color: #000000;">得到。在上面的例子中，我们已经使用了函数</span><span style="color: #000000;">pthread_setspecific</span><span style="color: #000000;">来将线程数据和一个键绑定在一起。这两个函数的原型如下：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int pthread_setspecific __P ((pthread_key_t __key,__const void *__pointer));
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern void *pthread_getspecific __P ((pthread_key_t __key));
+</span><span style="color: #000000;">　　这两个函数的参数意义和使用方法是显而易见的。要注意的是，用</span><span style="color: #000000;">pthread_setspecific</span><span style="color: #000000;">为一个键指定新的线程数据时，必须自己释放原有的线程数据以回收空间。这个过程函数</span><span style="color: #000000;">pthread_key_delete</span><span style="color: #000000;">用来删除一个键，这个键占用的内存将被释放，但同样要注意的是，它只释放键占用的内存，并不释放该键关联的线程数据所占用的内存资源，而且它也不会触发函数</span><span style="color: #000000;">pthread_key_create</span><span style="color: #000000;">中定义的</span><span style="color: #000000;">destructor</span><span style="color: #000000;">函数。线程数据的释放必须在释放键之前完成。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">4.2 </span><span style="color: #000000;">互斥锁</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　互斥锁用来保证一段时间内只有一个线程在执行一段代码。必要性显而易见：假设各个线程向同一个文件顺序写入数据，最后得到的结果一定是灾难性的。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　我们先看下面一段代码。这是一个读</span><span style="color: #000000;">/</span><span style="color: #000000;">写程序，它们公用一个缓冲区，并且我们假定一个缓冲区只能保存一条信息。即缓冲区只有两个状态：有信息或没有信息。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void reader_function ( void );
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void writer_function ( void );
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">char buffer;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">int buffer_has_item=0;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_t mutex;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">struct timespec delay;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void main ( void ){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_t reader;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">定义延迟时间</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">delay./* */tv_sec = 2;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">delay../* */tv_nec = 0;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">用默认属性初始化一个互斥锁对象</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_init (&amp;mutex,NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;reader, pthread_attr_default, (void *)&amp;reader_function), NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">writer_function( );
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void writer_function (void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(1){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">锁定互斥锁</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_lock (&amp;mutex);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">if (buffer_has_item==0){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">buffer=make_new_item( );
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">buffer_has_item=1;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">打开互斥锁</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_unlock(&amp;mutex);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_delay_np(&amp;delay);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void reader_function(void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(1){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_lock(&amp;mutex);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">if(buffer_has_item==1){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">consume_item(buffer);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">buffer_has_item=0;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_unlock(&amp;mutex);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_delay_np(&amp;delay);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　这里声明了互斥锁变量</span><span style="color: #000000;">mutex</span><span style="color: #000000;">，结构</span><span style="color: #000000;">pthread_mutex_t</span><span style="color: #000000;">为不公开的数据类型，其中包含一个系统分配的属性对象。函数</span><span style="color: #000000;">pthread_mutex_init</span><span style="color: #000000;">用来生成一个互斥锁。</span><span style="color: #000000;">NULL</span><span style="color: #000000;">参数表明使用默认属性。如果需要声明特定属性的互斥锁，须调用函数</span><span style="color: #000000;">pthread_mutexattr_init</span><span style="color: #000000;">。函数</span><span style="color: #000000;">pthread_mutexattr_setpshared</span><span style="color: #000000;">和函数</span><span style="color: #000000;">pthread_mutexattr_settype</span><span style="color: #000000;">用来设置互斥锁属性。前一个函数设置属性</span><span style="color: #000000;">pshared</span><span style="color: #000000;">，它有两个取值，</span><span style="color: #000000;">PTHREAD_PROCESS_PRIVATE</span><span style="color: #000000;">和</span><span style="color: #000000;">PTHREAD_PROCESS_SHARED</span><span style="color: #000000;">。前者用来不同进程中的线程同步，后者用于同步本进程的不同线程。在上面的例子中，我们使用的是默认属性</span><span style="color: #000000;">PTHREAD_PROCESS_ PRIVATE</span><span style="color: #000000;">。后者用来设置互斥锁类型，可选的类型有</span><span style="color: #000000;">PTHREAD_MUTEX_NORMAL</span><span style="color: #000000;">、</span><span style="color: #000000;">PTHREAD_MUTEX_ERRORCHECK</span><span style="color: #000000;">、</span><span style="color: #000000;">PTHREAD_MUTEX_RECURSIVE</span><span style="color: #000000;">和</span><span style="color: #000000;">PTHREAD _MUTEX_DEFAULT</span><span style="color: #000000;">。它们分别定义了不同的上所、解锁机制，一般情况下，选用最后一个默认属性。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_lock</span><span style="color: #000000;">声明开始用互斥锁上锁，此后的代码直至调用</span><span style="color: #000000;">pthread_mutex_unlock</span><span style="color: #000000;">为止，均被上锁，即同一时间只能被一个线程调用执行。当一个线程执行到</span><span style="color: #000000;">pthread_mutex_lock</span><span style="color: #000000;">处时，如果该锁此时被另一个线程使用，那此线程被阻塞，即程序将等待到另一个线程释放此互斥锁。在上面的例子中，我们使用了</span><span style="color: #000000;">pthread_delay_np</span><span style="color: #000000;">函数，让线程睡眠一段时间，就是为了防止一个线程始终占据此函数。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　上面的例子非常简单，就不再介绍了，需要提出的是在使用互斥锁的过程中很有可能会出现死锁：两个线程试图同时占用两个资源，并按不同的次序锁定相应的互斥锁，例如两个线程都需要锁定互斥锁</span><span style="color: #000000;">1</span><span style="color: #000000;">和互斥锁</span><span style="color: #000000;">2</span><span style="color: #000000;">，</span><span style="color: #000000;">a</span><span style="color: #000000;">线程先锁定互斥锁</span><span style="color: #000000;">1</span><span style="color: #000000;">，</span><span style="color: #000000;">b</span><span style="color: #000000;">线程先锁定互斥锁</span><span style="color: #000000;">2</span><span style="color: #000000;">，这时就出现了死锁。此时我们可以使用函数</span><span style="color: #000000;">pthread_mutex_trylock</span><span style="color: #000000;">，它是函数</span><span style="color: #000000;">pthread_mutex_lock</span><span style="color: #000000;">的非阻塞版本，当它发现死锁不可避免时，它会返回相应的信息，程序员可以针对死锁做出相应的处理。另外不同的互斥锁类型对死锁的处理不一样，但最主要的还是要程序员自己在程序设计注意这一点。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">4.3 </span><span style="color: #000000;">条件变量</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　前一节中我们讲述了如何使用互斥锁来实现线程间数据的共享和通信，互斥锁一个明显的缺点是它只有两种状态：锁定和非锁定。而条件变量通过允许线程阻塞和等待另一个线程发送信号的方法弥补了互斥锁的不足，它常和互斥锁一起使用。使用时，条件变量被用来阻塞一个线程，当条件不满足时，线程往往解开相应的互斥锁并等待条件发生变化。一旦其它的某个线程改变了条件变量，它将通知相应的条件变量唤醒一个或多个正被此条件变量阻塞的线程。这些线程将重新锁定互斥锁并重新测试条件是否满足。一般说来，条件变量被用来进行线程间的同步。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　条件变量的结构为</span><span style="color: #000000;">pthread_cond_t</span><span style="color: #000000;">，函数</span><span style="color: #000000;">pthread_cond_init</span><span style="color: #000000;">（）被用来初始化一个条件变量。它的原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int pthread_cond_init __P ((pthread_cond_t *__cond,__const pthread_condattr_t *__cond_attr));
+</span><span style="color: #000000;">　　其中</span><span style="color: #000000;">cond</span><span style="color: #000000;">是一个指向结构</span><span style="color: #000000;">pthread_cond_t</span><span style="color: #000000;">的指针，</span><span style="color: #000000;">cond_attr</span><span style="color: #000000;">是一个指向结构</span><span style="color: #000000;">pthread_condattr_t</span><span style="color: #000000;">的指针。结构</span><span style="color: #000000;">pthread_condattr_t</span><span style="color: #000000;">是条件变量的属性结构，和互斥锁一样我们可以用它来设置条件变量是进程内可用还是进程间可用，默认值是</span><span style="color: #000000;">PTHREAD_ PROCESS_PRIVATE</span><span style="color: #000000;">，即此条件变量被同一进程内的各个线程使用。注意初始化条件变量只有未被使用时才能重新初始化或被释放。释放一个条件变量的函数为</span><span style="color: #000000;">pthread_cond_ destroy</span><span style="color: #000000;">（</span><span style="color: #000000;">pthread_cond_t cond</span><span style="color: #000000;">）。　</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">pthread_cond_wait</span><span style="color: #000000;">（）使线程阻塞在一个条件变量上。它的函数原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int pthread_cond_wait __P ((pthread_cond_t *__cond,
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_t *__mutex));
+</span><span style="color: #000000;">　　线程解开</span><span style="color: #000000;">mutex</span><span style="color: #000000;">指向的锁并被条件变量</span><span style="color: #000000;">cond</span><span style="color: #000000;">阻塞。线程可以被函数</span><span style="color: #000000;">pthread_cond_signal</span><span style="color: #000000;">和函数</span><span style="color: #000000;">pthread_cond_broadcast</span><span style="color: #000000;">唤醒，但是要注意的是，条件变量只是起阻塞和唤醒线程的作用，具体的判断条件还需用户给出，例如一个变量是否为</span><span style="color: #000000;">0</span><span style="color: #000000;">等等，这一点我们从后面的例子中可以看到。线程被唤醒后，它将重新检查判断条件是否满足，如果还不满足，一般说来线程应该仍阻塞在这里，被等待被下一次唤醒。这个过程一般用</span><span style="color: #000000;">while</span><span style="color: #000000;">语句实现。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　另一个用来阻塞线程的函数是</span><span style="color: #000000;">pthread_cond_timedwait</span><span style="color: #000000;">（），它的原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int pthread_cond_timedwait __P ((pthread_cond_t *__cond,
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_t *__mutex, __const struct timespec *__abstime));
+</span><span style="color: #000000;">　　它比函数</span><span style="color: #000000;">pthread_cond_wait</span><span style="color: #000000;">（）多了一个时间参数，经历</span><span style="color: #000000;">abstime</span><span style="color: #000000;">段时间后，即使条件变量不满足，阻塞也被解除。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">pthread_cond_signal</span><span style="color: #000000;">（）的原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int pthread_cond_signal __P ((pthread_cond_t *__cond));
+</span><span style="color: #000000;">　　它用来释放被阻塞在条件变量</span><span style="color: #000000;">cond</span><span style="color: #000000;">上的一个线程。多个线程阻塞在此条件变量上时，哪一个线程被唤醒是由线程的调度策略所决定的。要注意的是，必须用保护条件变量的互斥锁来保护这个函数，否则条件满足信号又可能在测试条件和调用</span><span style="color: #000000;">pthread_cond_wait</span><span style="color: #000000;">函数之间被发出，从而造成无限制的等待。下面是使用函数</span><span style="color: #000000;">pthread_cond_wait</span><span style="color: #000000;">（）和函数</span><span style="color: #000000;">pthread_cond_signal</span><span style="color: #000000;">（）的一个简单的例子。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_t count_lock;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_cond_t count_nonzero;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">unsigned count;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">decrement_count</span><span style="color: #000000;">　</span><span style="color: #000000;">() {
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_lock (&amp;count_lock);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(count==0)
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_cond_wait( &amp;count_nonzero, &amp;count_lock);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">count=count -1;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_unlock (&amp;count_lock);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">increment_count(){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_lock(&amp;count_lock);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">if(count==0)
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_cond_signal(&amp;count_nonzero);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">count=count+1;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_mutex_unlock(&amp;count_lock);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">count</span><span style="color: #000000;">值为</span><span style="color: #000000;">0</span><span style="color: #000000;">时，</span><span style="color: #000000;">decrement</span><span style="color: #000000;">函数在</span><span style="color: #000000;">pthread_cond_wait</span><span style="color: #000000;">处被阻塞，并打开互斥锁</span><span style="color: #000000;">count_lock</span><span style="color: #000000;">。此时，当调用到函数</span><span style="color: #000000;">increment_count</span><span style="color: #000000;">时，</span><span style="color: #000000;">pthread_cond_signal</span><span style="color: #000000;">（）函数改变条件变量，告知</span><span style="color: #000000;">decrement_count</span><span style="color: #000000;">（）停止阻塞。读者可以试着让两个线程分别运行这两个函数，看看会出现什么样的结果。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">pthread_cond_broadcast</span><span style="color: #000000;">（</span><span style="color: #000000;">pthread_cond_t *cond</span><span style="color: #000000;">）用来唤醒所有被阻塞在条件变量</span><span style="color: #000000;">cond</span><span style="color: #000000;">上的线程。这些线程被唤醒后将再次竞争相应的互斥锁，所以必须小心使用这个函数。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">4.4 </span><span style="color: #000000;">信号量</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　信号量本质上是一个非负的整数计数器，它被用来控制对公共资源的访问。当公共资源增加时，调用函数</span><span style="color: #000000;">sem_post</span><span style="color: #000000;">（）增加信号量。只有当信号量值大于０时，才能使用公共资源，使用后，函数</span><span style="color: #000000;">sem_wait</span><span style="color: #000000;">（）减少信号量。函数</span><span style="color: #000000;">sem_trywait</span><span style="color: #000000;">（）和函数</span><span style="color: #000000;">pthread_ mutex_trylock</span><span style="color: #000000;">（）起同样的作用，它是函数</span><span style="color: #000000;">sem_wait</span><span style="color: #000000;">（）的非阻塞版本。下面我们逐个介绍和信号量有关的一些函数，它们都在头文件</span><span style="color: #000000;">/usr/include/semaphore.h</span><span style="color: #000000;">中定义。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　信号量的数据类型为结构</span><span style="color: #000000;">sem_t</span><span style="color: #000000;">，它本质上是一个长整型的数。函数</span><span style="color: #000000;">sem_init</span><span style="color: #000000;">（）用来初始化一个信号量。它的原型为：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">extern int sem_init __P ((sem_t *__sem, int __pshared, unsigned int __value));
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem</span><span style="color: #000000;">为指向信号量结构的一个指针；</span><span style="color: #000000;">pshared</span><span style="color: #000000;">不为０时此信号量在进程间共享，否则只能为当前进程的所有线程共享；</span><span style="color: #000000;">value</span><span style="color: #000000;">给出了信号量的初始值。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">sem_post( sem_t *sem )</span><span style="color: #000000;">用来增加信号量的值。当有线程阻塞在这个信号量上时，调用这个函数会使其中的一个线程不在阻塞，选择机制同样是由线程的调度策略决定的。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">sem_wait( sem_t *sem )</span><span style="color: #000000;">被用来阻塞当前线程直到信号量</span><span style="color: #000000;">sem</span><span style="color: #000000;">的值大于</span><span style="color: #000000;">0</span><span style="color: #000000;">，解除阻塞后将</span><span style="color: #000000;">sem</span><span style="color: #000000;">的值减一，表明公共资源经使用后减少。函数</span><span style="color: #000000;">sem_trywait ( sem_t *sem )</span><span style="color: #000000;">是函数</span><span style="color: #000000;">sem_wait</span><span style="color: #000000;">（）的非阻塞版本，它直接将信号量</span><span style="color: #000000;">sem</span><span style="color: #000000;">的值减一。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　函数</span><span style="color: #000000;">sem_destroy(sem_t *sem)</span><span style="color: #000000;">用来释放信号量</span><span style="color: #000000;">sem</span><span style="color: #000000;">。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　下面我们来看一个使用信号量的例子。在这个例子中，一共有</span><span style="color: #000000;">4</span><span style="color: #000000;">个线程，其中两个线程负责从文件读取数据到公共的缓冲区，另两个线程从缓冲区读取数据作不同的处理（加和乘运算）。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* File sem.c */
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;stdio.h&gt;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;pthread.h&gt;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">#include &lt;semaphore.h&gt;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">#define MAXSTACK 100
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">int stack[MAXSTACK][2];
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">int size=0;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem_t sem;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">从文件</span><span style="color: #000000;">1.dat</span><span style="color: #000000;">读取数据，每读一次，信号量加一</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void ReadData1(void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">FILE *fp=fopen("1.dat","r");
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(!feof(fp)){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">fscanf(fp,"%d %d",&amp;stack[0],&amp;stack[1]);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem_post(&amp;sem);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">++size;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">fclose(fp);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/*</span><span style="color: #000000;">从文件</span><span style="color: #000000;">2.dat</span><span style="color: #000000;">读取数据</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void ReadData2(void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">FILE *fp=fopen("2.dat","r");
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(!feof(fp)){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">fscanf(fp,"%d %d",&amp;stack[0],&amp;stack[1]);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem_post(&amp;sem);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">++size;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">fclose(fp);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/*</span><span style="color: #000000;">阻塞等待缓冲区有数据，读取数据后，释放空间，继续等待</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void HandleData1(void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(1){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem_wait(&amp;sem);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">printf("Plus:%d+%d=%d\n",stack[0],stack[1],
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">stack[0]+stack[1]);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">--size;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">void HandleData2(void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">while(1){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem_wait(&amp;sem);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">printf("Multiply:%d*%d=%d\n",stack[0],stack[1],
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">stack[0]*stack[1]);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">--size;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">int main(void){
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_t t1,t2,t3,t4;
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">sem_init(&amp;sem,0,0);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;t1,NULL,(void *)HandleData1,NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;t2,NULL,(void *)HandleData2,NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;t3,NULL,(void *)ReadData1,NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_create(&amp;t4,NULL,(void *)ReadData2,NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">/* </span><span style="color: #000000;">防止程序过早退出，让它在此无限期等待</span><span style="color: #000000;">*/
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">pthread_join(t1,NULL);
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">}
+</span><span style="color: #000000;">　　在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下，我们用命令</span><span style="color: #000000;">gcc -lpthread sem.c -o sem</span><span style="color: #000000;">生成可执行文件</span><span style="color: #000000;">sem</span><span style="color: #000000;">。 我们事先编辑好数据文件</span><span style="color: #000000;">1.dat</span><span style="color: #000000;">和</span><span style="color: #000000;">2.dat</span><span style="color: #000000;">，假设它们的内容分别为</span><span style="color: #000000;">1 2 3 4 5 6 7 8 9 10</span><span style="color: #000000;">和</span><span style="color: #000000;"> -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 </span><span style="color: #000000;">，我们运行</span><span style="color: #000000;">sem</span><span style="color: #000000;">，得到如下的结果：</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Multiply:-1*-2=2
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Plus:-1+-2=-3
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Multiply:9*10=90
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Plus:-9+-10=-19
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Multiply:-7*-8=56
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Plus:-5+-6=-11
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Multiply:-3*-4=12
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Plus:9+10=19
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Plus:7+8=15
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">Plus:5+6=11
+</span><span style="color: #000000;">　　从中我们可以看出各个线程间的竞争关系。而数值并未按我们原先的顺序显示出来这是由于</span><span style="color: #000000;">size</span><span style="color: #000000;">这个数值被各个线程任意修改的缘故。这也往往是多线程编程要注意的问题。</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　</span><span style="color: #000000;">5 </span><span style="color: #000000;">小结</span><span style="color: #000000;">
+</span><span style="color: #000000;">　　多线程编程是一个很有意思也很有用的技术，使用多线程技术的网络蚂蚁是目前最常用的下载工具之一，使用多线程技术的</span><span style="color: #000000;">grep</span><span style="color: #000000;">比单线程的</span><span style="color: #000000;">grep</span><span style="color: #000000;">要快上几倍，类似的例子还有很多。希望大家能用多线程技术写出高效实用的好程序来。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;"> </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">Last!!!!!!!!!Linux</span><span style="color: #000000;">内核对多进程和多线程的支持方式：</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">        </span><span style="color: #000000;">线程机制支持并发程序设计技术，在多处理器上能真正保证并行处理。而在</span><span style="color: #000000;">linux</span><span style="color: #000000;">实现线程很特别，</span><span style="color: #000000;">linux</span><span style="color: #000000;">把所有的线程都当作进程实现。</span><span style="color: #000000;">linux</span><span style="color: #000000;">下线程看起来就像普通进程</span><span style="color: #000000;">(</span><span style="color: #000000;">只是该进程和其他进程共享资源，如地址空间</span><span style="color: #000000;">)</span><span style="color: #000000;">。上述机制与</span><span style="color: #000000;">Microsoft windows</span><span style="color: #000000;">或是</span><span style="color: #000000;">Sun Solaris</span><span style="color: #000000;">实现差异很大。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">        Linux</span><span style="color: #000000;">的线程实现是在核外进行的，核内提供的是创建进程的接口</span><span style="color: #000000;">do_fork()</span><span style="color: #000000;">。内核提供了两个系统调用</span><span style="color: #000000;">__clone()</span><span style="color: #000000;">和</span><span style="color: #000000;">fork()</span><span style="color: #000000;">，最终都用不同的参数调用</span><span style="color: #000000;">do_fork()</span><span style="color: #000000;">核内</span><span style="color: #000000;">API</span><span style="color: #000000;">。</span><span style="color: #000000;"> do_fork() </span><span style="color: #000000;">提供了很多参数，包括</span><span style="color: #000000;">CLONE_VM</span><span style="color: #000000;">（共享内存空间）、</span><span style="color: #000000;">CLONE_FS</span><span style="color: #000000;">（共享文件系统信息）、</span><span style="color: #000000;">CLONE_FILES</span><span style="color: #000000;">（共享文件描述符表）、</span><span style="color: #000000;">CLONE_SIGHAND</span><span style="color: #000000;">（共享信号句柄表）和</span><span style="color: #000000;">CLONE_PID</span><span style="color: #000000;">（共享进程</span><span style="color: #000000;">ID</span><span style="color: #000000;">，仅对核内进程，即</span><span style="color: #000000;">0</span><span style="color: #000000;">号进程有效）。当使用</span><span style="color: #000000;">fork</span><span style="color: #000000;">系统调用产生多进程时，内核调用</span><span style="color: #000000;">do_fork()</span><span style="color: #000000;">不使用任何共享属性，进程拥有独立的运行环境。当使用</span><span style="color: #000000;">pthread_create()</span><span style="color: #000000;">来创建线程时，则最终设置了所有这些属性来调用</span><span style="color: #000000;">__clone()</span><span style="color: #000000;">，而这些参数又全部传给核内的</span><span style="color: #000000;">do_fork()</span><span style="color: #000000;">，从而创建的</span><span style="color: #000000;">”</span><span style="color: #000000;">进程</span><span style="color: #000000;">”</span><span style="color: #000000;">拥有共享的运行环境，只有栈是独立的，由</span><span style="color: #000000;"> __clone()</span><span style="color: #000000;">传入。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         </span><span style="color: #000000;">即：</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下</span>**<span style="color: #000000;">不管是多线程编程还是多进程编程，最终都是用</span><span style="color: #000000;">do_fork</span><span style="color: #000000;">实现</span>**<span style="color: #000000;">的多进程编程，只是进程创建时的参数不同，从而导致有不同的共享环境。</span><span style="color: #000000;">Linux</span><span style="color: #000000;">线程在核内是以轻量级进程的形式存在的，拥有独立的进程表项，而所有的创建、同步、删除等操作都在核外</span><span style="color: #000000;">pthread</span><span style="color: #000000;">库中进行。</span><span style="color: #000000;">pthread </span><span style="color: #000000;">库使用一个管理线程（</span><span style="color: #000000;">__pthread_manager() </span><span style="color: #000000;">，每个进程独立且唯一）来管理线程的创建和终止，为线程分配线程</span><span style="color: #000000;">ID</span><span style="color: #000000;">，发送线程相关的信号，而主线程</span><span style="color: #000000;">pthread_create()</span><span style="color: #000000;">） 的调用者则通过管道将请求信息传给管理线程。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">很多朋友都说使用多线程的好处是资源占用少，其隐含之意就是说进程占用资源比线程多，对吧？但实际上</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下多进程是否就真的点用很多资源呢？暂且不说进程是否比线程占用资源多，就进程占用资源的多少情况而言，</span><span style="color: #000000;">Linux</span><span style="color: #000000;">确实是做得相当节省的。产生一个多进程时肯定是要产生的一点内存是要复制进程表项，即一个</span><span style="color: #000000;">task_struct</span><span style="color: #000000;">结构，但这个结构本身做得相当小巧。其它对于一个进程来说必须有的数据段、代码段、堆栈段是不是全盘复制呢？对于多进程来说，代码段是肯定不用复制的，因为父进程和各子进程的代码段是相同的，数据段和堆栈段呢？也不一定，因为在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">里广泛使用的一个技术叫</span><span style="color: #000000;">copy-on-write</span><span style="color: #000000;">，即写时拷贝。</span><span style="color: #000000;">copy-on-write</span><span style="color: #000000;">意味着什么呢？意味着资源节省，假设有一个变量</span><span style="color: #000000;">x</span><span style="color: #000000;">在父进程里存在，当这个父进程创建一个子进程或多个子进程时这个变量</span><span style="color: #000000;">x</span><span style="color: #000000;">是否复制到了子进程的内存空间呢？不会的，子进程和父进程使用同一个内存空间的变量，但当子进程或父进程要改变变量</span><span style="color: #000000;">x</span><span style="color: #000000;">的值时就会复制该变量，从而导致父子进程里的变量值不同。</span>**<span style="color: #000000;">父子进程变量是互不影响的，由于父子进程地址空间是完全隔开的，变量的地址可以是完全相同的</span>**<span style="color: #000000;">。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">          Linux</span><span style="color: #000000;">的</span><span style="color: #000000;">”</span><span style="color: #000000;">线程</span><span style="color: #000000;">”</span><span style="color: #000000;">和</span><span style="color: #000000;">”</span><span style="color: #000000;">进程</span><span style="color: #000000;">”</span><span style="color: #000000;">实际上处于一个调度层次，共享一个进程标识符空间，这种限制使得不可能在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">上实现完全意义上的</span><span style="color: #000000;">POSIX</span><span style="color: #000000;">线程机制，因此众多的</span><span style="color: #000000;">Linux</span><span style="color: #000000;">线程库实现尝试都只能尽可能实现</span><span style="color: #000000;">POSIX</span><span style="color: #000000;">的绝大部分语义，并在功能上尽可能逼近。</span><span style="color: #000000;">Linux</span><span style="color: #000000;">进程的创建是非常迅速的。内核设计与实现一书中甚至指出</span><span style="color: #000000;">Linux</span><span style="color: #000000;">创建进程的速度和其他针对线程优化的操作系统（</span><span style="color: #000000;">Windows,Solaris</span><span style="color: #000000;">）创建线程的速度相比，测试结果非常的好，也就是说创建速度很快。由于异步信号是内核以进程为单位分发的，而</span><span style="color: #000000;">LinuxThreads</span><span style="color: #000000;">的每个线程对内核来说都是一个进程，且没有实现</span><span style="color: #000000;">”</span><span style="color: #000000;">线程组</span><span style="color: #000000;">”</span><span style="color: #000000;">，因此，某些语义不符合</span><span style="color: #000000;">POSIX</span><span style="color: #000000;">标准，比如没有实现向进程中所有线程发送信号，</span><span style="color: #000000;">README</span><span style="color: #000000;">对此作了说明。</span><span style="color: #000000;">LinuxThreads</span><span style="color: #000000;">中的线程同步很大程度上是建立在信号基础上的，这种通过内核复杂的信号处理机制的同步方式，效率一直是个问题。</span><span style="color: #000000;">LinuxThreads </span><span style="color: #000000;">的问题，特别是兼容性上的问题，严重阻碍了</span><span style="color: #000000;">Linux</span><span style="color: #000000;">上的跨平台应用（如</span><span style="color: #000000;">Apache</span><span style="color: #000000;">）采用多线程设计，从而使得</span><span style="color: #000000;">Linux</span><span style="color: #000000;">上的线程应用一直保持在比较低的水平。在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">社区中，已经有很多人在为改进线程性能而努力，其中既包括用户级线程库，也包括核心级和用户级配合改进的线程库。目前最为人看好的有两个项目，一个是</span><span style="color: #000000;">RedHat</span><span style="color: #000000;">公司牵头研发的</span><span style="color: #000000;">NPTL</span><span style="color: #000000;">（</span><span style="color: #000000;">Native Posix Thread Library</span><span style="color: #000000;">），另一个则是</span><span style="color: #000000;">IBM</span><span style="color: #000000;">投资开发的</span><span style="color: #000000;">NGPT</span><span style="color: #000000;">（</span><span style="color: #000000;">Next Generation Posix Threading</span><span style="color: #000000;">），二者都是围绕完全兼容</span><span style="color: #000000;">POSIX 1003.1c</span><span style="color: #000000;">，同时在核内和核外做工作以而实现多对多线程模型。这两种模型都在一定程度上弥补了</span><span style="color: #000000;">LinuxThreads</span><span style="color: #000000;">的缺点，且都是重起炉灶全新设计的。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">          </span><span style="color: #000000;">综上所述的</span>**<span style="color: #000000;">结论是在</span><span style="color: #000000;">Linux</span><span style="color: #000000;">下编程多用多进程编程少用多线程编程</span>**<span style="color: #000000;">。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">         IBM</span><span style="color: #000000;">有个家伙做了个测试，发现切换线程</span><span style="color: #000000;">context</span><span style="color: #000000;">的时候，</span><span style="color: #000000;">windows</span><span style="color: #000000;">比</span><span style="color: #000000;">linux</span><span style="color: #000000;">快一倍多。进出最快的锁（</span><span style="color: #000000;">windows2k</span><span style="color: #000000;">的</span><span style="color: #000000;"> critical section</span><span style="color: #000000;">和</span><span style="color: #000000;">linux</span><span style="color: #000000;">的</span><span style="color: #000000;">pthread_mutex</span><span style="color: #000000;">），</span><span style="color: #000000;">windows</span><span style="color: #000000;">比</span><span style="color: #000000;">linux</span><span style="color: #000000;">的要快五倍左右。当然这并不是说</span><span style="color: #000000;">linux</span><span style="color: #000000;">不好，而且在经过实际编程之后，综合来看我觉得</span><span style="color: #000000;">linux</span><span style="color: #000000;">更适合做</span><span style="color: #000000;">high performance server</span><span style="color: #000000;">，不过在多线程这个具体的领域内，</span><span style="color: #000000;">linux</span><span style="color: #000000;">还是稍逊</span><span style="color: #000000;">windows</span><span style="color: #000000;">一点。这应该是情有可原的，毕竟</span><span style="color: #000000;">unix</span><span style="color: #000000;">家族都是从多进程过来的，而</span><span style="color: #000000;"> windows</span><span style="color: #000000;">从头就是多线程的。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">如果是</span><span style="color: #000000;">UNIX/linux</span><span style="color: #000000;">环境，采用多线程没必要。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">多线程比多进程性能高？误导！</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">应该说，</span>**<span style="color: #000000;">多线程比多进程成本低，但性能更低</span>**<span style="color: #000000;">。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">在</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">环境，多进程调度开销比多线程调度开销，没有显著区别，就是说，</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">进程调度效率是很高的。内存消耗方面，二者只差全局数据区，现在内存都很便宜，服务器内存动辄若干</span><span style="color: #000000;">G</span><span style="color: #000000;">，根本不是问题。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+**<span style="color: #000000;">多进程是立体交通系统，虽然造价高，上坡下坡多耗点油，但是不堵车。</span>**
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+**<span style="color: #000000;">多线程是平面交通系统，造价低，但红绿灯太多，老堵车。</span>**
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">我们现在都开跑车，油（主频）有的是，不怕上坡下坡，就怕堵车。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;">高性能交易服务器中间件，如</span><span style="color: #000000;">TUXEDO</span><span style="color: #000000;">，都是主张多进程的。实际测试表明，</span><span style="color: #000000;">TUXEDO</span><span style="color: #000000;">性能和并发效率是非常高的。</span><span style="color: #000000;">TUXEDO</span><span style="color: #000000;">是贝尔实验室的，与</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">同宗，应该是对</span><span style="color: #000000;">UNIX</span><span style="color: #000000;">理解最为深刻的，他们的意见应该具有很大的参考意义。</span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;"> </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;"> </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>
+
+<span style="color: #000000;"> </span>
+
+<span style="color: #000000; font-family: 宋体;">
+</span>

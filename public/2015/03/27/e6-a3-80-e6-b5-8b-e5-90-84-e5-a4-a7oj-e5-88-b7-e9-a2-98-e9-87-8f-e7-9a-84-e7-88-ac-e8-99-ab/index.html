@@ -1,0 +1,342 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [Python][ACM] 检测各大OJ刷题量的爬虫 · kidozh</title><meta name="description" content="[Python][ACM] 检测各大OJ刷题量的爬虫 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[Python][ACM] 检测各大OJ刷题量的爬虫</h1><div class="post-info">2015年3月27日</div><div class="post-content"><p>寒假集训的时候，由于要统计做题量，所以到各大OJ来查阅做题量，我们可以使用Python来爬取题量，Codeforce的模块做的不是很成熟，可以调用CF的API来解决这个问题</p>
+<p>readme：<br> 1.自动获取POJ,HDU,ZOJ,FZU,ACdream,BZOJ上面的刷题量并且加以求和<br> 2.自动获取Codeforce上面的积分<br> 3.双线程更新Codeforce上的内容</p>
+<p>说明：<br> 1.直接输入账号就可以查看了<br> 2.由于本弱还未想到如何去结束循环（万一有的用户名就那么奇葩呢），所以大家直接点右上角就可以了<br> 3.本脚本的Python代码附在acm_crawler.py中，有什么建议，跪求告诉本弱</p>
+<p>注意：<br> 1.请务必在有网的时候使用本脚本，若网速极慢或者GFW问题的话或者账户名不存在，POJ，HDU，ZOJ,CodeForce,FZU,ACdream,BZOJ将返回0的结果，Codeforce将返回Not Found.<br> 2.本脚本不会窃取您的账户信息，也不会对您的计算机造成主观上的伤害（如果您是老爷机并且什么脚本都运行不了的情况下，请您三思而后行）</p>
+<p>将要更新：<br> 1.UVA，UVAlive，lightOJ的支持</p>
+<p>其他说明：<br> 1.此脚本原理是爬虫的原理，要是出现了BUG请反馈本弱。<br> 2.由于SGU，LightOJ，Ural，Uva均使用userid作为索引，所以无法查到对应网页，故无法予以支持。<br> 3.由于华中科技大学的virtual judge交题量巨大，在连接Codeforce的时候往往要刷新多次窗口，故请在网速较快的时候使用。</p>
+<pre class="lang:default decode:true ">__author__ = 'kido'
+import urllib2
+import cookielib
+import re
+import thread
+import time
+import threading
+import urllib
+
+def detect_poj(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://poj.org/userstatus?user_id='+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+#print html
+sem = re.findall('Solved:&lt;/td&gt;.*?&lt;td align=center width=25%&gt;.*?&lt;.*?&gt;(.*?)&lt;/a&gt;&lt;/td&gt;',html,re.S)
+#print re.search('Solved:&lt;/td&gt;.*?&lt;td align=center width=25%&gt;.+&lt;.*?&gt;(.*?)&lt;/a&gt;&lt;/td&gt;',html,re.S)
+try :
+return sem[0]
+except:
+return 0
+#for item in sem:
+#print item
+#return item
+#print result.read()
+
+def detect_hdu(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://acm.hdu.edu.cn/userstatus.php?user='+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+#print html
+sem = re.findall('&lt;tr&gt;&lt;td&gt;Problems Solved&lt;/td&gt;&lt;td align=center&gt;(.*?)&lt;/td&gt;&lt;/tr&gt;',html,re.S)
+try :
+return sem[0]
+except:
+return 0
+#for item in sem:
+#print item
+#return item
+
+def detect_cf(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://codeforces.com/profile/'+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+#print html
+sem = re.findall('Contest rating:.*?&lt;span.*?&gt;(.*?)&lt;/span&gt;',html,re.S)
+#for item in sem:
+#print item
+#return item
+try :
+return sem[0]
+except:
+return 'Not found'
+
+def detect_zoj(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://acm.zju.edu.cn/onlinejudge/showUserStatus.do?handle='+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+#print html
+sem = re.findall('&lt;font size="3"&gt;AC Ratio:&lt;/font&gt; &lt;font color="red" size="4"&gt;(.*?)/.*?&lt;/font&gt;&lt;br/&gt;',html,re.S)
+try:
+return sem[0]
+except:
+return 0
+#for item in sem:
+#print item
+#return item
+#return 0
+
+def detect_fzu(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://acm.fzu.edu.cn/user.php?uname='+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+#print html
+sem = re.findall('&lt;tr&gt;.*?&lt;td&gt;Total Accepted&lt;/td&gt;.*?&lt;td&gt;(.*?)&lt;/td&gt;.*?&lt;/tr&gt;',html,re.S)
+try:
+return sem[0]
+except:
+return 0
+
+def codeforce(start,end):
+i = start
+
+while i&lt;end:
+global cnt
+i+=1
+print '| detecting Codeforce page :',i,'/',lastpage
+req = urllib2.Request(
+url = 'http://codeforces.com/submissions/'+name+'/page/'+str(i)
+)
+
+#headers = headers
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+sem = re.findall('&lt;span class=.verdict-accepted.&gt;Accepted&lt;/span&gt;',html,re.S)
+cnt +=len(sem)
+
+def detect_codeforce(name):
+global cnt
+cnt=0
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://codeforces.com/submissions/'+name+'/page/1',
+#headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+#print html
+sem = re.findall('&lt;span class=.verdict-accepted.&gt;Accepted&lt;/span&gt;',html,re.S)
+page = re.findall('&lt;span class=.*? pageIndex=.*?&gt;&lt;a href="/submissions/.*?/page/.*?"&gt;(.*?)&lt;/a&gt;&lt;/span&gt;',html,re.S)
+global lastpage
+try :
+#print 'last page : ',int(page[len(page)-1])
+lastpage = int(page[len(page)-1])
+except :
+lastpage = 1
+i=1
+#print page
+
+cnt=cnt+len(sem)
+if lastpage &gt; 10:
+t = threading.Thread(target=codeforce,args=(1,lastpage/2))
+p = threading.Thread(target=codeforce,args=(lastpage/2,lastpage))
+threads =[]
+threads.append(t)
+threads.append(p)
+for i in threads:
+i.setDaemon(True)
+i.start()
+t.join()
+p.join()
+return cnt
+
+def detect_acdream(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://acdream.info/user/'+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+try :
+result = opener.open(req)
+except :
+return 0
+html =result.read()
+sem = re.findall('Submissions:.*?&lt;span.*?&gt;(.*?)&lt;/span&gt;',html,re.S)
+try:
+return sem[0]
+except:
+return 0
+
+def detect_dashiye(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+req = urllib2.Request(
+url = 'http://www.lydsy.com/JudgeOnline/userinfo.php?user='+name,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+html =result.read()
+sem = re.findall(r'&lt;tr bgcolor=#D7EBFF&gt;&lt;td&gt;Solved&lt;td align=center&gt;&lt;a href=.*?&gt;(.*?)&lt;/a&gt;',html,re.S)
+try:
+return sem[0]
+except:
+return 0
+
+def detect_codef(name):
+headers = {
+'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+}
+postdata = urllib.urlencode({
+'handle':'kidozh',
+'password':'(Protected)',
+'action':'enter'
+})
+req = urllib2.Request(
+url = 'http://codeforces.com/enter',
+data=postdata,
+headers = headers
+)
+cookie = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+result = opener.open(req)
+print '&gt; Logined (by means of kidozh)'
+#print result.read()
+post = urllib.urlencode({
+'isAdd':'true'
+})
+requ = urllib2.Request(
+url ='http://codeforces.com/profile/'+name,
+data = post,
+headers = headers
+)
+result = opener.open(requ)
+print '&gt; Successfully attach ! '
+#print result.read()
+#file_object = open('attach.html','w')
+#file_object.writelines(result.read())
+#file_object.close()
+#print result.read()
+requ = urllib2.Request(
+url = 'http://codeforces.com/problemset/standings',
+data = post,
+headers = headers
+)
+
+result = opener.open(requ)
+#print result.read()
+print '&gt; Connected With dashboard'
+html = result.read()
+#file_object = open('dashboard.html','w')
+#file_object.writelines(html)
+#file_object.close()
+#csrf = re.findall('&lt;span style=.*? class=.*? data-csrf=.(\w*?).&gt;&amp;nbsp;&lt;/span&gt;',html,re.S)
+#code = csrf[0]
+requ = urllib2.Request(
+url = 'http://codeforces.com/problemset/standings?&amp;friendsEnabled=on',
+data = post,
+headers = headers
+)
+
+result = opener.open(requ)
+print '&gt; Crawling Dashboard...'
+#file_object = open('thefile.html','w')
+html = result.read()
+#print html
+#file_object.writelines(html)
+#file_object.close()
+#match = name+'&lt;/a&gt;.*?&lt;/td&gt;.*?&lt;td &gt;.*?(\d*?).*?&lt;/td&gt;'
+match = name+'&lt;/a&gt;(.*?)&lt;tr&gt;'
+#p = re.compile(match,re.DOTALL)
+#pi = p.findall(html)
+#print re.search(match,html,re.DOTALL)
+#print match[0]
+mark = re.findall(match,html,re.S)
+#print mark[0]
+try :
+num = re.findall('&lt;td &gt;.*?([0-9]+).*?&lt;.td&gt;.*?',mark[0],re.S)
+except :
+return 0
+#print mark
+nat = re.findall('.*?([0-9]+).*?',mark[0],re.S|re.DOTALL)
+#print mark,num,nat
+try :
+return nat[0]
+except :
+return 0
+
+#-------------main part---------------------
+
+formattime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+try:
+print '-------------------------------'
+print ' Author : kidozh '
+print ' supported OJ : POJ,HDU,ZOJ,Codeforce,FZU,ACdream,BZOJ '
+print ' Current time : '+formattime
+print ' language : Python'
+print ' if your accounts don\'t keep consistency you can type many times'
+print '--------------------------------'
+except :
+print 'Cannot show welcome page...'+formattime
+quit = 1
+while 1:
+
+name = raw_input('please input your account(For example : vjudge1): ')
+poj = detect_poj(name)
+print 'POJ : ',poj
+hdu = detect_hdu(name)
+print 'HDU : ',hdu
+zoj = detect_zoj(name)
+print 'ZOJ : ',zoj
+fzu = detect_fzu(name)
+print 'FZU : ',fzu
+acdream = detect_acdream(name)
+print 'ACdream : ',acdream
+dashiye = detect_dashiye(name)
+print 'BZOJ : ',dashiye
+cf = detect_codef(name)
+print 'CodeForce : ',cf
+print 'Total : ',int(poj)+int(hdu)+int(zoj)+int(fzu)+int(acdream)+int(dashiye)+int(cf)
+print '+----------------------Code Force Score----------------------'
+print '+ Codeforce Score : ',detect_cf(name)
+</pre>
+
+</div></article></div></main><footer><div class="paginator"><a href="/2015/03/27/websyntaxhighlighter/" class="prev">上一篇</a><a href="/2015/03/27/hello-world-1/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

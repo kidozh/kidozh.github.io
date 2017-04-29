@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [JavaScript]自动填写西北工业大学教务系统 · kidozh</title><meta name="description" content="[JavaScript]自动填写西北工业大学教务系统 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[JavaScript]自动填写西北工业大学教务系统</h1><div class="post-info">2015年12月11日</div><div class="post-content"><h1 id="1-背景和代码"><a href="#1-背景和代码" class="headerlink" title="1.背景和代码"></a>1.背景和代码</h1><p>学校的教务系统又更新了，然而依旧要填这么多人，有些老师还没来上课（- -金属仨老师我就认识一个）。我参考了一位学长的JS代码（<a href="http://blog.tpircsboy.com/tech/jiaowu-judge/" target="_blank" rel="external">点我传送</a>），然后还是模拟了这个过程。但是现在教务系统的后台不知道是数据库原因还是手工设置的原因，不能一次性把所有的数据都POST上去（坑我一下午- -），所以我手动给出了alert（teacherID，lessonID）来手工设置间隔。</p>
+<pre class="show-title:false expand:false expand-toggle:false lang:js decode:true ">var table=document.getElementsByClassName("gridtable")[0];var eachline=table.rows;var info="";for(var i=1;i&lt;table.rows.length;i++){var cellinfo=eachline.item(i).cells.item(5).innerHTML;var regex=/[0-9]+/g;var res=cellinfo.match(regex," ");if(1){alert(res[1]+","+res[0])}if(res.length!=2){alert(res[1]);break}var teacherId=res[1];var lessonId=res[0];var http=new XMLHttpRequest;info=info+teacherId+" "+lessonId+";";http.open("POST","http://us.nwpu.edu.cn/eams/evaluateStd!save.action",true);http.setRequestHeader("Content-type","application/x-www-form-urlencoded");http.send("teacherId="+teacherId+"&amp;select6=5&amp;select7=5&amp;select8=5&amp;select1=5&amp;select2=5&amp;select3=5&amp;select4=5&amp;select5=5&amp;evaluateResult.remark=%E5%BE%88%E5%A5%BD%EF%BC%81&amp;semester.id=15&amp;lesson.id="+lessonId+"&amp;teacher.ids="+teacherId)};</pre>
+
+<p> 然后这个是没有压缩过的代码：</p>
+<pre class="lang:js decode:true " title="自动填写西工大教务系统">var table= document.getElementsByClassName('gridtable')[0];
+//alert(table.rows.length);
+var eachline = table.rows;
+var info = ""
+for (var i=1;i&lt;table.rows.length;i++)
+{
+    var cellinfo = eachline.item(i).cells.item(5).innerHTML;
+    var regex = /[0-9]+/g;
+    var res = cellinfo.match(regex," ");
+    //alert(res.toString());
+    //alert(cellinfo);
+    if (1)
+    {
+        alert(res[1]+','+res[0])
+    }
+    if (res.length !=2){
+        alert(res[1]);
+        break;
+    }
+    var teacherId = res[1];
+    var lessonId = res[0];
+    var http = new XMLHttpRequest;
+    info = info +teacherId + " "+lessonId+";";
+    http.open('POST', "http://us.nwpu.edu.cn/eams/evaluateStd!save.action", true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.send("teacherId="+teacherId+"&amp;select6=5&amp;select7=5&amp;select8=5&amp;select1=5&amp;select2=5&amp;select3=5&amp;select4=5&amp;select5=5&amp;evaluateResult.remark=%E5%BE%88%E5%A5%BD%EF%BC%81&amp;semester.id=15&amp;lesson.id="+lessonId+"&amp;teacher.ids="+teacherId);
+
+}
+</pre>
+
+<p> 这里最终效果会是这样：</p>
+<p><a href="/wp-content/uploads/2015/12/@HCT3O9A1@LFHZEA0.png"><img src="/wp-content/uploads/2015/12/@HCT3O9A1@LFHZEA0.png" alt="@HCT3{O$]9A1@L$FHZ(E}A0"></a></p>
+<p>嗯就是这样。</p>
+<h1 id="2-使用方法"><a href="#2-使用方法" class="headerlink" title="2.使用方法"></a>2.使用方法</h1><p>首先进入到这里：</p>
+<p><a href="/wp-content/uploads/2015/12/QQ图片20151211165226.png"><img src="/wp-content/uploads/2015/12/QQ图片20151211165226.png" alt="QQ图片20151211165226"></a></p>
+<p>然后，<span style="color: rgb(76, 76, 76); font-family: Oxygen, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; line-height: 29.7px; background-color: rgb(245, 245, 245);">在浏览器栏输入 </span><span style="box-sizing: inherit; font-family: Oxygen, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; font-weight: 700; vertical-align: baseline; padding: 0px; border: 0px; margin: 0px; outline: 0px; color: rgb(76, 76, 76); line-height: 29.7px; background-color: rgb(245, 245, 245);"><em>javascript: </em></span><span style="color: rgb(76, 76, 76); font-family: Oxygen, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; line-height: 29.7px; background-color: rgb(245, 245, 245);">，然后粘贴入上面的代码，回车就行了</span></p>
+<h1 id="3-兼容性"><a href="#3-兼容性" class="headerlink" title="3.兼容性"></a>3.兼容性</h1><p>我在Chrome上测试成功了，别的我还没有测试。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2015/12/14/latexlatex-e5-9f-ba-e7-a1-80/" class="prev">上一篇</a><a href="/2015/12/11/ml-e6-9c-ba-e5-99-a8-e5-ad-a6-e4-b9-a0-e5-92-8cpython-e5-ae-9e-e8-b7-b5-ef-bc-88-e4-ba-8c-ef-bc-89-e5-86-b3-e7-ad-96-e6-a0-91-ef-bc-88-e4-b8-ad-ef-bc-89/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

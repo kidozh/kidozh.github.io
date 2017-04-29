@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [Web Safety] XSS简介 · kidozh</title><meta name="description" content="[Web Safety] XSS简介 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[Web Safety] XSS简介</h1><div class="post-info">2015年8月5日</div><div class="post-content"><p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">    XSS,</span><span style="color: #333333; font-family: Arial; font-size: 10pt; background-color: white;"><br> </span><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">跨站脚本攻击（Cross Site Script Attack）,一种很常见的攻击方法。</span></p>
+<p>1. 一个简单的简单的XSS示例PHP示例</p>
+<pre class="lang:default decode:true ">&lt;html&gt;
+&lt;head&gt;&lt;/head&gt;
+&lt;?php
+        $input = $_GET["param"];
+        echo "&lt;div&gt;".$input."&lt;/div&gt;"
+    ?&gt;
+&lt;/html&gt;</pre>
+
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">这个时候我们在本地的PHP服务器中创建了一个带有GET的网页，这种不加区分的GET方法就是一个很简单的XSS注入点。<br></span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">当我们插入这样的代码：（好像拿Chrome浏览器就不会alert）<br></span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">    <a href="http://localhost/chart.php?param=%3Cscript%3Ealert(/xss/" target="_blank" rel="external">http://localhost/chart.php?param=%3Cscript%3Ealert(/xss/)%3C/script%3E%3C/div%3E</a>%3C/script%3E%3C/div%3E)<br></span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">也就是<a href="http://localhost/chart.php?param=%3cscript%3ealert(/xss/" target="_blank" rel="external">http://localhost/chart.php?param=&lt;script&gt;alert(/xss/)&lt;script&gt;&lt;div</a>%3cscript%3e%3cdiv)&gt;<br></span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">这个时候，对话框就出现/XSS/了，意味着代码被执行了。<br></span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">    <img src="/wp-content/uploads/2015/08/080515_1010_WebSafetyXS1.png" alt=""><br></span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">这个时候我们查看源代码就发现用户输入的内容被错误的认为是JavaScript被执行了。</span></p>
+<pre class="lang:default decode:true ">&lt;html&gt;
+    &lt;head&gt;
+
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div&gt;
+            &lt;script&gt;
+                alert(/xss/)
+            &lt;/script&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<ul>
+<li><div><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">第一种类型：反射型XSS（非持久性XSS）<br></span></div>
+
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">上面简单的例子就是一个很简单的反射型XSS，他只是一个简单的把用户输入的数据”反射”给浏览器。也就是说只有诱骗用户点击一个恶意链接的时候，才能攻击成功。<br></span></p>
+</li>
+<li><div><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">第二种类型：储存型XSS<br></span></div>
+
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">存储型XSS会把用户的数据储存在服务器上，在用户访问该服务器的时候将会运行该JavaScript，从而导致XSS攻击。比如，一个很常见的例子，攻击者在某论坛上发表了一个带有恶意JavaScript的博客文章，所有访问该文章的用户都会执行这段恶意的JavaScript代码。这种往往是对于标签的过滤不到位导致的。<br></span></p>
+</li>
+<li><div><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">第三种类型：DOM Based XSS<br></span></div>
+
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">这种XSS原理上来说也是反射性XSS，但是由于这个是因为修改DOM节点的XSS，所以被称为DOM Based XSS。同样的使用本地服务器做演示。<br></span></p>
+</li>
+</ul>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">PHP代码如下：<br> </span><pre class="crayon-selected">[php]<br>&amp;amp;amp;amp;lt;html&amp;amp;amp;amp;gt;<br>    &amp;amp;amp;amp;lt;head&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;/head&amp;amp;amp;amp;gt;<br>    &amp;amp;amp;amp;lt;script&amp;amp;amp;amp;gt;<br>    function test(){<br>        var string = document.getElementById(&quot;text&quot;).value;<br>        document.getElementById(&quot;t&quot;).innerHTML = &quot;&amp;amp;amp;amp;lt;a herf = ‘&quot;+string+&quot;’&amp;amp;amp;amp;gt;testLink&amp;amp;amp;amp;lt;/a&amp;amp;amp;amp;gt;&quot;;<br>    }<br>    &amp;amp;amp;amp;lt;/script&amp;amp;amp;amp;gt;<br>    &amp;amp;amp;amp;lt;div id = &quot;t&quot;&amp;amp;amp;amp;gt;&amp;amp;amp;amp;lt;/div&amp;amp;amp;amp;gt;<br>    &amp;amp;amp;amp;lt;input type = &quot;text&quot; id = &quot;text&quot; value = &quot;&quot; /&amp;amp;amp;amp;gt;<br>    &amp;amp;amp;amp;lt;input type = &quot;button&quot; id = &quot;s&quot; value = &quot;write&quot; onclick = &quot;test()&quot;/&amp;amp;amp;amp;gt;<br>&amp;amp;amp;amp;lt;/html&amp;amp;amp;amp;gt;</pre></p>
+<p>[/php]</p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">点击write之后，a标签后面出现一个超链接，链接地址就是input里面的地址，当按下button之时，test这个函数既可以触发，通过innerHTML将input里面的值写入html志宏，这就是DOM Based XSS发生的原因。<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">和XSS一样，为了融入HTML之中，我们构造：<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">‘ onclick = alert(/xss/) //<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">那么再输入之后，页面代码就变成了：<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">&lt;a herf = ‘’ onclick = alert(/xss/) //‘&gt;testLink&lt;/a&gt;<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">首先用一个单引号闭合原来herf之后的单引号，然后插入一个onclick事件，最后使用注释符”//“注释掉第二个单引号，那么点击的时候，事件被执行…<br> </span></p>
+<p><img src="/wp-content/uploads/2015/08/080515_1010_WebSafetyXS2.png" alt=""><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;"><br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">然而遵循这种思路，我们还有另一种利用方式，通过闭合&lt;a&gt;标签，插入一个新的HTML标签，尝试以下输入：<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">‘&gt;&lt;img src = # onerror = alert(/xss2/) /&gt;&lt;’<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">那么代码id = t将变成：<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;"> &lt;a herf = ‘’&gt;&lt;img src = # onerror = alert(/xss2/) /&gt;&lt;’’&gt;testLink&lt;/a&gt;<br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;"> 脚本被执行。<br> </span></p>
+<p><img src="/wp-content/uploads/2015/08/080515_1010_WebSafetyXS3.png" alt=""><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;"><br> </span></p>
+<p><span style="font-family: Microsoft YaHei Mono; font-size: 14pt;">XSS 被执行。</span></p>
+</div></article></div></main><footer><div class="paginator"><a href="/2015/11/19/ansys-e5-a6-82-e4-bd-95-e9-80-89-e6-8b-a9-e6-ad-a3-e7-a1-ae-e7-9a-84-e6-9c-89-e9-99-90-e5-85-83-e7-9a-84-e5-85-83-e7-b4-a0-e7-b1-bb-e5-9e-8b-ef-bc-9f/" class="prev">上一篇</a><a href="/2015/07/14/acmbestcoder-e4-b8-a4-e6-ac-a1-e7-9a-84dp/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> peewee入门 · kidozh</title><meta name="description" content="peewee入门 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">peewee入门</h1><div class="post-info">2016年12月15日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>折腾了几天SQLAlchemy，实在是折腾不动了，所以我决定开一个peewee的坑。</p>
+<p>那么，迁移必然是有原因的，我来简单的说一下迁移代码的原因。</p>
+<ul>
+<li>peewee的写法很像Django自带的orm，对于我这种Django支持者很好</li>
+<li>其自带的类型比起SQLAlchemy来说，验证起来要简单许多</li>
+<li>peewee轻量级，很方便</li>
+</ul>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><h2 id="PIP"><a href="#PIP" class="headerlink" title="PIP"></a>PIP</h2><p>最简单的还是通过<code>PIP</code>来安装：</p>
+<pre class="lang:default decode:true ">pip install peewee</pre>
+peewee包含了两个C的扩展：
+
+*   Speedup ： 其包含了一些可以用C来重写的函数，当Cython已经安装的话，这个模块将会被自动安装。
+*   Sqlite扩展 ： 其包含了一些用C操纵的SQLite的函数， REGEXP运算符以及全文搜索排序算法，这个模块应该使用`build_sqlite_ext`命令来安装
+安装SQLite扩展的方法：
+<pre class="lang:default decode:true ">python setup.py build_sqlite_ext
+python setup.py install</pre>
+
+<h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><p>这个工程托管于<a href="https://github.com/coleifer/peewee" target="_blank" rel="external">https://github.com/coleifer/peewee</a>并且可以使用git来安装。</p>
+<pre class="lang:default decode:true ">git clone https://github.com/coleifer/peewee.git
+cd peewee
+python setup.py install</pre>
+如果你想构建SQLite扩展，你可以这样：
+
+&nbsp;
+<pre class="lang:default decode:true "># Build the sqlite extension and place the shared library alongside the other modules.
+python setup.py build_sqlite_ext -i</pre>
+在有些系统上，你需要使用`sudo`来提权
+
+# 运行测试样例
+
+运行命令
+<pre class="lang:default decode:true ">python setup.py test
+
+# Or use the test runner:
+python runtests.py</pre>
+你也可以使用`runtests.py`测试指定的特征，默认情况下会使用SQLite数据库，并且playhouse的扩展并不会被测试，你也可以使用下面的命令来查看命令的选项：
+<pre class="lang:default decode:true ">python runtests.py --help</pre>
+
+<h1 id="可选的依赖"><a href="#可选的依赖" class="headerlink" title="可选的依赖"></a>可选的依赖</h1><blockquote>
+<p>因为大多数的Python发行版都包含SQLite的支持，你并不需要任何区别于标准库的依赖。你可以在命令行中运行import sqlite3来检测，如果你想运行于其他数据库的话，你可以分别使用满足 DB-API 2.0-compatible的驱动，比如针对MySQL的<code>pymysql</code> 或者针对Postgres的<code>psycopg2</code></p>
+</blockquote>
+<ul>
+<li><a href="http://cython.org/" target="_blank" rel="external">Cython</a> ： 通常用于加速。如果你是用SQLite的话，那么速度提升就会变得很明显</li>
+<li><a href="https://github.com/rogerbinns/apsw" target="_blank" rel="external">apsw</a> ： 一个可选的SQLite的第三方库，其提供了更好的性能。你可以通过<a href="http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#AESEncryptedField" title="AESEncryptedField" target="_blank" rel="external"><code>&lt;span class=&quot;pre&quot;&gt;AESEncryptedField&lt;/span&gt;</code></a>来使用它。</li>
+<li><a href="http://pythonhosted.org/pycrypto/" target="_blank" rel="external">pycrypto</a> ： 一个为了AES加密的库，作用于<a href="http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#AESEncryptedField" title="AESEncryptedField" target="_blank" rel="external"><code>&lt;span class=&quot;pre&quot;&gt;AESEncryptedField&lt;/span&gt;</code></a></li>
+<li>bcrypt ： bcrypt加密手段，作用于<a href="http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#PasswordField" title="PasswordField" target="_blank" rel="external"><code>&lt;span class=&quot;pre&quot;&gt;PasswordField&lt;/span&gt;</code></a></li>
+<li><a href="http://www.gevent.org/" target="_blank" rel="external">gevent</a> ：为了SqliteQueueDatabase的一个可选的依赖（其和<code>threading</code>这个库运行的很好）</li>
+<li><a href="http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/downloads/index.html" target="_blank" rel="external">BerkeleyDB</a> ：可以使用SQLite前端编译，它与Peewee一起工作。<br>如果你使用过django和flask框架，那会对你了解peewee非常有用。</li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/12/20/e6-9e-84-e5-bb-bawordpress-e4-b8-bb-e9-a2-98-e5-87-bd-e6-95-b0/" class="prev">上一篇</a><a href="/2016/12/12/e7-ab-99-e7-82-b9-e8-bf-81-e7-a7-bb-e5-88-b0-e6-96-b0-e5-8a-a0-e5-9d-a1/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

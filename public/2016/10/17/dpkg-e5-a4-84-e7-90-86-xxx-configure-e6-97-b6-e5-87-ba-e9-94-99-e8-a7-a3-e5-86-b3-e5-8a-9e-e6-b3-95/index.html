@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> dpkg:处理 xxx (--configure)时出错解决办法 · kidozh</title><meta name="description" content="dpkg:处理 xxx (--configure)时出错解决办法 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">dpkg:处理 xxx (--configure)时出错解决办法</h1><div class="post-info">2016年10月17日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>安装java的时候出现：dpkg:处理 oracle-java7-installer (–configure)时出错: 子进程 已安装 post-ins，</p>
+<p>然后在网上找到了这片文章，按步骤走就解决了，中间会提示自动卸载一下，执行那个命令就好了，</p>
+<p>我遇到的情况是在ubuntu上使用apt-get安装软件的时候出现如下错误:</p>
+<pre class="lang:default decode:true ">正在设置 nfs-common (1:1.2.2-4ubuntu5) ...
+dpkg：处理 nfs-common (--configure)时出错：
+ 子进程 已安装 post-installation 脚本 返回了错误号 10
+正在设置 samba-common (2:3.5.8~dfsg-1ubuntu2.3) ...
+dpkg：处理 samba-common (--configure)时出错：
+ 子进程 已安装 post-installation 脚本 返回了错误号 10
+dpkg：依赖关系问题使得 samba 的配置工作不能继续：
+ samba 依赖于 samba-common (= 2:3.5.8~dfsg-1ubuntu2.3)；然而：
+  软件包 samba-common 尚未配置。
+dpkg：处理 samba (--configure)时出错：
+ 依赖关系问题 - 仍未被配置
+dpkg：依赖关系问题使得 smbclient 的配置工作不能继续：
+ smbclient 依赖于 samba-common (= 2:3.5.8~dfsg-1ubuntu2.3)；然而：
+  软件包 samba-common 尚未配置。
+dpkg：处理 smbclient (--configure)时出错：
+ 依赖关系问题 - 仍未被配置
+因为错误消息指示这是由于上一个问题导致的错误，没有写入 apport 报告。
+                                                          由于已经达到 MaxReports 限制，没有写入 apport 报告。
+                                        在处理时有错误发生：
+ nfs-common
+ samba-common
+ samba
+ smbclient
+E: Sub-process /usr/bin/dpkg returned an error code (1)</pre>
+
+<h1 id="处理方法"><a href="#处理方法" class="headerlink" title="处理方法"></a>处理方法</h1><ol>
+<li><code>sudo mv /var/lib/dpkg/info /var/lib/dpkg/info_old</code> //现将info文件夹更名</li>
+<li><code>sudo mkdir /var/lib/dpkg/info</code> //再新建一个新的info文件夹</li>
+<li><code>sudo apt-get update</code></li>
+<li><code>sudo apt-get -f install</code></li>
+<li><code>sudo mv /var/lib/dpkg/info/* /var/lib/dpkg/info_old</code> //执行完上一步操作后会在新的info文件夹下生成一些文件，现将这些文件全部移到info_old文件夹下</li>
+<li><code>sudo rm -rf /var/lib/dpkg/info</code> //把自己新建的info文件夹删掉</li>
+<li><code>sudo mv /var/lib/dpkg/info_old /var/lib/dpkg/info</code> //把以前的info文件夹重新改回名字</li>
+</ol>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/10/19/e5-88-9b-e5-bb-ba-e4-b8-80-e4-b8-aawordpress-e4-b8-bb-e9-a2-98/" class="prev">上一篇</a><a href="/2016/10/16/e5-9c-a8ubuntu-e4-b8-8a-e8-a3-85nginxmysql-e5-92-8cphp/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

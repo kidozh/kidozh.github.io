@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 创建一个WordPress的主题HTML结构 · kidozh</title><meta name="description" content="创建一个WordPress的主题HTML结构 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">创建一个WordPress的主题HTML结构</h1><div class="post-info">2016年10月30日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>现在我们着手进入到WordPress的真正开发阶段：开始编写HTML结构</p>
+<h1 id="建立HTML结构的目的"><a href="#建立HTML结构的目的" class="headerlink" title="建立HTML结构的目的"></a>建立HTML结构的目的</h1><p>当我们编写一个网站的时候，你一定会有两个目标：使代码精简并且有意义。这样就是说，尽可能使用少的标记（也就是HTML的标签）并且保证使用类和ID名称使得标记有意义。举个例子，对于小工具栏，你应该使用<code>class=”widget-area”</code> 而不是 <code>class=”sidebar-left”</code>。</p>
+<p>现在当我们编写一个WordPress的主题（或者任何针对内容管理系统的模板）的时候，我们需要找到一种介于精简代码和我们称之为<a href="http://www.456bereastreet.com/lab/web_development_mistakes/" target="_blank" rel="external">冗余</a>的东西。代码里包含了很多不必要的<code>div</code>元素。换句话说，有很多冗余结构。你可能在浏览网页或者WordPress的主题的源代码时候见过div。你可以把他们作为HTML代码的一个容器 - 这个容器对于使用CSS来操作HTML代码来说很方便。当然我们也会有一些，但是我们不会想要太多的以及没有意义的标签。</p>
+<p>有一些诸如<code>header</code>、<code>nav</code>和<code>footer</code>的标签，HTML5已经使得我们对于有意义的布局的请求变得更为简单。这些信的主题和div标签很相似，并且这些标签能够作为HTML代码的容器。同样的，他们也能够允许我们创造一个更能描述HTML大纲的框架。</p>
+<p>所以我们已经有很好的框架了，使用在HTML5新的标签，这样我们能够针对我们的博客和站点布局来进行代码复用。</p>
+<h1 id="针对WordPress主题的HTML结构"><a href="#针对WordPress主题的HTML结构" class="headerlink" title="针对WordPress主题的HTML结构"></a>针对WordPress主题的HTML结构</h1><p>让我们看一看我们将会使用在WordPress主题主体的HTML结构。</p>
+<pre class="lang:xhtml decode:true ">&lt;div id="page" class="hfeed site"&gt;
+     &lt;header id="masthead" class="site-header" role="banner"&gt;
+          &lt;hgroup&gt;&lt;/hgroup&gt;
+          &lt;nav role="navigation" class="site-navigation main-navigation"&gt;&lt;/nav&gt;&lt;!-- .site-navigation .main-navigation --&gt;
+     &lt;/header&gt;&lt;!-- #masthead .site-header --&gt;
+     &lt;div id="main" class="site-main"&gt;
+          &lt;div id="primary" class="content-area"&gt;
+               &lt;div id="content" class="site-content"&gt;
+               &lt;/div&gt;&lt;!-- #content .site-content --&gt;&lt;/div&gt;
+          &lt;!-- #primary .content-area --&gt;
+          &lt;div id="secondary" class="widget-area"&gt;
+          &lt;/div&gt;&lt;!-- #secondary .widget-area --&gt;
+          &lt;div id="tertiary" class="widget-area"&gt;
+          &lt;/div&gt;&lt;!-- #tertiary .widget-area --&gt;&lt;/div&gt;
+     &lt;!-- #main .site-main --&gt;
+     &lt;footer id="colophon" class="site-footer" role="contentinfo"&gt;
+          &lt;div class="site-info"&gt;
+          &lt;/div&gt;&lt;!-- .site-info --&gt;
+     &lt;/footer&gt;&lt;!-- #colophon .site-footer --&gt;
+&lt;/div&gt; &lt;!-- #page .hfeed .site --&gt;</pre>
+
+<p>事实上，这个HTML组成了_s的脊梁。继续把这个粘到你的文本编辑器并且把他存到一个顺手的地方，当我们勾践文件结构的时候，我们将会稍后使用到它。但是在这之前，我们还是要看一些事情。</p>
+<h1 id="WordPress主题HTML快速的预览"><a href="#WordPress主题HTML快速的预览" class="headerlink" title="WordPress主题HTML快速的预览"></a>WordPress主题HTML快速的预览</h1><p>[caption id=”attachment_1390” align=”aligncenter” width=”768”]<img src="http://kidozh.com/wp-content/uploads/2016/10/html-visual1.png" alt="一个HTML的样例，点击获得大尺寸图片"> 一个HTML的样例，点击获得大尺寸图片[/caption]</p>
+<p>看一下上面的HTML结构。块的颜色越深，也就代表其布局也越深。这些块的布局是由CSS所大致决定的，这些内容我们在后面会提到。</p>
+<p>你也可以编辑HTML结构来满足你的需要。举个例子，你可以把导航（navigation）块移出<code>header</code>块或者把小工具（widget）块放进页脚（footer）块。根据这个指南的入门，我们将会使用CSS来安排我们的内容和小工具界面。</p>
+<p>那么现在我们就开始写一点代码吧。</p>
+<p>首先，在内容页的类，<code>hfeed</code>，<code>hfeed</code>是hatom Microformat schema的一部分。用简单的英语来说，就是告诉计算机来阅读这个内容（比如搜索引擎的爬虫或者其他服务都会通过这个来访问）。</p>
+<p>看下文件结构中的<code>header</code>和<code>footer</code>的，你可能已经注意到了HTML5的新特征<code>header</code>和<code>footer</code>。这些标签描述了文件的广义小节。通过借用这些类名称，我将会向标记中添加更多的信息。</p>
+<p>你将会发现了在HTML标签中的<code>ARIA</code>  <code>role</code>这个属性。这个role属性能够帮助一些残障辅助工具也来浏览你的站点。你可以在这里获得更多这一点的信息。</p>
+<p>在我们HTML的主要区域中，注意一下我们的小工具块是在内容块之后的。你也许发现了我们的内容是在一个容器div（类名为‘content-area ’）这就是关键。它不仅让我们的主要内容在搜索引擎优先发现，而且使用CSS的时候也能精简CSS代码。</p>
+<p>这个HTML的结构将会是你WordPress的未来框架，并且也会告诉你怎么使用CSS和这个强大的功能所搭配。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/11/03/wordpress-e4-b8-bb-e9-a2-98-e6-a8-a1-e6-9d-bf-e5-92-8c-e7-9b-ae-e5-bd-95-e7-bb-93-e6-9e-84/" class="prev">上一篇</a><a href="/2016/10/21/e4-b8-bb-e9-a2-98-e5-bc-80-e5-8f-91-e5-b7-a5-e5-85-b7/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

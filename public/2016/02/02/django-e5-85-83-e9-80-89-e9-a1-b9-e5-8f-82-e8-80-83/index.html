@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [Django]元选项参考 · kidozh</title><meta name="description" content="[Django]元选项参考 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[Django]元选项参考</h1><div class="post-info">2016年2月2日</div><div class="post-content"><h1 id="模型元选项"><a href="#模型元选项" class="headerlink" title="模型元选项"></a>模型元选项</h1><p>这篇文档阐述了所有可用的元选项，你可以在你模型的Meta类中设置他们。</p>
+<h1 id="可用的元选项"><a href="#可用的元选项" class="headerlink" title="可用的元选项"></a>可用的元选项</h1><h2 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h2><p><code>Options.abstract</code></p>
+<p>如果 <code>abstract = True</code>， 就表示模型是 抽象基类 (abstract base class).</p>
+<h2 id="app-label"><a href="#app-label" class="headerlink" title="app_label"></a>app_label</h2><p><code>Options.app_label</code></p>
+<p>如果一个模型位于标准的位置之外（应用的models.py 或models 包），该模型必须定义它属于哪个应用：</p>
+<pre class="lang:python decode:true ">app_label = 'myapp'</pre>
+
+<p><strong>New in Django 1.7:</strong></p>
+<p>定义在应用的models 模块以外的模型，不再需要app_label。</p>
+<h2 id="db-table"><a href="#db-table" class="headerlink" title="db_table"></a>db_table</h2><p><code>Options.db_table</code></p>
+<p>该模型所用的数据表的名称：</p>
+<pre class="lang:python decode:true ">db_table = 'music_album'</pre>
+
+<h3 id="数据表名称"><a href="#数据表名称" class="headerlink" title="数据表名称"></a>数据表名称</h3><p>为节省你的时间，Django 会根据模型类的名称和包含它的应用的名称自动指定数据库表名称。一个模型的数据库表名称，由这个模型的“应用标签”（在<code>manage.py startapp</code>中使用的名称）和模型类名称之间加上下划线组成。</p>
+<p>举个例子，  bookstore应用(使用  <code>manage.py startapp bookstore</code> 创建)，里面有个名为 Book的模型，那数据表的名称就是  bookstore_book 。</p>
+<p>使用 Meta类中的 <code>db_table</code> 参数来重写数据表的名称。</p>
+<p>数据表名称可以是 <code>SQL</code> 保留字，也可以包含不允许出现在 Python 变量中的特殊字符，这是因为 Django 会自动给列名和表名添加引号。</p>
+<h4 id="在-MySQL中使用小写字母为表命名"><a href="#在-MySQL中使用小写字母为表命名" class="headerlink" title="在 MySQL中使用小写字母为表命名"></a>在 MySQL中使用小写字母为表命名</h4><p>当你通过<code>db_table</code>覆写表名称时，强烈推荐使用小写字母给表命名，特别是如果你用了MySQL作为后端。详见MySQL注意事项 。</p>
+<h4 id="Oracle中表名称的引号处理"><a href="#Oracle中表名称的引号处理" class="headerlink" title="Oracle中表名称的引号处理"></a>Oracle中表名称的引号处理</h4><p>为了遵从<code>Oracle</code>中30个字符的限制，以及一些常见的约定，Django会缩短表的名称，而且会把它全部转为大写。在db_table的值外面加上引号来避免这种情况：</p>
+<pre class="lang:python decode:true ">db_table = '"name_left_in_lowercase"'</pre>
+
+<p> 这种带引号的名称也可以用于Django所支持的其他数据库后端，但是除了Oracle，引号不起任何作用。详见 Oracle 注意事项 。</p>
+<h2 id="db-tablespace"><a href="#db-tablespace" class="headerlink" title="db_tablespace"></a>db_tablespace</h2><p><code>Options.db_tablespace</code></p>
+<p>当前模型所使用的数据库表空间 的名字。默认值是项目设置中的DEFAULT_TABLESPACE，如果它存在的话。如果后端并不支持表空间，这个选项可以忽略。</p>
+<h2 id="default-related-name"><a href="#default-related-name" class="headerlink" title="default_related_name"></a>default_related_name</h2><p><code>Options.default_related_name</code></p>
+<p><strong>New in Django 1.8.</strong></p>
+<p>这个名字会默认被用于一个关联对象到当前对象的关系。默认为 <code>&amp;lt;model_name&amp;gt;_set</code>。</p>
+<p>由于一个字段的反转名称应该是唯一的，当你给你的模型设计子类时，要格外小心。为了规避名称冲突，名称的一部分应该含有’<code>%(app_label)s</code>‘和’<code>%(model_name)s</code>‘，它们会被应用标签的名称和模型的名称替换，二者都是小写的。详见抽象模型的关联名称。</p>
+<h2 id="get-latest-by"><a href="#get-latest-by" class="headerlink" title="get_latest_by"></a>get_latest_by</h2><p><code>Options.get_latest_by</code></p>
+<p>模型中某个可排序的字段的名称，比如<code>DateField</code>、<code>DateTimeField</code>或者<code>IntegerField</code>。它指定了Manager的<code>latest()</code>和<code>earliest()</code>中使用的默认字段。</p>
+<p>例如：</p>
+<pre class="lang:python decode:true ">get_latest_by = "order_date"</pre>
+
+<p> 详见<code>latest()</code>文档。</p>
+<h2 id="managed"><a href="#managed" class="headerlink" title="managed"></a>managed</h2><p><code>Options.managed</code></p>
+<p>默认为<code>True</code>，意思是Django在<code>migrate</code>命令中创建合适的数据表，并且会在 <code>flush</code> 管理命令中移除它们。换句话说，Django会管理这些数据表的生命周期。</p>
+<p>如果是False，Django 就不会为当前模型创建和删除数据表。如果当前模型表示一个已经存在的，通过其它方法建立的数据库视图或者数据表，这会相当有用。这是设置为<code>managed=False</code>时唯一的不同之处。. 模型处理的其它任何方面都和平常一样。这包括：</p>
+<ol>
+<li>如果你不声明它的话，会向你的模型中添加一个自增主键。为了避免给后面的代码读者带来混乱，强烈推荐你在使用未被管理的模型时，指定数据表中所有的列。</li>
+<li>如果一个带有<code>managed=False</code>的模型含有指向其他未被管理模型的<code>ManyToManyField</code>，那么多对多连接的中介表也不会被创建。但是，一个被管理模型和一个未被管理模型之间的中介表会被创建。</li>
+</ol>
+<p>如果你需要修改这一默认行为，创建中介表作为显式的模型（设置为managed），并且使用<code>ManyToManyField.through</code>为你的自定义模型创建关联。</p>
+<p>对于带有<code>managed=False</code>的模型的测试，你要确保在测试启动时建立正确的表。</p>
+<p>如果你对修改模型类在Python层面的行为感兴趣，你可以设置 <code>managed=False</code> ，并且为一个已经存在的模型创建一个副本。但是这种情况下使用代理模型才是更好的方法。</p>
+<h2 id="order-with-respect-to"><a href="#order-with-respect-to" class="headerlink" title="order_with_respect_to"></a>order_with_respect_to</h2><p><code>Options.order_with_respect_to</code></p>
+<p>按照给定的字段把这个对象标记为”可排序的“。这一属性通常用到关联对象上面，使它在父对象中有序。比如，如果Answer和 Question相关联，一个问题有至少一个答案，并且答案的顺序非常重要，你可以这样做：</p>
+<pre class="lang:python decode:true ">from django.db import models
+
+class Question(models.Model):
+    text = models.TextField()
+    # ...
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question)
+    # ...
+
+    class Meta:
+        order_with_respect_to = 'question'</pre>
+
+<p> 当<tt><code>order_with_respect_to</code></tt> 设置之后，模型会提供两个用于设置和获取关联对象顺序的方法：<tt><code>get_RELATED_order()</code></tt> 和<tt><code>set_RELATED_order()</code></tt>，其中<tt><code>RELATED</code></tt>是小写的模型名称。例如，假设一个 <tt>Question</tt> 对象有很多相关联的<tt>Answer</tt>对象，返回的列表中含有相关联<tt>Answer</tt>对象的主键：</p>
+<pre class="lang:default decode:true ">&gt;&gt;&gt; question = Question.objects.get(id=1)
+&gt;&gt;&gt; question.get_answer_order()
+[1, 2, 3]</pre>
+
+<p> 与Question对象相关联的Answer对象的顺序，可以通过传入一格包含Answer 主键的列表来设置：</p>
+<pre class="lang:default decode:true ">&gt;&gt;&gt; question.set_answer_order([3, 1, 2])</pre>
+
+<p> 相关联的对象也有两个方法， <code>get_next_in_order()</code> 和<code>get_previous_in_order()</code>，用于按照合适的顺序访问它们。假设Answer对象按照 id来排序：</p>
+<pre class="lang:default decode:true ">&gt;&gt;&gt; answer = Answer.objects.get(id=2)
+&gt;&gt;&gt; answer.get_next_in_order()
+&lt;Answer: 3&gt;
+&gt;&gt;&gt; answer.get_previous_in_order()
+&lt;Answer: 1&gt;</pre>
+
+<p> 修改 <code>order_with_respect_to</code></p>
+<p><code>order_with_respect_to</code>属性会添加一个额外的字段（/数据表中的列）叫做<code>_order</code>，所以如果你在首次迁移之后添加或者修改了<code>order_with_respect_to</code>属性，要确保执行和应用了合适的迁移操作。</p>
+<h2 id="ordering"><a href="#ordering" class="headerlink" title="ordering"></a>ordering</h2><p><code>Options.ordering</code></p>
+<p>对象默认的顺序，获取一个对象的列表时使用：</p>
+<pre class="lang:python decode:true ">ordering = ['-order_date']</pre>
+
+<p>它是一个字符串的列表或元组。每个字符串是一个字段名，前面带有可选的“-”前缀表示倒序。前面没有“-”的字段表示正序。使用”?”来表示随机排序。</p>
+<p>例如，要按照pub_date字段的正序排序，这样写：</p>
+<pre class="lang:python decode:true ">ordering = ['pub_date']</pre>
+
+<p>按照pub_date字段的倒序排序，这样写：</p>
+<pre class="lang:python decode:true ">ordering = ['-pub_date']</pre>
+
+<p>先按照pub_date的倒序排序，再按照 author 的正序排序，这样写：</p>
+<pre class="lang:python decode:true ">ordering = ['-pub_date', 'author']</pre>
+
+<p><strong>警告</strong></p>
+<p>排序并不是没有任何代价的操作。你向ordering属性添加的每个字段都会产生你数据库的开销。你添加的每个外键也会隐式包含它的默认顺序。</p>
+<h2 id="permissions"><a href="#permissions" class="headerlink" title="permissions"></a>permissions</h2><p><code>Options.permissions</code></p>
+<p>设置创建对象时权限表中额外的权限。增加、删除和修改权限会自动为每个模型创建。这个例子指定了一种额外的权限，<code>can_deliver_pizzas</code>：</p>
+<pre class="lang:python decode:true ">permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)</pre>
+
+<p>它是一个包含二元组的元组或者列表，格式为 (permission_code, human_readable_permission_name)。</p>
+<h3 id="default-permissions"><a href="#default-permissions" class="headerlink" title="default_permissions"></a>default_permissions</h3><p><code>Options.default_permissions</code></p>
+<p><strong>New in Django 1.7.</strong></p>
+<p>默认为(‘add’, ‘change’, ‘delete’)。你可以自定义这个列表，比如，如果你的应用不需要默认权限中的任何一项，可以把它设置成空列表。在模型被migrate命令创建之前，这个属性必须被指定，以防一些遗漏的属性被创建。</p>
+<h2 id="proxy"><a href="#proxy" class="headerlink" title="proxy"></a>proxy</h2><p><code>Options.proxy</code></p>
+<p>如果<code>proxy = True</code>, 作为该模型子类的另一个模型会被视为代理模型。</p>
+<h3 id="select-on-save"><a href="#select-on-save" class="headerlink" title="select_on_save"></a>select_on_save</h3><p><code>Options.select_on_save</code></p>
+<p>该选项决定了Django是否采用1.6之前的 <code>django.db.models.Model.save()</code>算法。旧的算法使用<code>SELECT</code>来判断是否存在需要更新的行。而新式的算法直接尝试使用 UPDATE。在一些小概率的情况中，一个已存在的行的<code>UPDATE</code>操作并不对Django可见。比如PostgreSQL的<code>ON UPDATE</code>触发器会返回<code>NULL</code>。这种情况下，新式的算法会在最后执行 <code>INSERT</code> 操作，即使这一行已经在数据库中存在。</p>
+<p>通常这个属性不需要设置。默认为<code>False</code>。</p>
+<p>关于旧式和新式两种算法，请参见<code>django.db.models.Model.save()</code>。</p>
+<h3 id="unique-together"><a href="#unique-together" class="headerlink" title="unique_together"></a>unique_together</h3><p><code>Options.unique_together</code></p>
+<p>用来设置的不重复的字段组合：</p>
+<pre class="lang:python decode:true ">unique_together = (("driver", "restaurant"),)</pre>
+
+<p>它是一个元组的元组，组合起来的时候必须是唯一的。它在Django后台中被使用，在数据库层上约束数据(比如，在  <code>CREATE TABLE</code>  语句中包含  UNIQUE语句)。</p>
+<p>为了方便起见，处理单一字段的集合时，<code>unique_together</code> 可以是一维的元组：</p>
+<pre class="lang:python decode:true ">unique_together = ("driver", "restaurant")</pre>
+
+<p><code>ManyToManyField</code>不能包含在<code>unique_together</code>中。（这意味着什么并不清楚！）如果你需要验证<code>ManyToManyField</code>关联的唯一性，试着使用信号或者显式的贯穿模型(<code>explicit through model</code>)。</p>
+<p><strong>Changed in Django 1.7:</strong></p>
+<p>当<code>unique_together</code>的约束被违反时，模型校验期间会抛出<code>ValidationError</code>异常。</p>
+<h2 id="index-together"><a href="#index-together" class="headerlink" title="index_together"></a>index_together</h2><p><code>Options.index_together</code></p>
+<p>用来设置带有索引的字段组合：</p>
+<pre class="lang:python decode:true ">index_together = [
+
+    ["pub_date", "deadline"],
+
+]</pre>
+
+<p>列表中的字段将会建立索引（例如，会在<code>CREATE INDEX</code>语句中被使用）。</p>
+<p><strong>Changed in Django 1.7.</strong></p>
+<p>为了方便起见，处理单一字段的集合时，index_together可以是一个一维的列表。</p>
+<pre class="lang:python decode:true ">index_together = ["pub_date", "deadline"]</pre>
+
+<h2 id="verbose-name"><a href="#verbose-name" class="headerlink" title="verbose_name"></a>verbose_name</h2><p><code>Options.verbose_name</code></p>
+<p>对象的一个易于理解的名称，为单数：</p>
+<pre class="lang:python decode:true ">verbose_name = "pizza"</pre>
+
+<p>如果此项没有设置，Django会把类名拆分开来作为自述名，比如CamelCase 会变成camel case，</p>
+<h3 id="verbose-name-plural"><a href="#verbose-name-plural" class="headerlink" title="verbose_name_plural"></a>verbose_name_plural</h3><p><code>Options.verbose_name_plural</code></p>
+<p>该对象复数形式的名称：</p>
+<pre class="lang:python decode:true ">verbose_name_plural = "stories"</pre>
+
+<p>如果此项没有设置，Django 会使用 <code>verbose_name + &quot;s&quot;</code>。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/02/24/e6-96-b0-e5-ad-a6-e5-b9-b4-e5-bc-80-e5-a7-8b/" class="prev">上一篇</a><a href="/2016/02/01/django-e6-a8-a1-e5-9e-8b-e5-ad-97-e6-ae-b5-e5-8f-82-e8-80-83/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

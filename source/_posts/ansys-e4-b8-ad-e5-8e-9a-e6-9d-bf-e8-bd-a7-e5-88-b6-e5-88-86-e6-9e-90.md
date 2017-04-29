@@ -1,0 +1,1209 @@
+---
+title: '[ANSYS]中厚板轧制分析'
+tags:
+  - ANSYS
+  - 机械
+  - 金属塑形成型原理
+id: 649
+categories:
+  - 机械
+date: 2015-12-09 02:49:06
+---
+
+我完成了对于ANSYS的基本认识，现在我就开始我的第一个实例，中厚板轧制分析,由于时长所限制我目前只给出求解之前的步骤
+
+# 主要参数计算：
+
+[![Concept](/wp-content/uploads/2015/12/Concept.png)](/wp-content/uploads/2015/12/Concept.png)
+
+在图片里我们给出了轧件咬入时候的受力分析。
+
+公式：$$ P = 2k\sqrt{R\Delta h} $$
+
+式子中：P为轧制力，2k为平均屈服应力，R为轧辊半径，$$ \Delta H $$ 为轧件的压下量。
+
+而咬入的条件为：$$\mu > tan \alpha$$
+
+式子中 $$ \mu $$为摩擦因素，$$\alpha $$为咬入角
+
+最大压下量为：$$ \Delta h_{max} > \mu^{2}R_{max} $$
+
+式子中：$$\Delta h_{max}$$为最大压下量，$$R_{max}$$为轧辊的最大半径
+
+## 中厚板的轧制实例
+
+这里我们建个模，设置初始条件有：
+
+初始速度$$v_{0}$$为5.8 m/s
+
+轧辊的角速度$$ \omega $$为6.28 Rad/s
+
+$$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 0.2
+
+对于轧件：
+
+*   密度$$ \rho = 7850 kg/m^{3} $$
+*   $$ E = 1.17*10^{11} Pa $$
+*   $$ \nu = 0.36 $$
+*   $$ \sigma_{Y} =  5.8*10^{7}  Pa $$
+*   $$ \sigma_{tan} = 9*10^{6} Pa $$
+
+对于轧辊
+
+*   密度<span style="line-height: 22.8571px;">$$ \rho = 7850 kg/m^{3} $$</span>
+*   $$ E = 2.1*10^{11} $$
+*   <span style="line-height: 22.8571px;">$$ \nu = 0.3 $$</span><span style="line-height: 22.8571px;"> </span>
+
+由于轧件在轧制过程中是对称分布，则我取了模型的**1/4**进行求解，同时将模型的密度放大**100**倍进行分析，缩短计算时间。
+
+# <span style="font-family: Consolas;">ANSYS</span>分析
+
+1.  ### 启动ANSYS
+
+1.1 以GUI模式进入ANSYS，同时在licensel栏中选择<span style="color: #00b050;">**LS-DYNA**</span>。（由于我的计算机并不支持CUDA并行计算，所以并没有开启GPU加速，有Nvidia显卡的同学可以选择开启此项功能）
+
+1.2 选择File Management对话框，在总路径下面为新工程建立一个子路径：ansysProduct/myHomework,工作名取为myHomework。
+
+1.3其他选项保持MEI认值，单击Run按钮进入ANSYS 10.0操作界面。
+
+### 2.设定标题
+
+选择菜单Utility Menu &gt; File &gt; Change Jobname 弹出对话框，输入myHomework，在New log and error files中选择Yes，单击OK按钮确认并且关闭对话框。
+
+### 3.定义单元类型
+
+3.1 选择菜单 Main Menu &gt; Preprocessor &gt; Element Types &gt; Add/Edit/Delete ，弹出Element Types 对话框。
+
+3.2 单击Add… 按钮，弹出Library of Element Types 对话框，在 <span style="color: #00b050;">**LS-DYNA**</span>
+ <span style="color: #00b050;">** Explicit**</span>下选择 <span style="text-decoration: underline;">3D Solid 164
+ </span>
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS2.png)
+
+3.3单击OK，退出后，点击Close ，关闭Element Types 对话框
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS3.png)
+
+3.4 （定义材料的模型）选择菜单Main Menu&gt;Preprocessor&gt;Material Props &gt;Material Models，弹出Define Material Model Behavior出现了Material Model Number 1，在对话框右边选择LS-DYNA &gt;Nonlinear &gt; Inelastic &gt;Isotropic Harding &gt; Bilinear Isotropic，在DENS（密度）输入785000，EX输入1.17E+011，NUXY输入0.36，Yield Stress 输入5.8E+077，Tangent Modulus 输入9E+006，如下图所示。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS4.png)
+
+3.5（定义第二个材料模型）同样的，选择菜单栏中的Material &gt; New Model，弹出的Define Material ID对话框，输入2。在右边窗口中选择LS-DYNA &gt;Rigid Properties，定义轧辊材料。这个时候在DENS输入785000，EX输入2.1E+11，NUXY输入0.3，Translation Constraint Parameter（平移约束参数）处选择All disps, Rotational Constraint Parameter（旋转约束参数）出选择Y and Z rotate。单击OK后关闭对话框后，在Material 菜单下单击QUIT，退出对话框。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS5.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS6.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS7.png)
+
+### 4.建立几何模型
+
+4.1 选择Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt; Keypoint &gt; In Active CS ，选择Crete Keypoints in Active Coordinate System 对话框，在X,Y,Z处依次填入 -0.001 , 0.0016,单击Apply
+
+4.2 在 X,Y,Z依次填入-0.001,0.506,0,单击Apply
+
+4.3分别填入 0.6,0.506,0,单击Apply
+
+4.4 分别填入0.6,0.016,0，单击OK，退出Create Keypoints in Active CS （1，2，3，4标号均已经给出，如下图）
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS8.png)
+
+4.5（画直线）选择 Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt;Lines&gt;Lines &gt; Straight Lines ， 依次点击 1 和2，2和3，3和4，4和1，在前三步点击Apply，在最后一项上点击OK完成直线的绘制。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS9.png)
+
+4.6（显示线框的编号）在Utility Menu &gt; Plot Ctrls &gt;Numbering，弹出Plot Numbering Controls，将Lines numbers 设置为On，单击OK，然后在 Utility Menu &gt; Plot &gt; Lines 使得图形窗口中显示线。这里我们可以看到：
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS10.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS11.png)
+
+4.7（画出轧棍）在 Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt; Areas &gt; Arbitrary &gt; By Lines,按照顺序单击L1,L2,L3,L4，完成截面的建立，选择Main Menu &gt; Preprocessor &gt; Operate &gt; Extrude &gt; Areas &gt; About Axis ,弹出Sweep Areas about 对话框，在图形窗口中选择我们刚刚绘制出的A1(Area 1)，单击OK，在接下来弹出来的Sweep Areas about Axis对话框中，在ARC栏中输入360，单击OK完成轧辊的几何模型，同时退出Sweep Areas about Axis
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS12.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS13.png)
+
+4.8（画出轧件）在 Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt; Volumes &gt; Block &gt; ByDimensions弹出的对话框在X-coordinates中输入0，0.5，在Y-coordinates中输入0，0.02，在Z-coordinates中输入-0.15，-0.65.单击OK完成轧辊的几何模型，同时也可以显示出轧辊的几何模型。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS14.png)
+
+### 5.划分网格
+
+5.1 （体的标号）选择 Utility Menu &gt; Plot Ctrls &gt; Numbering 所弹出的对话框中设置Volume numbers 为on，单击OK退出Plot Numbering Controls，并且在Utility Menu&gt; Plot &gt;Volumes中显示体。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS15.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS16.png)
+
+5.2（选择轧件）在Utility Menu &gt; Select &gt; Entities所弹出的Select Enti…对话框中选择Volume,By Num/Pick,选择V5（轧件），单击OK。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS17.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS18.png)
+
+5.3（只选择轧件）在Utility Menu&gt; Select&gt;Everything Below&gt;Selected Volumes ,在选择的体下编辑。同时在Utility Menu&gt;Plot&gt;Lines中显示轧辊的所有的线。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS19.png)
+
+5.4（设定划分曲线的形式）选择Main Menu &gt; Preprocessor &gt; Meshing &gt;Mesh Attributes &gt; Default Attribs弹出Meshing Attributes 在[MAT]中选择1（板坯轧件），单击OK退出
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS20.png)
+
+5.5（划分网格的尺寸控制）选择Main Menu&gt;Preprocessor &gt;Meshing &gt;Size Cntrl &gt;ManualSize &gt;Lines &gt;Picked Lines，弹出Element Size On…对话框。
+
+5.6（长的网格分段）在图形窗口中选择L30，31，32，33，在Element Size On对话框中单击Apply，弹出<span style="color: #00b0f0;">**Element Size On Picked Lines**</span>对话框，在NDIV No. of element divisions中输入51。单击Apply。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS21.png)
+
+5.6（宽的网格分段）在图形窗口中选择L23，25，26，28，在Element Size On对话框中单击Apply，弹出Element Size On Picked Lines对话框，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入21。单击Apply。
+
+5.6（高的网格分段）在图形窗口中选择L23，25，26，28，在Element Size On对话框中单击Apply，弹出Element Size On Picked Lines对话框，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入11。单击Apply。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS22.png)
+
+5.7（完成板坯V5的网格划分）选择Main Menu &gt; Preprocessor &gt;Meshing &gt;Mesh &gt;Volumes &gt;Mapped &gt;4 or 6 sided，弹出Mesh &gt; Volumes对话框，这里单击板坯V5，单击OK，完成板坯的网格划分。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS23.png)
+
+5.8（选择轧辊的步骤）选择Utility Menu &gt; Select &gt; Everything，然后选择Utility Menu &gt; Plot &gt; Volume显示体，然后Utility Menu &gt;Select&gt;Entities…弹出的对话框中选择Volume、By Num/Pick，单击轧辊（根据ANSYS的格式，应该是V1，2，3，4），单击OK。
+
+5.9（显示轧辊）选择Utility Menu &gt;Select &gt;Everything Below &gt;Selected Volume选定好了轧辊，选择Utility Menu &gt; Plot &gt;Line，显示所有的线。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS24.png)
+
+5.10（选择轧辊的性质）同上面的理在Main Menu &gt; Preprocessor &gt;Meshing &gt;Mesh Attributes &gt;Default Attribs，弹出Meshing Attributes对话框中，在[MAT]中选择2（Rigid轧辊），单击OK
+
+5.11（划分轧辊的对话框）选择Main Menu &gt; Preprocessor &gt;Meshing &gt; Size Cntrl&gt;Lines &gt;Picked Lines，在弹出的对话框中选择轧辊中的所有线段（Pick all![](/wp-content/uploads/2015/12/120815_1846_ANSYS25.png)），弹出Element Sizes On Picked Lines对话框，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入31，单击Apply在之后，在图形窗口中选择L2,4,12,7,17(也就是轴中框)，单击OK，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入11.
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS26.png)
+
+5.12 选择Main Menu &gt; Preprocessor &gt;Meshing &gt; Meshing &gt;MeshTool，弹出对话框，启动<span style="color: #7030a0;">**SmartSize**</span>，选择MeshTool的<span style="color: #7030a0;">Hex</span>和<span style="color: #7030a0;">Sweep</span>，单击<span style="color: #7030a0;">Sweep</span>，在弹出的对话框中，在图形窗口中选择轧辊（V<span style="color: #c00000; font-size: 14pt;">1,2,3,4</span>）。单击<span style="color: #c00000;">OK</span>之后完成对轧辊的划分。
+
+5.13 选择Utility Menu&gt;Select &gt;Everything以保证PART的正常进行。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS27.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS28.png)
+
+### 6.生成PART
+
+6.1 选择Main Menu &gt; Preprocessor&gt; LS-DYNA Options&gt;Parts Option，弹出Parts Date Written for LS-DYNA，选择Create all parts，单击OK后，从对话框中选择File &gt; Close，关闭EDPART Command对话框
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS29.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS30.png)
+
+在上面的对话框中，PART1和2分别代表轧件和轧辊，他们由MAT(material)来区分的。同时，轧件上单元数目为11781，轧辊的单元数目为23925个。
+
+### 7.定义接触
+
+7.1选择Main Menu &gt; Preprocessor &gt; LS-DYNA Options &gt; Contact &gt; Define Contact，弹出Contact Parameter Definitions（接触参数定义）对话框。选择Surface To Surf &gt; Automatic(ASTS)，在Static Friction Coefficient(动摩擦系数)中输入0.35，在Dynamic Friction Coefficient（动态摩擦系数）栏中输入0.2。单击OK。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS31.png)
+
+7.2在Contact Component or Part no 中选择1（板坯），在Target Component or Part no中选择2（轧辊）
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS32.png)
+
+### 8.创建组件，施加约束
+
+8.1选择Utility Menu &gt;Select &gt;Entities…，弹出Select Enti…对话框，依次选择Volume、By Num/Pick，单击OK，选择板坯轧件（V5）。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS33.png)
+
+8.2选择Utility Menu &gt;Select&gt;Entities，依次选择Nodes、Attached to、Volumes、all、From Full，单击OK。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS34.png)
+
+8.3选择Utility Menu&gt;Select &gt;Comp/Assembly &gt;Create Component…，在弹出的对话框中，Cname中输入slab，在Entity中选取Nodes，完成Component的设置。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS35.png)
+
+8.4选择Utility Menu &gt; Select &gt;Entities…，依次选取Nodes、ByLocation、Y coordinates、0、Reselect，单击OK（沿Y轴的节点）
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS36.png)
+
+8.5（完成轧件底部的约束）选择Main Menu &gt; Preprocessor &gt;LS-DYNA Option &gt;Constraints &gt;Apply &gt;On Nodes，弹出的对话框中继续Pick All，单击OK完成对于<span style="color: #4472c4;">轧件底部的约束</span>
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS37.png)
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS38.png)
+
+8.6选择Utility Menu &gt;Select &gt; Everything Below&gt; Selected Volumes。
+
+8.7选择Utility Menu&gt; Select &gt; Entities…,弹出Select Enti…对话框中依次选取Nodes、ByLocation、X coordinates、0、Reselect，单击OK
+
+8.8选择Main Menu &gt;Preprocessor &gt;LS-DYNA Option &gt; Constraints Apply &gt;On Nodes，在弹出的对话框中Select All，在Lab2栏中选择UX，在Value栏中输入0
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS39.png)
+
+8.9选择Utility Menu &gt;Select &gt;Everything
+
+8.10（设置初始速度）选择Main Menu &gt; Preprocessor &gt;LS-DYNA Option &gt; Initial Velocity &gt; On Nodes &gt; w/Nodal Rotate，弹出Input Velocity 对话框中，在Input Velocity on component栏中选择SLAB，在VZ栏中输入2.88，单击OK
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS40.png)
+
+### 9.施加载荷
+
+9.1选择Utility Menu &gt; Parameters &gt; Array Parameters &gt; Define/Edit，在弹出来的对话框中单击Add。
+
+9.2在弹出来的对话框中，在Par处输入time，在I，J，K处分别输入2，1，1，单击Apply
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS41.png)
+
+9.3在弹出来的对话框中，在Par处输入velocity，在I，J，K处分别输入2，1，1，单击Apply
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS42.png)
+
+9.4选择time，单击<span style="color: #00b050;">Edit</span>…，弹出Array Parameter Time 对话框，在第一栏中输入0，在第二栏中输入0.08，选择<span style="color: #00b0f0;">File&gt;Apply/Quit</span>。保存数据并退出。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS43.png)
+
+9.5选择velocity，单击<span style="color: #00b050;">Edit</span>…，弹出Array Parameter Time 对话框，在第一栏中输入0，在第二栏中输入-2.62，选择<span style="color: #00b0f0;">File&gt;Apply/Quit</span>。保存数据并退出。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS44.png)
+
+9.6选择Main Menu &gt; Preprocessor &gt; LS-DYNA Option &gt; Loading Option&gt; Specify Loads，弹出对话框中，在LoadLabels栏中选择RBRX，在Component name or PART number 栏中选择2（轧辊），在Parameter name for time values中选择TIME，在Parameter name for date value中选择VELOCITY，单击OK，完成轧辊的加载。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS45.png)
+
+### 10.求解（输出文件格式、时间、时间步）
+
+10.1选择Main Menu &gt;Solution &gt;Analysis Options &gt;Energy Options，弹出对话框，单击OK后退出。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS46.png)
+
+10.2选择Main Menu&gt; Solution &gt;Time Controls &gt;Solution Time，弹出对话框，输入0.15.
+
+10.3选择Main Menu&gt;Solution &gt; Output Controls &gt; Output File Type，弹出的对话框中，选择ANSYS and LS-DYNA，单击OK。
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS47.png)
+
+10.4选择Main Menu&gt;Solution &gt; Output Controls &gt;File Output Freq &gt; Number of Steps，在弹出的对话框在，在[EDRST]栏中输入50，[EDHTIME]栏中输入1000，[EDDUMP]栏中输入1，单击OK
+
+![](/wp-content/uploads/2015/12/120815_1846_ANSYS48.png)
+
+10.5选择Main Menu &gt; Solution &gt; Solve，弹出Solve Current Load Step，单击OK求解。
+
+注：这个过程进行时间比较长，在我的电脑（联想G500，Intel i7 Ivb）下大概运行了1小时6分钟。那么我的BLOG也到这里，我会在下一篇阐述结果和查看结果的方法。
+
+下面是ANSYS命令流的代码：
+<pre class="wrap:true minimize:true lang:default decode:true"> ANSYS Mechanical/LS-DYNA
+ Point Releases and Patches installed:
+
+ ANSYS, Inc. Products 15.0
+ ANSYS Mechanical Products 15.0
+ ANSYS Customization Files 15.0
+ ANSYS Autodyn 15.0
+ ANSYS LS-DYNA 15.0
+ ANSYS CFX (includes ANSYS CFD-Post) 15.0
+ ANSYS Fluent (includes ANSYS CFD-Post) 15.0
+ ANSYS TurboGrid 15.0
+ ANSYS Polyflow (includes ANSYS CFD-Post) 15.0
+ ANSYS CFD-Post only 15.0
+ ANSYS Aqwa 15.0
+ ANSYS ICEM CFD 15.0
+ ANSYS Icepak (includes ANSYS CFD-Post) 15.0
+ Catia, Version 6 15.0
+ ANSYS, Inc. License Manager 15.0
+
+          *****  ANSYS COMMAND LINE ARGUMENTS  *****
+  INITIAL JOBNAME              = myHomework                                                                                                                                                                                                                             
+  START-UP FILE MODE           = READ
+  STOP FILE MODE               = READ
+  GRAPHICS DEVICE REQUESTED    = win32
+  GRAPHICAL ENTRY              = YES
+  LANGUAGE                     = en-us
+  INITIAL DIRECTORY = D:\ANSYS_Product
+
+ 00762312          VERSION=WINDOWS x64     RELEASE= 15.0     UP20131014
+ CURRENT JOBNAME=myHomework  22:34:15  DEC 08, 2015 CP=      1.469
+
+ /SHOW SET WITH DRIVER NAME= WIN32   ,  RASTER MODE,  GRAPHIC PLANES =  8
+
+ RUN SETUP PROCEDURE FROM FILE= D:\Program Files\ANSYS Inc\v150\ANSYS\apdl\start150.ans
+
+ /INPUT FILE= menust.tmp  LINE=       0
+
+ /INPUT FILE= D:\Program Files\ANSYS Inc\v150\ANSYS\apdl\start150.ans  LINE=       0
+ ACTIVATING THE GRAPHICAL USER INTERFACE (GUI).  PLEASE WAIT...
+
+ CUTTING PLANE SET TO THE WORKING PLANE
+
+ PRODUCE NODAL PLOT IN DSYS=  0
+ TURN OFF WORKING PLANE DISPLAY
+
+ ***** ANSYS - ENGINEERING ANALYSIS SYSTEM  RELEASE 15.0      *****
+ ANSYS Mechanical/LS-DYNA
+ 00762312          VERSION=WINDOWS x64   22:34:31  DEC 08, 2015 CP=      4.906
+
+          ***** ANSYS ANALYSIS DEFINITION (PREP7) *****
+
+ ENTER  /SHOW,DEVICE-NAME  TO ENABLE GRAPHIC DISPLAY
+ ENTER  FINISH             TO LEAVE PREP7
+ PRINTOUT KEY SET TO /GOPR (USE /NOPR TO SUPPRESS)
+
+ *** NOTE ***                            CP =       5.828   TIME= 22:35:58
+ KEYOPT( 1 ) has been set to 1 for element type SOLID164\.         
+
+ ELEMENT TYPE      1 IS SOLID164     EXPLCT CONSTANT STRESS SOLID
+  KEYOPT( 1- 6)=        1      0      0        0      0      0
+  KEYOPT( 7-12)=        0      0      0        0      0      0
+  KEYOPT(13-18)=        0      0      0        0      0      0
+
+ CURRENT NODAL DOF SET IS  UX    UY    UZ    AX    AY    AZ    VX    VY
+                           VZ
+  THREE-DIMENSIONAL MODEL
+
+ *** NOTE ***                            CP =       5.828   TIME= 22:35:58
+ Although VX,VY,VZ and AX,AY,AZ may appear as degrees of freedom, they
+ are not actually physical degrees of freedom.  However, these    
+ quantities are computed as degrees of freedom and stored for     
+ post-processing.                                                 
+
+ KEYPOINT      0   X,Y,Z= -0.100000E-02  0.160000E-01   0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      1
+
+ PLOT KEY POINTS FROM       1 TO       1 BY      1
+
+ KEYPOINT      0   X,Y,Z= -0.100000E-02  0.506000       0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      2
+
+ PLOT KEY POINTS FROM       1 TO       2 BY      1
+
+ KEYPOINT      0   X,Y,Z= -0.600000      0.506000       0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      3
+
+ PLOT KEY POINTS FROM       1 TO       3 BY      1
+
+ DELETE ALL PICKED KEYPOINTS.
+
+ *** NOTE ***                            CP =       8.672   TIME= 22:43:46
+ No key points selected to display.  The KPLOT command is ignored.
+
+ AUTOMATIC SCALING FOR WINDOW 1
+    DISTANCE AND FOCUS POINT AUTOMATICALLY CALCULATED
+
+ *** NOTE ***                            CP =       9.062   TIME= 22:43:51
+ No key points selected to display.  The KPLOT command is ignored.
+
+ view point for window  1    0.0000     -1.0000      0.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ *** NOTE ***                            CP =       9.078   TIME= 22:43:52
+ No key points selected to display.  The KPLOT command is ignored.
+
+ AUTOMATIC SCALING FOR WINDOW 1
+    DISTANCE AND FOCUS POINT AUTOMATICALLY CALCULATED
+
+ *** NOTE ***                            CP =       9.094   TIME= 22:43:53
+ No key points selected to display.  The KPLOT command is ignored.
+
+ KEYPOINT      0   X,Y,Z= -0.100000E-02  0.160000E-01   0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      1
+
+ KEYPOINT      0   X,Y,Z= -0.100000E-02  0.506000       0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      2
+
+ KEYPOINT      0   X,Y,Z=  0.600000      0.506000       0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      3
+
+ PLOT KEY POINTS FROM       1 TO       3 BY      1
+
+ KEYPOINT      0   X,Y,Z=  0.600000      0.160000E-01   0.00000      IN CSYS=  0
+
+     KEYPOINT NUMBER =      4
+
+ AUTOMATIC SCALING FOR WINDOW 1
+    DISTANCE AND FOCUS POINT AUTOMATICALLY CALCULATED
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    0.0000     -1.0000      0.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    0.0000     -1.0000      0.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    0.0000      1.0000      0.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    1.0000      0.0000      0.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    0.0000      0.0000      1.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    1.0000      2.0000      3.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ view point for window  1    0.0000      0.0000      1.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT KEY POINTS FROM       1 TO       4 BY      1
+
+ LINE CONNECTS KEYPOINTS      1     2
+  LINE NO.=     1  KP1=      1  TAN1=    0.0000  -1.0000   0.0000
+                   KP2=      2  TAN2=    0.0000   1.0000   0.0000
+
+ LINE CONNECTS KEYPOINTS      2     3
+  LINE NO.=     2  KP1=      2  TAN1=   -1.0000   0.0000   0.0000
+                   KP2=      3  TAN2=    1.0000   0.0000   0.0000
+
+ LINE CONNECTS KEYPOINTS      3     4
+  LINE NO.=     3  KP1=      3  TAN1=    0.0000   1.0000   0.0000
+                   KP2=      4  TAN2=    0.0000  -1.0000   0.0000
+
+ LINE CONNECTS KEYPOINTS      4     1
+  LINE NO.=     4  KP1=      4  TAN1=    1.0000   0.0000   0.0000
+                   KP2=      1  TAN2=   -1.0000   0.0000   0.0000
+
+ PLOT LINES FROM     1  TO     4  BY      1
+
+ KP   NUMBERING KEY =  0
+
+ LINE NUMBERING KEY =  1
+
+ AREA NUMBERING KEY =  0
+
+ VOLU NUMBERING KEY =  0
+
+ NODE NUMBERING KEY =  0
+
+ TABN NUMBERING KEY =  0
+
+ SVAL NUMBERING KEY =  0
+
+ NUMBER KEY SET TO  0  -1=NONE  0=BOTH  1=COLOR  2=NUMBER
+
+ ELEM NUMBERING KEY =  0
+
+ PLOT LINES FROM     1  TO     4  BY      1
+
+ KP   NUMBERING KEY =  0
+
+ LINE NUMBERING KEY =  1
+
+ AREA NUMBERING KEY =  0
+
+ VOLU NUMBERING KEY =  0
+
+ NODE NUMBERING KEY =  0
+
+ TABN NUMBERING KEY =  0
+
+ SVAL NUMBERING KEY =  0
+
+ NUMBER KEY SET TO  0  -1=NONE  0=BOTH  1=COLOR  2=NUMBER
+
+ ELEM NUMBERING KEY =  0
+
+ PLOT LINES FROM     1  TO     4  BY      1
+
+ PLOT LINES FROM     1  TO     4  BY      1
+
+ *** ERROR ***                           CP =      12.906   TIME= 22:59:09
+ This function requires selected areas.                           
+  No areas are currently selected.                                
+
+ DEFINE AREA BY LIST OF LINES
+      (TRAVERSED IN SAME DIRECTION AS LINE     1)
+
+     AREA NUMBER =      1
+
+ ROTATE AREAS
+        1,
+      ABOUT THE AXIS DEFINED BY KEYPOINTS      2     3
+     DEGREES OF ARC=   360.00   NUMBER OF SEGMENTS=   4
+
+ PLOT VOLUMES FROM     1  TO     4  BY    1
+
+ CREATE A HEXAHEDRAL VOLUME WITH
+ X-DISTANCES FROM      0.000000000     TO     0.5000000000
+ Y-DISTANCES FROM      0.000000000     TO     0.2000000000E-01
+ Z-DISTANCES FROM    -0.6500000000     TO    -0.1500000000
+
+      OUTPUT VOLUME =     5
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ view point for window  1    1.0000      2.0000      3.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ view point for window  1    1.0000      1.0000      1.0000
+
+ ROTATION ANGLE FOR WINDOW 1 IS     0.00 ABOUT AXIS ZS
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ KP   NUMBERING KEY =  0
+
+ LINE NUMBERING KEY =  1
+
+ AREA NUMBERING KEY =  0
+
+ VOLU NUMBERING KEY =  1
+
+ NODE NUMBERING KEY =  0
+
+ TABN NUMBERING KEY =  0
+
+ SVAL NUMBERING KEY =  0
+
+ NUMBER KEY SET TO  0  -1=NONE  0=BOTH  1=COLOR  2=NUMBER
+
+ ELEM NUMBERING KEY =  0
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ CUMULATIVE ROTATION ANGLE FOR WINDOW 1 IS   -30.00 ABOUT AXIS YS
+
+ NEW VIEW SETTINGS FOR WINDOW 1 SET TO:
+   VIEW POINT IS  0.85355     0.50000     0.14645
+   ROTATION ABOUT ZS AXIS IS    19.47 DEGREES
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ CUMULATIVE ROTATION ANGLE FOR WINDOW 1 IS   -30.00 ABOUT AXIS YS
+
+ NEW VIEW SETTINGS FOR WINDOW 1 SET TO:
+   VIEW POINT IS  0.90105     0.28868    -0.32370
+   ROTATION ABOUT ZS AXIS IS    31.48 DEGREES
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ CUMULATIVE ROTATION ANGLE FOR WINDOW 1 IS   -30.00 ABOUT AXIS YS
+
+ NEW VIEW SETTINGS FOR WINDOW 1 SET TO:
+   VIEW POINT IS  0.70711      0.0000    -0.70711
+   ROTATION ABOUT ZS AXIS IS    35.26 DEGREES
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ CUMULATIVE ROTATION ANGLE FOR WINDOW 1 IS    30.00 ABOUT AXIS XS
+
+ NEW VIEW SETTINGS FOR WINDOW 1 SET TO:
+   VIEW POINT IS  0.40825     0.40825    -0.81650
+   ROTATION ABOUT ZS AXIS IS    39.23 DEGREES
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ KP   NUMBERING KEY =  0
+
+ LINE NUMBERING KEY =  1
+
+ AREA NUMBERING KEY =  0
+
+ VOLU NUMBERING KEY =  1
+
+ NODE NUMBERING KEY =  0
+
+ TABN NUMBERING KEY =  0
+
+ SVAL NUMBERING KEY =  0
+
+ NUMBER KEY SET TO  0  -1=NONE  0=BOTH  1=COLOR  2=NUMBER
+
+ ELEM NUMBERING KEY =  0
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ KP   NUMBERING KEY =  0
+
+ LINE NUMBERING KEY =  1
+
+ AREA NUMBERING KEY =  0
+
+ VOLU NUMBERING KEY =  1
+
+ NODE NUMBERING KEY =  0
+
+ TABN NUMBERING KEY =  0
+
+ SVAL NUMBERING KEY =  0
+
+ NUMBER KEY SET TO  0  -1=NONE  0=BOTH  1=COLOR  2=NUMBER
+
+ ELEM NUMBERING KEY =  0
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+ SELECT       FOR ITEM=VOLU COMPONENT=
+  IN RANGE         5 TO          5 STEP          1
+
+        1  VOLUMES (OF        5  DEFINED) SELECTED BY  VSEL  COMMAND.
+
+ SELECT ALL ENTITIES ASSOCIATED WITH TYPE= VOLU
+
+ SELECT      ALL AREAS HAVING ANY VOLUMES IN SELECTED VOLUME SET.
+
+        6  AREAS (OF       22  DEFINED) SELECTED FROM
+        1 SELECTED VOLUMES BY  ASLV  COMMAND.
+
+ SELECT      LINES ASSOCIATED WITH SELECTED AREAS
+
+       12  LINES (OF       33  DEFINED) SELECTED FROM
+        6 SELECTED AREAS BY  LSLA  COMMAND.
+
+ SELECT      ALL KEYPOINTS ON ANY LINE IN LINE SET.
+
+        8  KEYPOINTS (OF       18  DEFINED) SELECTED FROM
+       12 SELECTED LINES BY  KSLL  COMMAND.
+
+ SELECT      ELEMENTS CREATED FROM SELECTED VOLUMES.
+
+        0  ELEMENTS (OF        0  DEFINED) SELECTED FROM
+        1 SELECTED VOLUMES BY  ESLV  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED AREAS.
+
+        0  ELEMENTS (OF        0  DEFINED) SELECTED FROM
+        6 SELECTED AREAS BY  ESLA  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED LINES.
+
+        0  ELEMENTS (OF        0  DEFINED) SELECTED FROM       12 SELECTED LINES
+         BY  ESLL  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED KEYPOINTS.
+
+        0  ELEMENTS (OF        0  DEFINED) SELECTED FROM        8 SELECTED KPTS
+         BY  ESLK  COMMAND.
+
+        0 NODES (OF        0  DEFINED) SELECTED FROM
+        0 SELECTED ELEMENTS BY NSLE COMMAND.
+
+ PLOT LINES FROM     1  TO    33  BY      1
+
+ MATERIAL         1     DENS =   785000.0
+
+ MATERIAL         1     EX   =  0.1170000E+12
+
+ MATERIAL         1     NUXY =  0.3600000
+
+ DEFINE DATA TABLE  BISO  FOR MATERIAL     1
+   WITH A MAXIMUM OF   6 TEMPERATURE SPECIFICATIONS
+
+ DATA FOR  BISO  TABLE FOR MATERIAL   1 AT TEMPERATURE=  0.0000   
+ LOC=  1 0.58000E+08  0.0000
+
+ DATA FOR  BISO  TABLE FOR MATERIAL   1 AT TEMPERATURE=  0.0000   
+ LOC=  2 0.90000E+07
+
+ MATERIAL         1     DENS =   785000.0
+
+ MATERIAL         1     EX   =  0.1170000E+12
+
+ MATERIAL         1     NUXY =  0.3600000
+
+ DEFINE DATA TABLE  BISO  FOR MATERIAL     1
+   WITH A MAXIMUM OF   6 TEMPERATURE SPECIFICATIONS
+
+ DATA FOR  BISO  TABLE FOR MATERIAL   1 AT TEMPERATURE=  0.0000   
+ LOC=  1 0.58000E+08  0.0000
+
+ DATA FOR  BISO  TABLE FOR MATERIAL   1 AT TEMPERATURE=  0.0000   
+ LOC=  2 0.90000E+07
+
+ MATERIAL         2     RIGI = Explicit Dynamics Rigid Properties 
+   CON1=   7.000000     CON2=   5.000000
+
+ MATERIAL         2     DENS =   785000.0
+
+ MATERIAL         2     EX   =  0.2100000E+12
+
+ MATERIAL         2     NUXY =  0.3000000
+
+ ELEMENT TYPE SET TO         1
+
+ MATERIAL NUMBER SET TO         1
+
+ REAL CONSTANT NUMBER=        1
+
+ ELEMENT COORDINATE SYSTEM IS AS DEFINED FOR THE ELEMENTS.
+ (NOTE- FOR GLOBAL SYSTEM  0  (CARTESIAN), DEFINE
+ LOCAL CARTESIAN SYSTEM  (LOCAL,N,0)  AND USE ESYS,N.)
+
+ SECTION ID NUMBER=        1
+
+ ELEMENT TYPE SET TO         1
+
+ MATERIAL NUMBER SET TO         1
+
+ REAL CONSTANT NUMBER=        1
+
+ ELEMENT COORDINATE SYSTEM IS AS DEFINED FOR THE ELEMENTS.
+ (NOTE- FOR GLOBAL SYSTEM  0  (CARTESIAN), DEFINE
+ LOCAL CARTESIAN SYSTEM  (LOCAL,N,0)  AND USE ESYS,N.)
+
+ SECTION ID NUMBER=        1
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   51.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   21.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   11.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+ PRODUCE ALL HEXAHEDRAL ELEMENTS IN 3D.
+ USE THE MAPPED MESHER.
+
+ GENERATE NODES AND ELEMENTS   IN  ALL  PICKED   VOLUMES
+
+ Initiating meshing of volume 5 exterior.                         
+
+ Meshing of volume 5 exterior is complete.  Facet count = 6\.      
+
+ Initiating meshing of volume 5 interior.                         
+  Estimated number of elements to fill this volume = 1\.           
+  Estimated number of nodes = 8\.                                  
+
+ Meshing of volume 5 is complete.                                 
+  Now storing 0 nodes and 1 elements.                             
+
+ NUMBER OF VOLUMES MESHED   =         1
+ MAXIMUM NODE NUMBER        =         8
+ MAXIMUM ELEMENT NUMBER     =         1
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+ USE THE FREE MESHER.
+
+ RESET SMART SIZING PARAMETERS
+      SIZE LEVEL                                      =      6
+      SMART SIZING SCALE               FACTOR         =   1.0000  
+      AREA INTERNAL EXPANSION          FACTOR         =   1.0000  
+      AREA INTERNAL TRANSITION CONTROL FACTOR         =   2.0000  
+      SPANNED ANGLE PER ELEMENT (LOW  ORDER ELEMENTS) =     22
+      SPANNED ANGLE PER ELEMENT (HIGH ORDER ELEMENTS) =     30
+      GROWTH RATIO FOR PROXIMITY CHECK                =   1.5000  
+      MAXIMUM NUMBER OF ITERATIONS                    =      4
+      SURFACE PROXIMITY REFINEMENT IS                     OFF
+      SMALL HOLE COARSENING IS                            ON
+ USE THE MAPPED MESHER.
+
+ *** WARNING ***                         CP =      26.453   TIME= 00:37:38
+ Smartsizing is inactive while mapped meshing key is set.         
+
+    CLEAR NODES AND ELEMENTS FROM  ALL  PICKED   VOLUMES
+
+ CLEARED     1 VOLUMES,     6 AREAS,    12 LINES,     8 KEYPOINTS
+
+ GENERATE NODES AND ELEMENTS   IN  ALL  PICKED   VOLUMES
+
+ Initiating meshing of volume 5 exterior.                         
+
+ Meshing of volume 5 exterior is complete.  Facet count = 6\.      
+
+ Initiating meshing of volume 5 interior.                         
+  Estimated number of elements to fill this volume = 1\.           
+  Estimated number of nodes = 8\.                                  
+
+ Meshing of volume 5 is complete.                                 
+  Now storing 0 nodes and 1 elements.                             
+
+ NUMBER OF VOLUMES MESHED   =         1
+ MAXIMUM NODE NUMBER        =         8
+ MAXIMUM ELEMENT NUMBER     =         1
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+
+ *** NOTE ***                            CP =      27.031   TIME= 00:37:48
+ Some functions of this menu cannot be used while the             
+  MeshTool is active.                                             
+
+ ELEMENT TYPE SET TO         1
+
+ MATERIAL NUMBER SET TO         1
+
+ REAL CONSTANT NUMBER=        1
+
+ ELEMENT COORDINATE SYSTEM IS AS DEFINED FOR THE ELEMENTS.
+ (NOTE- FOR GLOBAL SYSTEM  0  (CARTESIAN), DEFINE
+ LOCAL CARTESIAN SYSTEM  (LOCAL,N,0)  AND USE ESYS,N.)
+
+ SECTION ID NUMBER=        1
+
+    CLEAR NODES AND ELEMENTS FROM  ALL  PICKED   VOLUMES
+
+ CLEARED     1 VOLUMES,     6 AREAS,    12 LINES,     8 KEYPOINTS
+
+ GENERATE NODES AND ELEMENTS   IN  ALL  PICKED   VOLUMES
+
+ Initiating meshing of volume 5 exterior.                         
+
+ Meshing of volume 5 exterior is complete.  Facet count = 6\.      
+
+ Initiating meshing of volume 5 interior.                         
+  Estimated number of elements to fill this volume = 1\.           
+  Estimated number of nodes = 8\.                                  
+
+ Meshing of volume 5 is complete.                                 
+  Now storing 0 nodes and 1 elements.                             
+
+ NUMBER OF VOLUMES MESHED   =         1
+ MAXIMUM NODE NUMBER        =         8
+ MAXIMUM ELEMENT NUMBER     =         1
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+
+ PLOT LINES FROM     1  TO    33  BY      1
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   51.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   31.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   11.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   31.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   31.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   51.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      FOR ELEMENT SIZE =   11.000        SPACING RATIO =     1.0000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ PLOT LINES FROM     1  TO    33  BY      1
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   51,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   31,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   11,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   51,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   21,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   11,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   51,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+    CLEAR NODES AND ELEMENTS FROM  ALL  PICKED   VOLUMES
+
+ CLEARED     1 VOLUMES,     6 AREAS,    12 LINES,     8 KEYPOINTS
+ PRODUCE ALL HEXAHEDRAL ELEMENTS IN 3D.
+
+ GENERATE NODES AND ELEMENTS   IN  ALL  PICKED   VOLUMES
+
+ Initiating meshing of volume 5 exterior.                         
+
+ Meshing of volume 5 exterior is complete.  Facet count = 3726\.   
+
+ Initiating meshing of volume 5 interior.                         
+  Estimated number of elements to fill this volume = 11781\.       
+  Estimated number of nodes = 13728\.                              
+
+ Meshing of volume 5 is complete.                                 
+  Now storing 10000 nodes and 11781 elements.                     
+
+ NUMBER OF VOLUMES MESHED   =         1
+ MAXIMUM NODE NUMBER        =     13728
+ MAXIMUM ELEMENT NUMBER     =     11781
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+
+ SELECT ALL ENTITIES OF TYPE= ALL  AND BELOW
+
+ PLOT VOLUMES FROM     1  TO     5  BY    1
+
+        4  VOLUMES (OF        5  DEFINED) SELECTED BY  VSEL  COMMAND.
+
+ SELECT ALL ENTITIES ASSOCIATED WITH TYPE= VOLU
+
+ SELECT      ALL AREAS HAVING ANY VOLUMES IN SELECTED VOLUME SET.
+
+       16  AREAS (OF       22  DEFINED) SELECTED FROM
+        4 SELECTED VOLUMES BY  ASLV  COMMAND.
+
+ SELECT      LINES ASSOCIATED WITH SELECTED AREAS
+
+       21  LINES (OF       33  DEFINED) SELECTED FROM
+       16 SELECTED AREAS BY  LSLA  COMMAND.
+
+ SELECT      ALL KEYPOINTS ON ANY LINE IN LINE SET.
+
+       10  KEYPOINTS (OF       18  DEFINED) SELECTED FROM
+       21 SELECTED LINES BY  KSLL  COMMAND.
+
+ SELECT      ELEMENTS CREATED FROM SELECTED VOLUMES.
+
+        0  ELEMENTS (OF    11781  DEFINED) SELECTED FROM
+        4 SELECTED VOLUMES BY  ESLV  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED AREAS.
+
+        0  ELEMENTS (OF    11781  DEFINED) SELECTED FROM
+       16 SELECTED AREAS BY  ESLA  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED LINES.
+
+        0  ELEMENTS (OF    11781  DEFINED) SELECTED FROM       21 SELECTED LINES
+         BY  ESLL  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED KEYPOINTS.
+
+        0  ELEMENTS (OF    11781  DEFINED) SELECTED FROM       10 SELECTED KPTS
+         BY  ESLK  COMMAND.
+
+ SELECT      ALL NODES HAVING ANY ELEMENT IN ELEMENT SET.
+
+        0 NODES (OF    13728  DEFINED) SELECTED FROM
+        0 SELECTED ELEMENTS BY NSLE COMMAND.
+
+ PLOT LINES FROM     1  TO    33  BY      1
+
+ ELEMENT TYPE SET TO         1
+
+ MATERIAL NUMBER SET TO         2
+
+ REAL CONSTANT NUMBER=        1
+
+ ELEMENT COORDINATE SYSTEM IS AS DEFINED FOR THE ELEMENTS.
+ (NOTE- FOR GLOBAL SYSTEM  0  (CARTESIAN), DEFINE
+ LOCAL CARTESIAN SYSTEM  (LOCAL,N,0)  AND USE ESYS,N.)
+
+ SECTION ID NUMBER=        1
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   31,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ SET DIVISIONS ON ALL PICKED LINES
+      TO  NDIV =   11,  SPACING RATIO =   1.000
+ NDIV AND SPACE CAN BE OVERRIDDEN FOR CURVATURE OR PROXIMITY
+
+ GENERATE NODES AND ELEMENTS IN ALL PICKED VOLUMES
+
+ Performing SmartSizing
+
+ SmartSizing Completed
+
+        SWEEPING VOLUME 4 FROM AREA 15 TO AREA 14
+        VOLUME 4 MESHED WITH 6094 HEXAHEDRA AND 22 WEDGES
+
+        SWEEPING VOLUME 3 FROM AREA 11 TO AREA 10
+        VOLUME 3 MESHED WITH 5995 HEXAHEDRA AND 0 WEDGES
+
+        SWEEPING VOLUME 2 FROM AREA 7 TO AREA 6
+        VOLUME 2 MESHED WITH 5830 HEXAHEDRA AND 0 WEDGES
+
+        SWEEPING VOLUME 1 FROM AREA 3 TO AREA 2
+        VOLUME 1 MESHED WITH 5962 HEXAHEDRA AND 22 WEDGES
+
+ Volume Sweeping Complete
+
+ The Following Volumes Were Successfully Swept
+     1           2           3           4
+
+ MAXIMUM NODE NUMBER        =     40560
+ MAXIMUM ELEMENT NUMBER     =     35706
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+
+ SELECT ALL ENTITIES OF TYPE= ALL  AND BELOW
+
+ PRODUCE ELEMENT PLOT IN DSYS =   0
+
+ GENERATE AUTOMATIC SURFACE TO SURFACE CONTACT USING
+    CONTACT COMP/PART 1        AND TARGET COMP/PART 2
+    WITH FRICTION COEFFICIENT VALUES OF:
+    FS =   0.35000     FD =   0.20000    DC =    0.0000     VC =    0.0000     VDC =    0.0000
+    BT =    0.0000     DT =   0.10000E+08
+
+ SELECT       FOR ITEM=VOLU COMPONENT=
+  IN RANGE         5 TO          5 STEP          1
+
+        1  VOLUMES (OF        5  DEFINED) SELECTED BY  VSEL  COMMAND.
+
+ SELECT      ALL NODES (INTERIOR TO VOLUME, INTERIOR TO AREAS
+ INTERIOR TO LINES, AND AT KEYPOINTS) RELATED TO SELECTED VOLUME SET.
+
+    13728  NODES (OF    40560  DEFINED) SELECTED FROM
+        1 SELECTED VOLUMES BY  NSLV  COMMAND.
+
+ DEFINITION OF COMPONENT = SLAB      ENTITY=NODE
+
+ RESELECT     FOR ITEM=LOC  COMPONENT=Y     BETWEEN  0.0000     AND   0.0000
+   KABS=  0\.  TOLERANCE= 0.100000E-05
+
+       1144  NODES (OF      40560  DEFINED) SELECTED BY  NSEL  COMMAND.
+
+ PRINTOUT RESUMED BY /GOP
+
+ PRINTOUT RESUMED BY /GOP
+
+ SPECIFIED CONSTRAINT UY   FOR PICKED NODES
+ REAL=  0.00000000       IMAG=  0.00000000
+
+ ALL BOUNDARY CONDITION DISPLAY KEYS SET TO  1
+
+ SELECT ALL ENTITIES ASSOCIATED WITH TYPE= VOLU
+
+ SELECT      ALL AREAS HAVING ANY VOLUMES IN SELECTED VOLUME SET.
+
+        6  AREAS (OF       22  DEFINED) SELECTED FROM
+        1 SELECTED VOLUMES BY  ASLV  COMMAND.
+
+ SELECT      LINES ASSOCIATED WITH SELECTED AREAS
+
+       12  LINES (OF       33  DEFINED) SELECTED FROM
+        6 SELECTED AREAS BY  LSLA  COMMAND.
+
+ SELECT      ALL KEYPOINTS ON ANY LINE IN LINE SET.
+
+        8  KEYPOINTS (OF       18  DEFINED) SELECTED FROM
+       12 SELECTED LINES BY  KSLL  COMMAND.
+
+ SELECT      ELEMENTS CREATED FROM SELECTED VOLUMES.
+
+    11781  ELEMENTS (OF    35706  DEFINED) SELECTED FROM
+        1 SELECTED VOLUMES BY  ESLV  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED AREAS.
+
+    11781  ELEMENTS (OF    35706  DEFINED) SELECTED FROM
+        6 SELECTED AREAS BY  ESLA  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED LINES.
+
+    11781  ELEMENTS (OF    35706  DEFINED) SELECTED FROM       12 SELECTED LINES
+         BY  ESLL  COMMAND.
+
+ ALSO SELECT ELEMENTS CREATED FROM SELECTED KEYPOINTS.
+
+    11781  ELEMENTS (OF    35706  DEFINED) SELECTED FROM        8 SELECTED KPTS
+         BY  ESLK  COMMAND.
+
+ SELECT      ALL NODES HAVING ANY ELEMENT IN ELEMENT SET.
+
+    13728 NODES (OF    40560  DEFINED) SELECTED FROM
+    11781 SELECTED ELEMENTS BY NSLE COMMAND.
+
+ RESELECT     FOR ITEM=LOC  COMPONENT=X     BETWEEN  0.0000     AND   0.0000
+   KABS=  0\.  TOLERANCE= 0.100000E-05
+
+        624  NODES (OF      40560  DEFINED) SELECTED BY  NSEL  COMMAND.
+
+ PRINTOUT RESUMED BY /GOP
+
+ PRINTOUT RESUMED BY /GOP
+
+ SPECIFIED CONSTRAINT UX   FOR PICKED NODES
+ REAL=  0.00000000       IMAG=  0.00000000
+
+ SELECT ALL ENTITIES OF TYPE= ALL  AND BELOW
+
+Apply Initial Velocity to node component: SLAB
+Translation : Vx =   0.0000     Vy =   0.0000     Vz =   2.8800   
+Rotation    : Ox =   0.0000     Oy =   0.0000     Oz =   0.0000   
+
+ SET PARAMETER DIMENSIONS ON  TIME TYPE=ARRA  DIMENSIONS=     2     1     1
+
+ ARRAY PARAMETER _ZX       DELETED.
+
+ SET PARAMETER DIMENSIONS ON  VELOCITY TYPE=ARRA  DIMENSIONS=     2     1     1
+
+ SET PARAMETER DIMENSIONS ON  VELOCITY TYPE=ARRA  DIMENSIONS=     2     1     1
+
+ SET PARAMETER DIMENSIONS ON  VELOCITY TYPE=ARRA  DIMENSIONS=     2     1     1
+
+ PARAMETER TIME(2,1,1) =    0.8000000000E-01
+
+ PARAMETER VELOCITY(2,1,1) =    -2.620000000
+
+Apply Initial Velocity to node component: SLAB
+
+ *** WARNING ***                         CP =      56.484   TIME= 02:28:12
+ Previous initial velocity on same node component (SLAB) will be  
+ replaced.                                                        
+Translation : Vx =   0.0000     Vy =   0.0000     Vz =   2.8800   
+Rotation    : Ox =   0.0000     Oy =   0.0000     Oz =   0.0000   
+
+ ***** ROUTINE COMPLETED *****  CP =        57.391
+
+ *****  ANSYS SOLUTION ROUTINE  *****
+
+ HOURGLASS ENERGY is to be computed and included in the energy balance.
+
+ STONEWALL ENERGY will be computed and included in the energy balance.
+
+ SLIDING INTERFACE ENERGY is to be computed and included in the energy balance.
+
+ RAYLIGH ENERGY dissipation is to be computed and included in the energy balance.
+
+ HOURGLASS ENERGY is to be computed and included in the energy balance.
+
+ STONEWALL ENERGY will be computed and included in the energy balance.
+
+ SLIDING INTERFACE ENERGY is to be computed and included in the energy balance.
+
+ RAYLIGH ENERGY dissipation is to be computed and included in the energy balance.
+
+ CONTROL TERMINATION time set to  0.1500     seconds
+</pre>

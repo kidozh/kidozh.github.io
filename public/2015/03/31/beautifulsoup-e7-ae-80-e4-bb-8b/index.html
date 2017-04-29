@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [Python]Beautiful Soup简介 · kidozh</title><meta name="description" content="[Python]Beautiful Soup简介 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[Python]Beautiful Soup简介</h1><div class="post-info">2015年3月31日</div><div class="post-content"><p><strong>什么是BeautifulSoup？</strong></p>
+<p><a href="http://www.crummy.com/software/BeautifulSoup/" target="_blank" rel="external">Beautiful Soup</a> 是用Python写的一个HTML/XML的解析器，它可以很好的处理不规范标记并生成剖析树(parse tree)。 它提供简单又常用的导航（navigating），搜索以及修改剖析树的操作。它可以大大节省你的编程时间。</p>
+<p>直接看例子：</p>
+<pre class="lang:default decode:true ">#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from bs4 import BeautifulSoup
+html_doc = """
+&lt;html&gt;&lt;head&gt;&lt;title&gt;The Dormouse's story&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;p class="title"&gt;&lt;b&gt;The Dormouse's story&lt;/b&gt;&lt;/p&gt;
+
+&lt;p class="story"&gt;Once upon a time there were three little sisters; and their names were
+&lt;a href="http://example.com/elsie" class="sister" id="link1"&gt;Elsie&lt;/a&gt;,
+&lt;a href="http://example.com/lacie" class="sister" id="link2"&gt;Lacie&lt;/a&gt; and
+&lt;a href="http://example.com/tillie" class="sister" id="link3"&gt;Tillie&lt;/a&gt;;
+and they lived at the bottom of a well.&lt;/p&gt;
+&lt;p class="story"&gt;...&lt;/p&gt;
+"""
+
+soup = BeautifulSoup(html_doc)
+print soup.title
+print soup.title.name
+print soup.title.string
+print soup.p
+print soup.a
+print soup.find_all('a')
+print soup.find(id='link3')
+print soup.get_text()</pre>
+
+<div>结果是：<span class="lang:default highlight:0 decode:true  crayon-inline ">title The Dormouse’s story The Dormouse’s story Elsie [Elsie, Lacie, Tillie] Tillie The Dormouse’s story The Dormouse’s story Once upon a time there were three little sisters; and their names were Elsie, Lacie and Tillie; and they lived at the bottom of a well.</span> </div><div><br><br>可以看出：soup 就是BeautifulSoup处理格式化后的字符串，soup.title 得到的是title标签，soup.p 得到的是文档中的第一个p标签，要想得到所有标签，得用find_all函数。find_all 函数返回的是一个序列，可以对它进行循环，依次得到想到的东西.<br><br>get_text() 是返回文本,这个对每一个BeautifulSoup处理后的对象得到的标签都是生效的。你可以试试 print soup.p.get_text()<br><br>其实是可以获得标签的其他属性的，比如我要获得a标签的href属性的值，可以使用 print soup.a[‘href’],类似的其他属性，比如class也是可以这么得到的（soup.a[‘class’]）。<br><br>特别的，一些特殊的标签，比如head标签，是可以通过soup.head 得到，其实前面也已经说了。<br><br>如何获得标签的内容数组？使用contents 属性就可以 比如使用 print soup.head.contents，就获得了head下的所有子孩子，以列表的形式返回结果，<br><br>可以使用 [num] 的形式获得 ,获得标签，使用.name 就可以。<br><br>获取标签的孩子，也可以使用children，但是不能print soup.head.children 没有返回列表，返回的是,<br><br>不过使用list可以将其转化为列表。当然可以使用for 语句遍历里面的孩子。<br><br>关于string属性，如果超过一个标签的话，那么就会返回None，否则就返回具体的字符串print soup.title.string 就返回了 The Dormouse’s story<br><br>超过一个标签的话，可以试用strings<br><br>向上查找可以用parent函数，如果查找所有的，那么可以使用parents函数<br><br>查找下一个兄弟使用next_sibling,查找上一个兄弟节点使用previous_sibling,如果是查找所有的，那么在对应的函数后面加s就可以<br><br>如何遍历树？<br><br>使用find_all 函数<br><br>find_all(name, attrs, recursive, text, limit, <strong>kwargs)<br><br>举例说明：<br><pre class="lang:default decode:true ">print soup.find_all(‘title’)<br>print soup.find_all(‘p’,’title’)<br>print soup.find_all(‘a’)<br>print soup.find_all(id=”link2”)<br>print soup.find_all(id=True)</pre><br><br>返回值为：<br><br><span class="lang:default highlight:0 decode:true  crayon-inline ">[] [ The Dormouse’s story ] [Elsie, Lacie, Tillie] [Lacie] [Elsie, Lacie, Tillie]</span><br><br>通过css查找,直接上例子把：<br><br>print soup.find<em>all(“a”, class</em>=”sister”)<br> print soup.select(“p.title”)<br><br>通过属性进行查找<br> print soup.find_all(“a”, attrs={“class”: “sister”})<br><br>通过文本进行查找<br> print soup.find_all(text=”Elsie”)<br> print soup.find_all(text=[“Tillie”, “Elsie”, “Lacie”])<br><br>限制结果个数<br> print soup.find_all(“a”, limit=2)<br><br>结果为：<br><br>[<a href="http://example.com/elsie" target="_blank" rel="external">Elsie</a>, <a href="http://example.com/lacie" target="_blank" rel="external">Lacie</a>, <a href="http://example.com/tillie" target="_blank" rel="external">Tillie</a>]<br> [
+
+</strong>The Dormouse’s story**<br><br>]<br> [<a href="http://example.com/elsie" target="_blank" rel="external">Elsie</a>, <a href="http://example.com/lacie" target="_blank" rel="external">Lacie</a>, <a href="http://example.com/tillie" target="_blank" rel="external">Tillie</a>]<br> [u’Elsie’]<br> [u’Elsie’, u’Lacie’, u’Tillie’]<br> [<a href="http://example.com/elsie" target="_blank" rel="external">Elsie</a>, <a href="http://example.com/lacie" target="_blank" rel="external">Lacie</a>]<br><br>总之，通过这些函数可以查找到想要的东西。<br></div></div></article></div></main><footer><div class="paginator"><a href="/2015/04/02/e6-95-99-e8-82-b2-e5-ae-9e-e9-aa-8c-e5-ad-a6-e9-99-a2-e9-a1-b9-e7-9b-ae-e7-ae-a1-e7-90-86-e6-80-bb-e7-ba-b2/" class="prev">上一篇</a><a href="/2015/03/29/web-e5-b0-86bing-e7-9a-84-e6-a1-8c-e9-9d-a2-e4-bd-9c-e4-b8-ba-e5-8d-9a-e5-ae-a2-e7-9a-84-e4-b8-bb-e9-a2-98/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

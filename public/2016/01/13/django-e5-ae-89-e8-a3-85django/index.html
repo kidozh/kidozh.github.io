@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [Django]安装Django · kidozh</title><meta name="description" content="[Django]安装Django - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[Django]安装Django</h1><div class="post-info">2016年1月13日</div><div class="post-content"><h1 id="1-安装Python"><a href="#1-安装Python" class="headerlink" title="1 安装Python"></a>1 安装Python</h1><p>由于Django由Python写成，所以需要首先使用Python。由于Python 2.x和3.x的原因，所以Django对不同版本的Python的兼容性或者适用性存在偏差。</p>
+<p>下面是Python和Django的对应关系：</p>
+<table style="width: 575px; height: 122px;" border="0" width="469" cellspacing="0" cellpadding="0"><colgroup> <col style="mso-width-source: userset; mso-width-alt: 4096; width: 96pt;" width="128"> <col style="mso-width-source: userset; mso-width-alt: 10912; width: 256pt;" width="341"> </colgroup><tbody><tr style="height: 16.5pt;"><td class="xl63" style="height: 16.5pt; width: 96pt;" width="128" height="22">Django 版本</td><td class="xl63" style="width: 256pt;" width="341">Python版本</td></tr><tr style="height: 16.5pt;"><td class="xl63" style="height: 16.5pt;" align="right" height="22">1.7</td><td class="xl63">2.7 and 3.2, 3.3, 3.4</td></tr><tr style="height: 15.0pt;"><td class="xl64" style="height: 15.0pt;" align="right" height="20">1.8</td><td class="xl64">2.7 and 3.2 (until the end of 2016), 3.3, 3.4, 3.5</td></tr><tr style="height: 16.5pt;"><td class="xl63" style="height: 16.5pt;" align="right" height="22">1.9</td><td class="xl63">2.7, 3.4, 3.5</td></tr></tbody></table>
+
+<p>对于每个版本的Python，只有最近的发行版本才能得到官方支持，在<a href="https://www.python.org/downloads/" target="_blank" rel="external">Python Download Page</a>上可以获得Python的最新版本。Django对于Python的支持将会到Python安全维护的全周期内。比如Python 3.3 的安全支持在2017年9月终止，Django 1.8LTS（长期支持版）的安全检查会在2018年4月终止，因此Django 1.8也是最后一个支持Python 3.3的Django。</p>
+<p>在Django 1.6之前，Python 3.x系列被公认为十分稳定的版本，在生产环境中其能够得到信任的。由于更新Python版本提供了更多的特性，所以应该使用更新的Python 2.x和3.x系列。第三方应用能够自由的选择他们的依赖项。</p>
+<p>而对于windows操作系统，需要下载MSI installer for windows，完成之后按照窗口导引就能完成安装了。</p>
+<p>在安装完成之后，需要检查Python是否存在在环境变量Path之中。首先打开命令行，通过<code>python --version</code>检查环境变量是否被正确的设定了，如果没有，需要保证python的python可执行文件和script文件夹被正确的包含在内。例如，python 2.7安装路径位于C:\python27\，那么C:\python27\和<span style="line-height: 22.8571px;">C:\python27\Script\都需要包含在环境变量里</span></p>
+<h2 id="2-安装Apache和mod-wsgi"><a href="#2-安装Apache和mod-wsgi" class="headerlink" title="2 安装Apache和mod_wsgi"></a>2 安装Apache和mod_wsgi</h2><p>由于django自带了一个轻量级的服务器，所以在仅需要测试的时候，是不必要安装Apache服务器的，但是在实际的应用环境（比如接受较大并发的访问的时候）之中的时候，安装Apache和mod_wsgi是十分必要的。</p>
+<p>mod_wsgi主要分为两个模式：嵌入式和守护式。在嵌入式之中，mod_wsgi和mod_perl十分相似，其把Python嵌入到Apache之中，当服务器开启的时候，它将会从内存之中加载Python代码，这样使得Python代码存活在Apache服务器运行的全周期之内，这也使得其性能高于其他服务器部署方式。而对于守护式而言，mod_wsgi会创建一个独立的守护进程来处理访客的请求，这样也使得其安全性得到了提升。在需要重新部署代码的时候，不需要重启整个Apache服务器，这样使得代码部署和实际应用之间无缝衔接。具体怎么部署还是需要参考mod_wsgi的文档。</p>
+<p>确保Apache服务器被正常开启，mod_wsgi服务得以激活，Django就会运行在任何一个版本的支持mod_wsgi的Apache服务器之上。</p>
+<p><a href="https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/" target="_blank" rel="external">官方FAQ</a>上介绍了如何配置mod_wsgi的方法，鉴于篇幅所限，不在这里介绍了。</p>
+<p>当然Django也支持其他的部署方式，例如在nginx上的uWSGI运行Django也非常好。Django遵循着wsgi说明书（即<a href="https://www.python.org/dev/peps/pep-3333/" target="_blank" rel="external">PEP3333</a>，Python的网络服务器网关接口），这样也使得其能够运行在一系列的服务器上。</p>
+<h1 id="3-安装数据库"><a href="#3-安装数据库" class="headerlink" title="3 安装数据库"></a>3 安装数据库</h1><p>如果你打算使用数据库来承载内容的话，你必须确保数据库服务正在运行，Django在官方上支持PostgreSQL，MySQL，ORACLE和SQLite。如果你开发的工程较为简单，那么SQLite是足够应付的了，但是由于SQLite还是和其他数据库具有很大的差异，所以在实际环境之中，数据库还是保持统一会比较好。</p>
+<p>对于官方版本，需要确保与数据库的链接被正确安装了：</p>
+<ul>
+<li><span style="font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif; line-height: 22.8571px;">PostgreSQL需要使用</span><span style="font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif;"><span style="line-height: 22.8571px;"> <a href="http://initd.org/psycopg/" target="_blank" rel="external">psycopg2</a> 包，在<a href="https://docs.djangoproject.com/en/1.8/ref/databases/#postgresql-notes" target="_blank" rel="external">PostgreSQL notes </a></span></span><span style="font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif;"><span style="line-height: 22.8571px;">之中也能得到详尽的帮助</span></span></li>
+<li>MySQL需要一个数据库API驱动器，比如mysqlclient，在<a href="https://docs.djangoproject.com/en/1.8/ref/databases/#mysql-notes" target="_blank" rel="external">notes for MySQL backend</a>里可以获得详细信息</li>
+<li>SQLite可以在<a href="https://docs.djangoproject.com/en/1.8/ref/databases/#sqlite-notes" target="_blank" rel="external">SQLite backend notes</a>里得到帮助</li>
+<li>Oracle需要一份cx_Oracle的备份，但是还是需要在<a href="https://docs.djangoproject.com/en/1.8/ref/databases/#oracle-notes" target="_blank" rel="external">notes for the Oracle backend </a>获得对cx_Oracle和Oracle支持版本的信息</li>
+</ul>
+<p>而对于官方并不支持的数据库，第三方应用也是可以使用的，比如：</p>
+<ul>
+<li><span style="line-height: 1.42857;">SAP SQL Anywhere</span></li>
+<li><span style="line-height: 1.42857;">IBM DB2</span></li>
+<li><span style="line-height: 1.42857;">Microsoft SQL Server</span></li>
+<li><span style="line-height: 1.42857;">Firebird</span></li>
+<li><span style="line-height: 1.42857;">ODBC</span></li>
+</ul>
+<p>这些数据库django版本和ORM特征差异较大，对于这些非官方的后台的具体功能以及任何支持查询，应直接使用第三方项目提供支持的渠道获得帮助。</p>
+<p>Django的命令<code>manage.py migrate</code>可以自动创建数据库之中的表格，但是需要确保具有访问和修改数据库的权限，如果需要手动进行的话，也需要给予的<code>SELECT, INSERT, UPDATE 和 DELETE</code>权限。当选用Django的测试框架去测试查询Django的时候，需要确保Django有创建test数据库的权限。</p>
+<h1 id="4-移除老版本的Django"><a href="#4-移除老版本的Django" class="headerlink" title="4 移除老版本的Django"></a>4 移除老版本的Django</h1><p>当升级Django的版本的时候，首先需要卸载老版本的Django的。</p>
+<p>如果你具有easy_install或者pip的话，更新Django的时候会自动执行卸载的过程的。</p>
+<p>如果是没有以上两种工具，那么就需要手工在site-packages中删除django库的，可以通过以下命令在<strong>Shell</strong>命令行来取得其地址：</p>
+<pre class="lang:ps decode:true ">$ python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"</pre>
+
+<h1 id="5-安装Django代码"><a href="#5-安装Django代码" class="headerlink" title="5 安装Django代码"></a>5 安装Django代码</h1><p>安装Django的方法与你所选择的Django有差异。</p>
+<h3 id="pip安装官方发行版："><a href="#pip安装官方发行版：" class="headerlink" title="pip安装官方发行版："></a>pip安装官方发行版：</h3><ol>
+<li><span style="line-height: 1.1;">安装pip。最简单的办法就是安装<a href="http://www.pip-installer.org/en/latest/installing.html#install-pip" target="_blank" rel="external">独立的pip安装器 </a>，如果你已经安装了pip，需要确保其还能跟得上时代的潮流</span></li>
+<li><a href="http://www.virtualenv.org/" target="_blank" rel="external">virtualenv</a>和<a href="http://virtualenvwrapper.readthedocs.org/en/latest/" target="_blank" rel="external">virtualenvwrapper</a>提供了一个隔离的Python环境，这样也使得不比在系统层面上安装那么多库文件，其也支持在没有管理员权限的情况下安装Django，<a href="https://docs.djangoproject.com/en/1.8/intro/contributing/" target="_blank" rel="external">这里</a>就有如何在Python3上安装Django的方法。</li>
+<li>当完成了环境的创建和激活之后，就可以使用<code>pip install Django</code>来在Shell命令行之中安装Django了</li>
+</ol>
+<h3 id="安装特殊发行版"><a href="#安装特殊发行版" class="headerlink" title="安装特殊发行版"></a>安装特殊发行版</h3><p>在<a href="https://docs.djangoproject.com/en/1.8/misc/distributions/" target="_blank" rel="external">这里</a>检查一下你的系统是否有特殊发行版，通常特殊发行版能够自动安装依赖和更新路径，但是往往极少含有最新的Django</p>
+<h3 id="安装开发版本"><a href="#安装开发版本" class="headerlink" title="安装开发版本"></a>安装开发版本</h3><p>安装开发版本就需要关注<a href="https://code.djangoproject.com/timeline" target="_blank" rel="external">开发门径</a>了，你需要注意<a href="https://docs.djangoproject.com/en/1.8/releases/#development-release-notes" target="_blank" rel="external">即将到来的发行版</a>。对于每个稳定版本，任何改变都会在文档中予以标识。</p>
+<p>如果你想得到最新的Django代码以求最新的BUG修正和代码优化，需要执行以下几步：</p>
+<ol>
+<li>确保Git安装完成，并且能够在Shell命令行中调用<code>git help</code></li>
+<li>检出Django的一个主要版本，例如使用这个命令：<span class="trim-code-tag:false mixed:false lang:default decode:true  crayon-inline ">$ git clone git://github.com/django/django.git</span> ，然后再本地目录里就会出现Django文件夹</li>
+<li>确保Python能够正确的加载代码，最为稳妥的办法就是使用<a href="http://www.virtualenv.org/" target="_blank" rel="external">virtualenv</a><span style="line-height: 22.8571px;">、</span><a href="http://virtualenvwrapper.readthedocs.org/en/latest/" target="_blank" rel="external">virtualenvwrapper</a>和<a href="http://www.pip-installer.org/" target="_blank" rel="external">pip</a></li>
+<li>当安装并且激活<a href="http://www.virtualenv.org/" target="_blank" rel="external">virtualenv</a>之后需要运行命令：<span style="color: #c7254e; font-family: Monaco, Menlo, Consolas, 'Courier New', monospace; font-size: 14.4px; line-height: 20.5714px; white-space: nowrap; background-color: #f9f2f4;">pip install -e Django</span>，这样也会使得django-admin被正确执行</li>
+</ol>
+<p>当需要获取最新的Django的时候，运行命令<span style="color: #c7254e; font-family: Monaco, Menlo, Consolas, 'Courier New', monospace; font-size: 14.4px; line-height: 20.5714px; white-space: nowrap; background-color: #f9f2f4;">git pull</span><span style="line-height: 1.42857;"> 即可，git会自动完成各种更新的。</span></p>
+<h1 id="windows环境下的BUG"><a href="#windows环境下的BUG" class="headerlink" title="windows环境下的BUG"></a>windows环境下的BUG</h1><ul>
+<li>如果django-admin只显示帮助文本而不接受参数的话，这样很有可能是文件和Windows的关联出了问题，检查是否有多个script在环境变量之中，这往往是多个版本的Python安装所导致的</li>
+<li>在使用代理采用pip或者easy_install安装的时候，需要在命令行之中配置代理，例如：<pre class="lang:ps decode:true">set http_proxy=<a href="http://username:password@proxyserver:proxyport" target="_blank" rel="external">http://username:password@proxyserver:proxyport</a><br>set https_proxy=<a href="https://username:password@proxyserver:proxyport" target="_blank" rel="external">https://username:password@proxyserver:proxyport</a></pre></li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/01/13/django-e7-bc-96-e5-86-99-e7-ac-ac-e4-b8-80-e4-b8-aadjango-e7-a8-8b-e5-ba-8f/" class="prev">上一篇</a><a href="/2016/01/12/python-e5-b0-86django-e7-9a-84-e6-95-b0-e6-8d-ae-e9-80-9a-e8-bf-87syncdb-e7-ba-bf-e4-b8-8a-e5-88-b0-e6-95-b0-e6-8d-ae-e5-ba-93-e4-b9-8b-e4-b8-ad/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

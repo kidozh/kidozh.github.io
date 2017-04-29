@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> kidozh</title><meta name="description" content="kidozh的一些想法和随手笔记"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><ul class="home post-list"><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/05/14/logistic-e5-9b-9e-e5-bd-92/" class="post-title-link">Logistic回归</a></h2><div class="post-info">2016年5月14日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我们会在这里介绍最优化算法。</p>
+<p>假设现在有一些数据点，我们用一条曲线对其进行拟合，这个拟合过程就叫做回归。利用Logistic回归进行分类的主要思想是：根据现有的数据对分类边界建立回归公式，并由此进行分类。训练分类器时的做法就是寻找最佳的拟合参数，使用的是最优化算法，接下来介绍这个而值型输出分类器的数学原理。</p>
+<h1 id="Logistics回归的一般过程"><a href="#Logistics回归的一般过程" class="headerlink" title="Logistics回归的一般过程"></a>Logistics回归的一般过程</h1><ol>
+<li>收集数据</li>
+<li>准备数据：需要进行距离计算，所以要求数据类型为数值型</li>
+<li>分析数据</li>
+<li>训练算法：大部分时间将用于训练，训练的目的是找到最佳的分类回归系数</li>
+<li>测试算法</li>
+<li>使用算法：我们需要输入一些数据，并将其转换为对应的结构化数值，接着，给予训练好的回归系数就可以对这些数值进行简单的回归计算，判定它们属于哪个类别，然后就可以在输出的类别上做一些其他的分析工作。</li>
+</ol>
+<h2 id="基于Logistic回归和Sigmoid函数的分类"><a href="#基于Logistic回归和Sigmoid函数的分类" class="headerlink" title="基于Logistic回归和Sigmoid函数的分类"></a>基于Logistic回归和Sigmoid函数的分类</h2><h3 id="基于Logistics回归的优缺点"><a href="#基于Logistics回归的优缺点" class="headerlink" title="基于Logistics回归的优缺点"></a>基于Logistics回归的优缺点</h3><p>优点：计算代价不高，易于理解和实现</p>
+<p>缺点：容易欠拟合，分类精度可能不高</p>
+<p>适用的数据类型：数值型和标称型数据</p>
+<p>所以这里我们需要的函数应该是能够接受所有的输入并且预测出类别。例如，在两个类的情况下，上述函数输出0或者1，这就是海维赛德阶跃函数（heaviside step function），或者直接称之为单位阶跃函数。这里我们常常适用<code>sigmoid</code>函数来取代海维赛德阶跃函数，<code>sigmoid</code></div><a href="/2016/05/14/logistic-e5-9b-9e-e5-bd-92/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/05/09/numpy-e5-85-a5-e9-97-a8/" class="post-title-link">Numpy入门</a></h2><div class="post-info">2016年5月9日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>很久都没有用过numpy来做科学计算了，现在Python的机器学习这么火，而机器学习很多代码都需要用numpy、scipy来构建，所以我现在开始进行一些温习吧</p>
+<h1 id="ndarray对象"><a href="#ndarray对象" class="headerlink" title="ndarray对象"></a>ndarray对象</h1><h2 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h2><p>我们需要创建数组并且对其进行操作。</p>
+<p>我们可以通过给array函数传递python的序列对象创建数组，如果传递的是多层嵌套序列，将创建多维数组。</p>
+<pre class="lang:python decode:true">a = numpy.array([1,2,3,4])# the list can be replaced with tuple
+b = numpy.array((1,2,3,4))
+c = numpy.array([[1,2,3,4],
+                [5,6,7,8],
+                [9,10,11,12]])</pre>
+
+<p> 数组的类型可以通过dtype来获取：</p>
+<pre class="lang:python decode:true">&gt;&gt;&gt; print c.dtype
+int64</pre>
+
+<p> 数组的大小可以通过shape获得或者修改：</p>
+<pre class="lang:python decode:true">print a.shape,c.shape
+(4,) (3, 4)</pre>
+
+<p>这里的大小和列表的大小保持一致。而当变更shape的时候，例如(3,4)-&gt;(4,3)的时候，并不是对数组进行转置，而只是改变每个轴的大小，<strong>数组元素在内存中的位置并不发生改变</strong>。</p>
+<pre class="lang:python decode:true">c.shape = 4,3
+print c
+
+[[ 1  2  3]
+ [ 4  5  6]
+ [ 7  8  9]
+ [10 11 12]]</pre>
+
+<p> 当某个轴为-1的时候，蒋根据数组元素的个数自动计算此轴的长度，也就是说，如果你变更的shape是2,-1那么其就会自动计算为2,6</p>
+<pre class="lang:python decode:true">c.shape = 2,-1
+print c
+
+[[ 1  2  3  4  5  6]
+ [ 7  8  9 10 11 12]]</pre>
+
+<p> 使用数组的<code>reshape</code>的方法，可以创建一个变更尺寸的新数组，而原数组的shape保持不变。但是<strong>新数组和原数组仍然共享数据存储内存区域</strong>，所以修改任意一个数组的元素都会<strong>变更</strong>另一个数组的内容。</p>
+<pre class="lang:default decode:true">d = c.reshape((2,-1))
+print d
+
+[[ 1  2  3  4  5  6]
+ [ 7  8  9 10 11 12]]</pre>
+
+<p> 数组的元素可以通过<code>dtype</code>属性获得，上面例子中的参数序列的元素都是<code>int</code>，因此创建的数组的元素类型也是整数，你可以通过指定<code>dtype</code>参数来指定元素类型。</p>
+<pre class="lang:default decode:true">e = numpy.array([1,2,3,4],dtype=numpy.float)</pre>
+
+<p> numpy中的数据类型转换，不能直接改原数据的<code>dtype</code>。只能用函数<code>astype()</code>。</p>
+<p>而python会自带一些函数来创建数组，可以不需要使用python对象转换为array对象。</p>
+<h3 id="arange"><a href="#arange" class="headerlink" title="arange"></a>arange</h3><p>类似于<code>range</code>，通过指定开始、结果以及步长来创建一个一维数组。</p>
+<h3 id="linspace"><a href="#linspace" class="headerlink" title="linspace"></a>linspace</h3><p>通过开始设置开始、终值和元素个数来创建等差一维数组，可以通过设置<code>endpoint</code>来指定是否包括终值。</p>
+<pre class="lang:python decode:true">numpy.linspace(0,1,12)
+array([ 0\.        ,  0.09090909,  0.18181818,  0.27272727,  0.36363636,
+        0.45454545,  0.54545455,  0.63636364,  0.72727273,  0.81818182,
+        0.90909091,  1\.        ])</pre>
+
+<h3 id="logspace"><a href="#logspace" class="headerlink" title="logspace"></a>logspace</h3><p>和<code>linspace</code>一样，不过创建等比数列。下面这个例子产生1（10^0）到100（10^2），有20个元素的等比数列。</p>
+<pre class="lang:python decode:true">numpy.logspace(0,2,20)
+array([   1\.        ,    1.27427499,    1.62377674,    2.06913808,
+          2.6366509 ,    3.35981829,    4.2813324 ,    5.45559478,
+          6.95192796,    8.8586679 ,   11.28837892,   14.38449888,
+         18.32980711,   23.35721469,   29.76351442,   37.92690191,
+         48.32930239,   61.58482111,   78.47599704,  100\.        ])</pre>
+
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>此外使用<code>frombuffer</code>，<code>fromstring</code>，<code>fromfile</code>等函数可以从字节中创建数组</p>
+<p>下面以<code>fromstring</code></div><a href="/2016/05/09/numpy-e5-85-a5-e9-97-a8/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/05/08/e6-9c-b4-e7-b4-a0-e8-b4-9d-e5-8f-b6-e6-96-af/" class="post-title-link">朴素贝叶斯</a></h2><div class="post-info">2016年5月8日</div><div class="post-content"></div><a href="/2016/05/08/e6-9c-b4-e7-b4-a0-e8-b4-9d-e5-8f-b6-e6-96-af/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/04/08/abc-e7-ae-80-e5-8d-95-e8-af-81-e6-98-8e-e5-85-b6-e6-9c-80-e5-a4-a7-e5-80-bc/" class="post-title-link">[A^B%C]简单证明其最大值</a></h2><div class="post-info">2016年4月8日</div><div class="post-content"></div><a href="/2016/04/08/abc-e7-ae-80-e5-8d-95-e8-af-81-e6-98-8e-e5-85-b6-e6-9c-80-e5-a4-a7-e5-80-bc/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/03/30/ansys-e7-bb-8f-e5-85-b8-e7-95-8c-e9-9d-a2-e7-9a-84-e6-8e-a5-e8-a7-a6-e5-88-86-e6-9e-90-e4-be-8b-e5-ad-90-e5-b9-b2-e6-b6-89-e9-85-8d-e5-90-88-e5-ad-94-e8-be-b9-e7-9a-84-e5-ba-94-e5-8a-9b/" class="post-title-link">[ANSYS] 经典界面的接触分析例子 – 干涉配合孔边的应力分布</a></h2><div class="post-info">2016年3月30日</div><div class="post-content"></div><a href="/2016/03/30/ansys-e7-bb-8f-e5-85-b8-e7-95-8c-e9-9d-a2-e7-9a-84-e6-8e-a5-e8-a7-a6-e5-88-86-e6-9e-90-e4-be-8b-e5-ad-90-e5-b9-b2-e6-b6-89-e9-85-8d-e5-90-88-e5-ad-94-e8-be-b9-e7-9a-84-e5-ba-94-e5-8a-9b/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/03/29/ansysflexlm-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8/" class="post-title-link">[ANSYS]FLEXlm无法启动</a></h2><div class="post-info">2016年3月29日</div><div class="post-content"></div><a href="/2016/03/29/ansysflexlm-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/03/25/e5-9b-9e-e8-a5-bf-e5-ae-89-e6-9c-89-e6-84-9f/" class="post-title-link">回西安有感</a></h2><div class="post-info">2016年3月25日</div><div class="post-content"></div><a href="/2016/03/25/e5-9b-9e-e8-a5-bf-e5-ae-89-e6-9c-89-e6-84-9f/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/02/24/e6-96-b0-e5-ad-a6-e5-b9-b4-e5-bc-80-e5-a7-8b/" class="post-title-link">新学年开始</a></h2><div class="post-info">2016年2月24日</div><div class="post-content"></div><a href="/2016/02/24/e6-96-b0-e5-ad-a6-e5-b9-b4-e5-bc-80-e5-a7-8b/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/02/02/django-e5-85-83-e9-80-89-e9-a1-b9-e5-8f-82-e8-80-83/" class="post-title-link">[Django]元选项参考</a></h2><div class="post-info">2016年2月2日</div><div class="post-content"></div><a href="/2016/02/02/django-e5-85-83-e9-80-89-e9-a1-b9-e5-8f-82-e8-80-83/" class="read-more">...阅读全文</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/02/01/django-e6-a8-a1-e5-9e-8b-e5-ad-97-e6-ae-b5-e5-8f-82-e8-80-83/" class="post-title-link">[Django]模型字段参考</a></h2><div class="post-info">2016年2月1日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文档包含了Django提供的全部模型字段的字段选项 和 字段类型的API参考。</p>
+<p>如果内建的字段不能满足你的需要，你可以尝试对特定国家和文化有效的包含配套代码的 <a href="https://django-localflavor.readthedocs.org/" target="_blank" rel="external">django-localflavor</a>。当然，你也可以很容易的编写你自定义的字段。</p>
+<p>严格意义上来讲， model 是定义在<code>django.db.models.fields</code>里面，但为了使用方便，它们被导入到 <code>django.db.models</code>中；标准上，我们导入<span class="lang:python decode:true  crayon-inline ">from django.db import models</span> ，然后使用 <code>models.&amp;lt;Foo&amp;gt;Field</code>的形式使用字段。</p>
+<h1 id="字段选项"><a href="#字段选项" class="headerlink" title="字段选项"></a>字段选项</h1><p>下列参数是全部字段类型都可用的，都是可选的。</p>
+<h2 id="null"><a href="#null" class="headerlink" title="null"></a>null</h2><p><code>Field.null</code></p>
+<p>如果为<code>True</code>，Django 将空值以<code>NULL</code> 存储到数据库中。默认值是 <code>False</code>。</p>
+<p>字符串字段例如<code>CharField</code> 和<code>TextField</code> 要避免使用<code>null</code>，因为空字符串值将始终储存为空字符串而不是<code>NULL</code>。如果字符串字段的<code>null=True</code>，那意味着对于“无数据”有两个可能的值：<code>NULL</code> 和空字符串。在大多数情况下，对于“无数据”声明两个值是赘余的，Django 的惯例是使用空字符串而不是<code>NULL</code>。</p>
+<p>无论是字符串字段还是非字符串字段，如果你希望在表单中允许空值，你将还需要设置<code>blank=True</code>，因为null 仅仅影响数据库存储（参见<a href="http://python.usyiyi.cn/django_182/ref/models/fields.html#django.db.models.Field.blank" target="_blank" rel="external">blank</a>）。</p>
+<p>注意：</p>
+<p>在使用Oracle 数据库时，数据库将存储<code>NULL</code> 来表示空字符串，而与这个属性无关。</p>
+<p>如果你希望<code>BooleanField</code> 接受null 值，请用 <code>NullBooleanField</code> 代替。</p>
+<h2 id="blank"><a href="#blank" class="headerlink" title="blank"></a>blank</h2><p><code>Field.blank</code></p>
+<p>如果为<code>True</code>，则该字段允许为空白。 默认值是 <code>False</code>。</p>
+<p>注意它与<code>null</code>不同。<code>null</code> 纯粹是数据库范畴的概念，而<code>blank</code> 是数据验证范畴的。如果字段设置<code>blank=True</code>，表单验证时将允许输入空值。如果字段设置<code>blank=False</code>，则该字段为必填。</p>
+<h2 id="choices"><a href="#choices" class="headerlink" title="choices"></a>choices</h2><p><code>Field.choices</code></p>
+<p>它是一个可迭代的结构(比如，列表或是元组)，由可迭代的二元组组成(比如<span class="lang:python decode:true  crayon-inline ">[(A, B), (A, B) …]</span> )，用来给这个字段提供选择项。如果设置了 <code>choices</code> ，默认表格样式就会显示选择框，而不是标准的文本框，而且这个选择框的选项就是 <code>choices</code> 中的元组。</p>
+<p>每个元组中的第一个元素，是存储在数据库中的值；第二个元素是该选项更易理解的描述。 比如:</p>
+<pre class="lang:python decode:true">YEAR_IN_SCHOOL_CHOICES = (
+    ('FR', 'Freshman'),
+    ('SO', 'Sophomore'),
+    ('JR', 'Junior'),
+    ('SR', 'Senior'),
+)</pre>
+
+<p> 一般来说，最好在模型类内部定义<code>choices</code>，然后再给每个值定义一个合适名字的常量。</p>
+<pre class="lang:python decode:true">from django.db import models
+
+class Student(models.Model):
+    FRESHMAN = 'FR'
+    SOPHOMORE = 'SO'
+    JUNIOR = 'JR'
+    SENIOR = 'SR'
+    YEAR_IN_SCHOOL_CHOICES = (
+        (FRESHMAN, 'Freshman'),
+        (SOPHOMORE, 'Sophomore'),
+        (JUNIOR, 'Junior'),
+        (SENIOR, 'Senior'),
+    )
+    year_in_school = models.CharField(max_length=2,
+                                      choices=YEAR_IN_SCHOOL_CHOICES,
+                                      default=FRESHMAN)
+
+    def is_upperclass(self):
+        return self.year_in_school in (self.JUNIOR, self.SENIOR)</pre>
+
+<p> 尽管你可以在模型类的外部定义choices然后引用它，在模型类中定义choices和其每个<code>choice</code>的name可以保存所有的关于应用到此信息的类的信息， 也使得choices更容易被应用（例如， <code>Student.SOPHOMORE</code> 可以在任何引入Student 模型的位置生效)。</p>
+<p>你也可以归类可选的<code>choices</code>到已命名的组中用来达成组织整理的目的:</p>
+<pre class="lang:python decode:true">MEDIA_CHOICES = (
+    ('Audio', (
+            ('vinyl', 'Vinyl'),
+            ('cd', 'CD'),
+        )
+    ),
+    ('Video', (
+            ('vhs', 'VHS Tape'),
+            ('dvd', 'DVD'),
+        )
+    ),
+    ('unknown', 'Unknown'),
+)</pre>
+
+<p> 每个元组的第一个元素是组的名字。第二个元素是一组可迭代的二元元组，每一个二元元组包含一个值和一个给人看的名字构成一个选项。分组的选项可能会和未分组的选项合在同一个<code>list</code>中。 （就像例中的<code>unknown</code>选项）。</p>
+<p>对于每个有choices set的模型字段, Django 将会加入一个通过该字段现在的值取回给人看的名字的方法。参见数据库API文档中的<code>get_FOO_display()</code>。</p>
+<p>请注意<code>choices</code>可以是任何可迭代的对象 – 不是必须是列表或者元组。这一点使你可以动态的构建<code>choices</code>。但是如果你发现你自己搞不定动态的<code>choices</code>，你最好还是使用<code>ForeignKey</code>来构建一个合适的数据库表。<code>choices</code>意味着那些变动不多的静态数据，如果有的（变动）话。</p>
+<p>除非字段中默认了<code>blank=False</code>，那么<code>---------</code>就会在选择框中被渲染出来。你也可以向元祖中添加一个包含<code>None</code>的<code>choices</code>来覆盖这个行为（比如：<code>(None, &#39;Your String For Display&#39;)</code>）。</p>
+<h2 id="db-column"><a href="#db-column" class="headerlink" title="db_column"></a>db_column</h2><p><code>Field.db_column</code></p>
+<p>数据库中用来表征该字段的名称。如果未指定，那么Django将会使用<code>Field</code>名作为字段名.</p>
+<p>如果你的数据库列名为SQL语句的保留字，或者是包含不能作为Python 变量名的字符，很明显地如连字符，仍然可以的。Django 会在后台给列名和表名加上双引号。</p>
+<h2 id="db-index"><a href="#db-index" class="headerlink" title="db_index"></a>db_index</h2><p><code>Field.db_index</code></p>
+<p>若值为 <code>True</code>, 则 <code>django-admin sqlindexes</code> 将会为此字段输出 <code>CREATE INDEX</code> 语句。（译注：为此字段创建索引）</p>
+<h2 id="db-tablespace"><a href="#db-tablespace" class="headerlink" title="db_tablespace"></a>db_tablespace</h2><p><code>Field.db_tablespace</code></p>
+<p>如果该字段有索引的话，<code>database tablespace</code>的名称用作该字段的索引。 如果<code>DEFAULT_INDEX_TABLESPACE</code> 已经设置，则默认值是由<code>DEFAULT_INDEX_TABLESPACE</code>指定, 如果没有设置则由 <code>db_tablespace</code> 指定。如果后台数据库不支持表空间，或者索引，则该选项被忽略。</p>
+<h2 id="default"><a href="#default" class="headerlink" title="default"></a>default</h2><p><code>Field.default</code></p>
+<p>该字段的默认值. 它可以是一个值或者一个可调用对象. 如果是一个可调用对象，那么在每一次创建新对象的时候，它将会调用一次.</p>
+<p>这个默认值不可以是一个可变对象（如字典，列表，等等）,因为对于所有模型的一个新的实例来说，它们指向同一个引用。或者，把他们包装为一个可调用的对象。例如，你有一个自定义的<code>JSONField</code>，并且想指定一个特定的字典值，可以如下使用：</p>
+<pre class="lang:python decode:true">def contact_default():
+    return {"email": "to1@example.com"}
+
+contact_info = JSONField("ContactInfo", default=contact_default)</pre>
+
+<p> 请注意<code>lambdas</code> 函数不可作为如 <code>default</code> 这类可选参数的值.因为它们无法被 <code>migrations</code>命令序列化. 请参见文档其他部分。</p>
+<p>默认值会在新实例创建并且没有给该字段提供值时使用。如果字段为主键，默认值也会在设置为</div><a href="/2016/02/01/django-e6-a8-a1-e5-9e-8b-e5-ad-97-e6-ae-b5-e5-8f-82-e8-80-83/" class="read-more">...阅读全文</a></article></li></ul></main><footer><div class="paginator"><a href="/page/3/" class="prev">上一页</a><a href="/page/5/" class="next">下一页</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

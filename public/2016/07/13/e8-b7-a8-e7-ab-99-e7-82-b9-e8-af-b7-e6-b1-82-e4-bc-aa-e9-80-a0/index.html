@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 跨站点请求伪造 · kidozh</title><meta name="description" content="跨站点请求伪造 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">跨站点请求伪造</h1><div class="post-info">2016年7月13日</div><div class="post-content"><h1 id="CSRF简介"><a href="#CSRF简介" class="headerlink" title="CSRF简介"></a>CSRF简介</h1><p>CSRF全称是Cross Site Request Forgery，也就是跨站点请求伪造，是一种很常见的Web攻击。</p>
+<p>在很多网站的操作中，往往使用者只需要一个Cookie和参数就可以对其内容的增添或者删除的操作，比如搜狐的博客就有：</p>
+<p><code>http://blog.sohu.com/manage/entry.do?m=delete&amp;amp;id=156713012</code></p>
+<p>这样当用户登陆的时候，就能通过访问这个连接达到删除博客的目的。这样假设我们诱导用户访问上面的地址，用户就会神不知鬼不觉的删除自己的文章。 这个删除博客文章的请求，就是攻击者所伪造的，所以这种攻击就被成为跨站点请求伪造。</p>
+<h1 id="CSRF进阶"><a href="#CSRF进阶" class="headerlink" title="CSRF进阶"></a>CSRF进阶</h1><h2 id="浏览器Cookie策略"><a href="#浏览器Cookie策略" class="headerlink" title="浏览器Cookie策略"></a>浏览器Cookie策略</h2><p>上面的例子中，攻击者伪造的请求之所以可以被服务器验证通过，是因为用户的浏览器成功的发送了Cookie的缘故。</p>
+<p>浏览器所持有的Cookie分为两种：一种是Session Cookie，也就是临时Cookie；另一种是Third-party Cookie，也就是本地Cookie。</p>
+<p>两者的区别再与Third-Party Cookie在Set-Cookie时候就指定了Expire的时间，只有到了Expire时间后Cookie才会是小，所以这种Cookie会保存在本地；而Session Cookie则没有指定Expire的时间，所以当浏览器关闭的时候，Cookie也失效了。</p>
+<p>也就是说，Session Cookie在全浏览器的生命周期，即使浏览器打开了一个新的Tab页，Session Cookie也都是有效的。Session Cookie保存在浏览器的内存空间中；而Third-Party Cookie则保存在本地。</p>
+<p>如果浏览器从一个域的页面中，要加载另一个域的资源，由于安全原因，某些浏览器会阻止Third-party Cookie的发送。</p>
+<p>需要说明的是IE出于安全的考虑，默认禁止了浏览器在<code>&amp;lt;img&amp;gt;</code>、<code>&amp;lt;iframe&amp;gt;</code>、<code>&amp;lt;script&amp;gt;</code>、<code>&amp;lt;link&amp;gt;</code>等标签中发送第三方Cookie。而Firefox默认的策略是允许发送第三方cookie的。</p>
+<p>目前主流的浏览器之中，默认会拦截Third-party Cookie的有：IE、Safari；不会拦截的则有：Firefox、Opera、Chrome、Android等。但是CSRF攻击的目标如果不需要使用cookie，那么也不必考虑浏览器的Cookie策略了。</p>
+<h2 id="P3P头的副作用"><a href="#P3P头的副作用" class="headerlink" title="P3P头的副作用"></a>P3P头的副作用</h2><p>尽管有些CSRF攻击的实施起来不需要认证，不需要发送Cookie，但是不可否认的是，大部分敏感的操作都是躲在认证之后的。因此浏览器拦截第三方Cookie的发送，在某种程度上来说降低了CSRF攻击的威力。</p>
+<p>但是P3P的介入却使得情况变得复杂。P3P是W3C指定的一项关于隐私的标准，全称是The Platform for Privacy Preferences。</p>
+<p>如果网站返回给浏览器的HTTP头包含了P3P头，则在某种程度上来说，会允许浏览器发送第三方Cookie，在IE下即使是<code>&amp;lt;iframe&amp;gt;</code>和<code>&amp;lt;script&amp;gt;</code>也不会在拦截第三方Cookie的发送。</p>
+<p>在网站的业务中，P3P主要用于类似广告等需要跨域访问的页面。但是很遗憾的是，P3P头设置后，对于Cookie的影响将扩大到整个域中的所有页面，因为Cookie是以域和path为单位的，所以不满足最小权限的要求。</p>
+<p>假设有www.a.com和www.b.com两个域，在www.b.com上有一个页面，其中包含一个指向www.a.com的iframe。</p>
+<p>如果www.b.com/test.html的内容为:</p>
+<p><code>&amp;lt;iframe width=300 height=300 src=&quot;http://www.a.com/test.php&quot;&amp;gt;&amp;lt;/iframe&amp;gt;</code></p>
+<p>如果这<a href="http://www.a.com/test.php对a.com设置了Cookie的页面，其内容为：" target="_blank" rel="external">http://www.a.com/test.php对a.com设置了Cookie的页面，其内容为：</a></p>
+<p><pre class="lang:php decode:true">&lt;?php<br>header(“Set-Cookie:test=axis;domian=.a.com;path=/“)<br>?&gt;</pre><br>如果请求www.b.com/test.html的时候，他的iframe会告诉浏览器去跨域请求www.a.com/test.php。test.php会尝试请求Set-Cookie，所以浏览器会收到一个Cookie。</p>
+<p>如果设置Cookie成功之后，会再次请求该界面，浏览器会发送刚刚收到的Cookie，可是由于跨域限制，在a.com上Set-Cookie是不会成功的，所以无法发送刚才收到的Cookie，无论是临时还是本地的Cookie。</p>
+<p>可是当加入P3P之后，其允许跨域访问数据，从而跨域Set-Cookie成功。</p>
+<p>P3P头的介入会改变域名的隐私策略，从而使得<code>&amp;lt;iframe&amp;gt;</code>、<code>&amp;lt;script&amp;gt;</code>等标签在IE中不再拦截第三方Cookie的发送。P3P头只需要由网站设置一次即可，之后的每次请求都会遵循此策略，而不需要再重复设置。</p>
+<p>P3P策略可以查询W3C标准。也可以直接引用一个XML策略文件。<a href="http://www.w3.org/TR/P3P" target="_blank" rel="external">www.w3.org/TR/P3P</a></p>
+<h2 id="GET或者POST"><a href="#GET或者POST" class="headerlink" title="GET或者POST"></a>GET或者POST</h2><p>不仅仅GET能够发起CSRF攻击，POST请求也能够发起CSRF攻击，所以不能仅凭请求方式来获取变量执行操作。</p>
+<p>比如，在一个页面中构造好一个<code>&amp;lt;form&amp;gt;</code>，然后使用Javascript自动提交这个表单，比如，攻击者在www.b.com/test.html中写入下面的代码。</p>
+<p><pre class="lang:js decode:true ">&lt;form action=”<a href="http://www.a.com/register" target="_blank" rel="external">http://www.a.com/register</a>“ id=”register” method=”post”&gt;<br>    &lt;input type=”text” name=”username” value=”” /&gt;<br>    &lt;input type=”text” name=”password” value=”” /&gt;<br>    &lt;input type=”submit” name=”submit” value=”submit”&gt;<br>&lt;/form&gt;<br>&lt;script&gt;<br>    var f=document.getElementById(“register”);<br>    f.inputs[0].value=”test”;<br>    f.inputs[1].value=”passwd”;<br>    f.submit();<br>&lt;/script&gt;</pre><br>攻击者甚至可以将这个页面隐藏于一个不可见的iframe的窗口中，这整个自动提交表单的过程来说，对于用户来说也是不可见的。</p>
+<h2 id="Flash-CSRF"><a href="#Flash-CSRF" class="headerlink" title="Flash CSRF"></a>Flash CSRF</h2><p>Flash也有许多的方式能够发起网络请求，包括POST。但是自IE 8起，Flash发送的网络请求已经不再发送本地Cookie了。</p>
+<h2 id="CSRF-Worm"><a href="#CSRF-Worm" class="headerlink" title="CSRF Worm"></a>CSRF Worm</h2><p>实现的原理可以举个例子：</p>
+<p>假设现在有一个SMS服务，可以向指定的用户发送短消息：</p>
+<p><code>http://msg.xx.com/?ct=22&amp;amp;cm=MailSender&amp;amp;tn=bmSubmit&amp;amp;sn=账号&amp;amp;co=消息内容</code></p>
+<p>只需要修改参数sn，即可以对指定的用户发送短消息，而这里另一个接口则可以查询出某个用户的所有好友：</p>
+<p><code>http://frd.xx.com/?ct=28&amp;amp;cm=FriList&amp;amp;tn=bmABCFriList&amp;amp;un=账号&amp;amp;callback=gotfriends</code></p>
+<p>将两者结合起来，可以组成一个CSRF Worm，让一个用户查看恶意截面后，将给他的好友发送一条短消息，这个短消息又包含一张图片，其地址再次指向CSRF页面，使得这些好友再次将信息发给他的好友，这个worm因此得以传播。</p>
+<p>首先：模拟服务器取得request的参数。</p>
+<p><pre class="lang:js decode:true ">var lsURL = window.location.href;<br>loU = lsURL.split(“?”);// get href from broswer<br>if(loU.length&gt;1){<br>    var loallPm=loU[1].split(“&amp;”);// get param from ?XXXX<br>}</pre><br>定义蠕虫页面的服务器地址，取得?和&amp;符号后面的字符串，从URL中提取出感染蠕虫的用户名以及感染者好友的用户名。</p>
+<p>其次：好友json数据的动态获取。</p>
+<p><pre class="lang:js decode:true ">var gotfriends = function(x){<br>    for (i=0;i&lt;x[2].length;i++){<br>        friends.push(x[2][i][1]);<br>    }<br>}<br>loadjson(‘&lt;script<br>src=”<a href="http://frd.xxx.com/?ct=28&amp;un=&#39;+lusername+&#39;&amp;cm=FriList&amp;tn=bmABCFriList&amp;callback=gotfriends&amp;.tmp=&amp;1=2&quot;&lt;\/script&amp;gt" target="_blank" rel="external">http://frd.xxx.com/?ct=28&amp;un=&#39;+lusername+&#39;&amp;cm=FriList&amp;tn=bmABCFriList&amp;callback=gotfriends&amp;.tmp=&amp;1=2&quot;&lt;\/script&amp;gt</a>;’);</pre><br>通过CSRF漏洞从远程加载受害者好友json数据，根据该接口的json数据格式，提取出好友数据为蠕虫的传播流程做准备。</p>
+<p>最后：感染信息输出和消息发送的核心部分。</p>
+<p><pre class="lang:js decode:true ">evilurl=url+”/wish.php?from=”+lusername+”&amp;to=”;<br>sendmsg=”<a href="http://msg.xx.com/?ct=22&amp;cm=MailSend&amp;tn=bmSubmit&amp;sn=[user]&amp;co=[evilmsg" target="_blank" rel="external">http://msg.xx.com/?ct=22&amp;cm=MailSend&amp;tn=bmSubmit&amp;sn=[user]&amp;co=[evilmsg</a>]”;<br>for(i=0;i&lt;friends.length;i++){<br>    mysendmsg=mysendmsg+”&amp;”+i;<br>    eval(‘x’+i+’=new Image();x’+i+’.src=unescape(“”+mysendmsg+’”);’);<br>}</pre><br>将感染者的用户和需要传播的好友用户名放到蠕虫链接内，然后输出短消息。</p>
+<p>所以讲这两个结合起来就可以组成一个CSRF Worm，让一个用户查看恶意页面之后，将给他的所有好友发送一条短信息，这个短信息中又可以插入一张图片，其地址可以指向CSRF页面，使得这些好友再次把信息发送给他们的好友，这个worm就可以传播了。</p>
+<p>这样可以把感染者的用户名和需要传播的好友用户名放到蠕虫连接内，然后输出短消息。这样的话，即使没有XSS漏洞，也能仅仅依靠CSRF，也是能够发送大规模蠕虫攻击的。</p>
+<h1 id="CSRF的防御"><a href="#CSRF的防御" class="headerlink" title="CSRF的防御"></a>CSRF的防御</h1><h2 id="验证码"><a href="#验证码" class="headerlink" title="验证码"></a>验证码</h2><p>验证码被认为是对抗CSRF攻击最简单和有效的防御方法。</p>
+<p>CSRF攻击的过程，往往是在用户不知情的情况下构造了网络请求。而验证码可以强制你用户必须与应用进行交互才能完成请求。因此在最终情况下，验证码能够很好的遏制CSRF攻击。</p>
+<p>但是验证码并非是万能的，在很多时候，出于用户体验的考虑，网站不能给所有的操作都加上验证码。因此，验证码只能作为防御CSRF的一种辅助手段，而不能作为最主要的解决方案。</p>
+<h2 id="Referer-Check"><a href="#Referer-Check" class="headerlink" title="Referer Check"></a>Referer Check</h2><p>Referer Check在互联网之中最常见的应用就是防止图片。同样的，Referer Check也可以被用于检查请求是否来自合法的“源”。</p>
+<p>常见的互联网应用，页面和页面之间都具有一定的逻辑关系，这样就使得每个正常请求的Referer具有一定的规律。</p>
+<p>比如对于发帖这个操作，在正常的情况下是需要先登录到用户后台，或者访问有发帖功能的页面。再提交“发帖”的表单的时候，Referer的值必然是发帖表单所在的页面。如果Referer的值不是这个页面，甚至不是发帖网页的域，则极有可能是CSRF攻击。</p>
+<p>即使我们能够通过检查Referer合法来判定用户是否被CSRF攻击，也仅仅是满足了防御的充分条件。Referer Check的缺陷再与，服务器并非什么时候都能取到Referer，很多用户出于隐私保护的考虑，限制了Referer的发送，在某些情况下，浏览器也不会发送Referer。比如从HTTPS跳转到HTTP的时候，出于安全的考虑，浏览器也不会发送Referer。</p>
+<p>出于种种原因，我们还是无法依赖Referer Check作为防御CSRF的主要手段。但是通过Referer Check来监控CSRF攻击的发生，也是一种可行的方法。</p>
+<h2 id="CSRF-Token"><a href="#CSRF-Token" class="headerlink" title="CSRF_Token"></a>CSRF_Token</h2><p>现在业界对于CSRF的防御，一致的做法是使用一个Token。在介绍此方法之前，我们可以了解一下CSRF的本质。</p>
+<h3 id="CSRF的本质"><a href="#CSRF的本质" class="headerlink" title="CSRF的本质"></a>CSRF的本质</h3><p>CSRF能够攻击成功的原因，其本质是重要操作的所有参数都是可以被攻击者猜到的。攻击者只有预测到URL的所有参数和参数值，才能成功的构造出一个伪造的请求；反之，攻击者将无法攻击成功。</p>
+<p>出于这个原因，我们可以把参数加密，或者使用一些随机数，从而可以让攻击者无法猜测到参数值：</p>
+<p>比如，一个删除操作的URL是：<code>http://host/path/delete?username=abc&amp;amp;item=123</code></p>
+<p>其中就可以把username的参数改为hash值：<code>http://host/path/delete?username=md5(salt+abc)&amp;amp;item=123</code></p>
+<p>这样攻击者再不知道salt的情况下，是无法构造出这个URL的，因此也就无法发起CSRF攻击了。而对于服务器来说，则可以从Session或者Cookie中取得username=abc的值，再结合salt对于整个请求进行认证，正常请求会被认为是合法的。</p>
+<p>但是这个方法也存在一些问题。首先加密或者混淆后的URL会变得很难读，对于用户很不友好。其次，如果加密后的参数每次改变，则某些URL将无法被用户收藏。最后，普通的参数如果也被加密或者hash，那么会给数据分析带来很大的困扰，因为数据分析工作常常需要用到参数的明文。</p>
+<p>因此，我们可以使用anti-CSRF Token。</p>
+<p>回到上面的URL中，保持原参数不变，新增一个参数Token。这个Token是随机，不可预测的：</p>
+<p><code>http://host/path/delete?username=abc&amp;amp;item=123&amp;amp;token=[random(seed)]</code></p>
+<p>Token需要爱足够随机，必须使用足够安全的随机数生成算法，或者采用真随机数生成器。Token应该被用户与服务器共同持有，不能被第三者知晓。在实际应用的时候，Token可以放在Session中，或者浏览器的Cookie中。</p>
+<p>由于Token的存在，攻击者是无法构造出一个完整的URL实施CSRF攻击的。</p>
+<p>Token需要同时放在表单和Session中，再提交请求的时候，服务器只需要验证表单中的Token，或者与用户Session（或者Cookie）中的Token是否一致。如果已知，则认为是合法请求，如果不一致或者有一个为空，则认为请求不合法，可能发生了CSRF攻击。通过可以把Token作为一个隐藏的input字段，放在<code>form</code>中。</p>
+<h3 id="Token的使用原则"><a href="#Token的使用原则" class="headerlink" title="Token的使用原则"></a>Token的使用原则</h3><p>anti-CSRF在使用的过程中，需要注意：</p>
+<p>防御CSRF的Token，是根据不可预测性原则设计的方案，所以Token的生成一定要随机，需要使用安全的随机数生成Token。</p>
+<p>此外，这个Token目的不是为了防止重复提交。所以为了使用方便，可以允许在一个用户的有效生命周期内，在Token消耗前都使用同一个Token。但是如果用户已经提交了表单，则这个Token已经消耗掉，应该生成一个新的Token。</p>
+<p>如果Token保存在Cookie中，而不是服务器端的Session之中，则会有个新问题。如果一个用户打开几个相同的页面同时操作，当某个页面的表单再次提交时，会出现Token错误。在这种情况下，可以考虑生成多个有效的Token，解决多页面共存的场景。</p>
+<p>最后使用Token时候应该注意Token的保密性。Token如果出现在某个页面的URL之中，则可能通过Referer的方式泄露。</p>
+<p>因此在使用Token的时候，应该尽量把Token放在表单之中，把敏感操作由GET改为POST，以form的形式提交，可以避免Token泄露。</p>
+<p>同样的CSRF的Token仅仅用于对抗CSRF攻击，当网站还同时存在XSS漏洞时，这个方案就会变得无效，因为XSS可以模拟客户端浏览器执行任意操作，在XSS攻击下，攻击者完全可以请求页面，读出页面中的Token值，然后再构造出一个合法的请求。这个过程被称为XSRF和CSRF区分。</p>
+<p>XSS带来的问题，应该使用XSS的防御方案综合解决，否则CSRF的Token防御就变得无效。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/07/15/python-e8-af-86-e5-88-ab-e9-aa-8c-e8-af-81-e7-a0-81/" class="prev">上一篇</a><a href="/2016/05/30/e8-a5-bf-e5-8c-97-e5-b7-a5-e4-b8-9a-e5-a4-a7-e5-ad-a6acm2014-e7-ba-a7-e8-8e-b7-e5-a5-96-e6-83-85-e5-86-b5-e7-bb-9f-e8-ae-a1/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

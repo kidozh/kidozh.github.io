@@ -1,0 +1,146 @@
+---
+title: '[LaTeX]LaTeX基础'
+tags:
+  - LaTeX
+id: 723
+categories:
+  - LaTeX
+date: 2015-12-14 23:36:27
+---
+
+# 1 源文件结构
+
+## 1.1 短篇论文
+
+通常在10页以内、不设置目录的论文称为短篇论文，他们大都是由若干节和小节组成，其源文件的基本结构如下所示：
+<pre class="lang:tex decode:true">\documentclass{article} % 使用article文档类型格式排版
+\usepackage{amsmath} % 调用公式宏包
+\usepackage{graphicx} % 调用插图宏包
+
+\begin{document}
+	This is 内容...
+\end{document}</pre>
+
+ 这里由于TeX原生并不支持中文，在没有引入中文包之前，无法正常显示中文。
+
+从源文件的第一行命令\(\documentclass!\)开始，到<span style="line-height: 22.8571px;">\(\begin{document}!\)之前所有的命令语言均称之为导言；在\(\begin{document}!\)和</span><span style="line-height: 22.8571px;">\(\end{document}!\)之间的所有命令语句和文本统称为正文。命令<span class="lang:default decode:true  crayon-inline ">\end{document}</span> 之后的任何字符，$$\LaTeX\$$都将忽略。</span>
+
+导言主要由文档类型命令和调用宏包命令以及其他设置命令组成，其作用是对文稿的格式和排版功能进行设置，在导言中的任何设置都将对正文的全文产生影响。
+
+正文则是由论文内容（包括了文本、插图、表格、公式和各种<span style="line-height: 22.8571px;">$$\LaTeX\$$命令</span><span style="line-height: 1.42857;">）组成，正文中的命令只对其后的局部正文产生影响。</span>
+
+短篇论文通常使用article文类或出版机构提供的专用文类。由于短篇论文的篇幅甚小，层次结构简单，直接将论文内容写入正文区域就可以了。
+
+%在<span style="line-height: 22.8571px;">$$\LaTeX\$$是注释符，他表示其右侧的文字是对左侧的命令和文本的说明，在编译源文件时，</span><span style="line-height: 22.8571px;">$$\LaTeX\$$将忽略注释符以及其右侧的所有字符。</span>
+
+## 1.2 中长篇论文
+
+一般篇幅在10页以上至几百页的，需要设置目录的论文称之为中长篇论文，他们都是由若干章组成的，其源文件的典型结构如下所示。
+<pre class="lang:tex decode:true">\documentclass{book} % 使用book文档类型格式排版
+\usepackage{amsmath} % 调用公式宏包
+\usepackage{graphicx} % 调用插图宏包
+% 其他调用宏包和设置命令
+
+% 其他调用宏包和设置命令
+\begin{document}
+	\include{cover} % 调入封面资源文件 cover.tex
+	\pagenumbering{Roman} % 罗马数字页码
+	\include{abstract} % 调入摘要资源文件 abstract.tex
+	\pagenumbering{arabic} % 阿拉伯数字页码
+	\include{contents} % 调入创建目录资源文件 contents.tex
+	\pagenumbering{arabic} % 阿拉伯数字页码
+	\include{chapter1} % 调入第1章资源文件 chapter1.tex
+	\include{chapter2} % 调入第2章资源文件 chapter2.tex
+	% 下面还有代码
+	Yeah
+	% 上面还有代码
+	\include{reference} % 调入参考文件资源文件 reference.tex
+\end{document}</pre>
+
+##  1.3 文件名
+
+在保存文件的时候，需要注意以下原则
+
+*   不能使用/ \ &lt; &gt; * ? " : | 和变音字母以及空格，慎重使用中文
+*   不应该大小写字母混组，有些版本的$$\LaTeX\$$在区分大小写上具有差异
+
+# 2 命令
+
+## 2.1 命令的构成
+
+### 2.1.1 命令的类型
+
+$$\LaTeX\$$命令都是以反斜杠符号\作为转义符开头，后跟命令名，其中命令名主要分为以下两种类型：
+
+*   反斜杠符号后面跟若干个英文字母组成的命令名，他区分大小写，以空格、数字（个别命令如<span class="lang:default decode:true  crayon-inline ">\fontdimen</span> 等除外）或者非字母符号作为结束标志。绝大部分这种命令都可以顾名思义，例如命令<span class="lang:default decode:true  crayon-inline">\newline</span> 表示另起一行，命令<span class="lang:default decode:true  crayon-inline ">\today</span> 表示显示当前日期。
+*   反斜杠符号后跟一个非字母符号的命令名，例如\!、\^等；这种命令意味着转义
+
+### 2.1.2 命令的参数
+
+命令可以附带若干参数。参数是影响命令作用的数据，例如高度、宽度、对齐方式或者文本。
+
+参数主要分为以下两种类型：
+
+*   必要参数。不能省略的命令必须要求附带的参数。必要参数被置于命令名后的一对花括号之中，即{参数}，当引用多组参数的时候，需要使用以下格式{选项1}{选项2}...
+*   可选参数。可以省略的参数。使用方括号[]之中来引用参数，即[参数]，而输入多个参数的时候，可以在方括号内部给予,予以分隔，或者使用[参数1=选项,参数2=选项,...]，其顺序允许自由调换甚至省略
+
+但是当一个命令中既有必要参数和可选参数的时候，通常可选参数都位于必要参数之前，一个常规的$$\LaTeX\$$命令的语法结构的形式为：\命令名[可选参数]{必要参数}
+
+有些命令后面带*的形式，两者功能基本相同，只是在某个或者某些排版的细节之处略有不同。
+
+### 2.1.3命令的种类
+
+$$\LaTeX\$$定义了大量的具有各种排版功能的命令，其主要分为三大类：
+
+1.  用户命令
+2.  编写命令
+3.  内部命令
+
+对于命令用户而言，$$\LaTeX\$$提供给作者在写作论文时使用的命令，例如节命令<span class="lang:tex decode:true  crayon-inline ">\section</span> 、字体尺寸命令<span class="lang:default decode:true  crayon-inline ">\small</span> 等，这些命令的命令名大部分都是由简短的小写字母串组成，而其用分为以下三种类型：
+
+*   常规命令。可以在源文件单独使用的、具有某种排版功能的命令。例如<span class="lang:tex decode:true  crayon-inline ">\small</span> 等
+*   数据命令。代表某一数值，例如表示缩进宽度的长度数据命令<span class="lang:default decode:true  crayon-inline ">\parindent</span> ,表示节序号值得计数器数据命令<span class="lang:tex decode:true  crayon-inline ">\value{section}</span> 等；数据命令不能单独使用，他们只能被作为参数应用于常规命令中。
+*   环境命令。有两个命令组成的命令组，具有某一专项排版功能，例如表格环境、公式环境和列表环境等。
+
+用户命令按照其具体用途还可以细分为字体命令、长度命令、引用命令、表格命令、数学命令和绘图命令等多种。
+
+对于编写命令而言，其用于编写文类和宏包文件的命令，例如<span class="lang:tex decode:true  crayon-inline ">\RequirePackage</span> 等
+
+对于内部命令而言，系统内部使用的命令。部分内部文件也可以用于源文件之中，但是并**不推荐使用**。内部文件中含有的@符号被称为核心命令，都不能直接用于源文件之中。例如：在排版论文名页时，系统假设作者姓名为<span class="lang:tex decode:true  crayon-inline ">\@author</span> ，而实际姓名需要由用户命令<span class="lang:tex decode:true  crayon-inline ">\author</span> 提供。加入@的主要目的是为了避免与同名的用户命令和自定义命令相冲突，系统不会把源文件之中的@当成字母，而是符号。
+
+## 2.2 命令的作用范围
+
+根据不同的作用范围，将其分为声明形式、参数形式、组合形式和环境形式。
+
+*   声明形式，将作用于命令之后的所有相关内容，例如粗体命令<span class="lang:tex decode:true  crayon-inline ">\bfseries</span> ，可以将其后所有的文本和表格中的字体改成粗体
+*   参数形式，只作用于命令所带的参数，对于<span class="lang:tex decode:true  crayon-inline ">\textsl{Asia}</span> ，就会得到$$\textsl{Asia}$$，将所带参数Asia改成斜体，当没有花括号界定参数只是，参数命令将其后的第一个字母作为参数，对于<span class="lang:tex decode:true  crayon-inline ">\textsl Asia</span> 将会得到$$\textsl Asia$$，因此，这种命令的参数可以空置，例如<span class="lang:default decode:true  crayon-inline ">\textsl{}</span> ，但是不能省略
+*   组合形式，将声明形式的命令和所需作用的内容置于一对花括号之中，这样可以将声明形式的命令作用范围限制在花括号内部。例如<span class="lang:tex decode:true  crayon-inline ">{\bfseries Asia}</span> ，只会将Asia这个单词改为粗体。**组合允许嵌套**。
+*   环境形式，在各种环境之中所使用的声明形式命令，其作用范围只限于该环境之内，但是对于某个计数器的赋值或者新计数器的定义，无论它处于哪个地方，都将在其后的正文有效。
+
+# 3 自定义命令
+
+## 3.1 定义新命令
+
+$$\LaTeX\$$提供了一整套用于常规排版的用户命令，系统也提供了一条新定义命令：
+<pre class="lang:tex decode:true">\newcommand{cmd}[args][default]{def}</pre>
+
+1.  <span style="line-height: 1.42857;"> cmd 新定义命令的名称，他必须符合命令的构成规则，并且不能和系统和已调用宏包提供的命令和环境重名，也不能以<span class="lang:tex decode:true  crayon-inline ">\end</span> 开头，否则都会提示出错</span>
+2.  args 参数数量，可选参数，指定新命令具有的参数个数，他可以是0-9之中的任何一个整数，其默认值为0，也就是无参数
+3.  default 默认值，可选参数，用于设定第一个参数的默认值；若在新定义命令中给出默认值，则表示该命令第一个参数是可选参数。新命令之中最多只有一个可选参数，并且必须是第一个参数。
+4.  def 定义内容，其中涉及到某个参数时用符号#n表示，例如设计第一个参数时用#1代表，第二个用#2
+
+新命令是个声明形式的命令，通常放在导言里面，这样在全文之中都可以使用其定义的新命令；其也可以置于正文中，作用范围仅限于后面的内容，或是在所在环境和组合之内。在新命令中不得含有抄录命令<span class="lang:tex decode:true  crayon-inline ">\verb</span> 或者抄录环境verbatim
+
+## 3.2 防止同名命名冲突
+
+而对于预防同名命令的冲突造成的编译中断，就可以使用<span class="lang:default decode:true  crayon-inline ">\providecommand {newCommand}[argsNum][default]{def}</span> ，其定义方法和<span class="lang:tex decode:true  crayon-inline ">\newcommand</span> 相同，若新命令与当前源文件与某个已有命令重名，系统并不会提示出错，而是**保留定义内容**，假设当前中不存在同名命令，或提供同名命令的宏包被取消，则该新命令生效。
+
+## 3.3 修改已有命令
+
+若是需要修改已有的命令时，调用<span class="lang:tex decode:true  crayon-inline ">\renewcommand {existCommand}[argsNum][default]{def}</span> ，但是这种方法并不被建议。
+
+## 3.4 核心命令的修改
+
+含有@符号的命令是系统内部的核心命令，当对已有用户命令的使用或者修改，在使用核心命令对其重新定义时，应将核心命令或者<span class="lang:tex decode:true  crayon-inline ">\renewcommand </span> 重新定义命令插入在下面两条命令之间：
+
+<span class="lang:tex decode:true  crayon-inline ">\makeatletter</span> <span class="lang:tex decode:true  crayon-inline ">\makeatother</span> 前者通知$$\LaTeX\$$将读好@和其他英文字母对待，这样其后含有@符号的核心命令就符合了用户命令的构成规则，可以在源文件中使用，第二条命令告诉$$\LaTeX\$$仍然将@当作符号处理，于是其后就不得再出现核心命令了

@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 朴素贝叶斯 · kidozh</title><meta name="description" content="朴素贝叶斯 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">朴素贝叶斯</h1><div class="post-info">2016年5月8日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在机器学习之中，我们可以通过概率论来进行分类。最简单的就是朴素贝叶斯分类器了。</p>
+<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>可以处理多类别问题</li>
+<li>在数据较少的情况依然有效</li>
+</ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>对于输入数据的准备方式较为敏感</p>
+<h1 id="条件概率"><a href="#条件概率" class="headerlink" title="条件概率"></a>条件概率</h1><p>贝叶斯决策理论要求计算两个概率$$p1(c<em>{1}|x,y)$$和$$p2(c</em>{2}|x,y)$$：</p>
+<ul>
+<li>当p1&gt;p2时，那么这个事件属于1</li>
+<li>当p1&lt;p2时，那么这个事件属于2</li>
+</ul>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><ol>
+<li>收集数据</li>
+<li>准备数据</li>
+<li>分析数据：特征大的时候适用直方图效果更好</li>
+<li>训练算法：计算不同独立特征下的条件概率</li>
+<li>测试算法：计算错误率</li>
+<li>适用算法</li>
+</ol>
+<p>假定每个特征需要$$N$$个样本，当我们需要研究$$M$$的时候，此时样本数提升到$$N^{M}$$个了。而当特征之间互相独立的时候，也就是一个特征或者单词出现的可能性和其他临近的单词没有关系的时候，样本数就从$$N^{M}$$降低到$$M*N$$个。</p>
+<p>但是我们知道，这样的假设并不正确，因为”青菜”这个单词常出现在”难吃”附近但是很少出现在“垃圾食品”。并且贝叶斯的另一个假设就是，每种特征等值重要。当然这也是很Navie的。</p>
+<h1 id="使用Python进行文本分类"><a href="#使用Python进行文本分类" class="headerlink" title="使用Python进行文本分类"></a>使用Python进行文本分类</h1><h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><p>我们简述一下这个准备数据的过程。我们需要把文本看成是一个单词的向量。我们需要考虑出现再所有文档之中的所有的单词，然后考虑哪些词应该被纳入词汇表，这就是我们的数据准备方式。</p>
+<pre class="lang:python decode:true">def loadDataSet():
+    postingList = [
+        ['my','dog','has','been','lost'],
+        ['you','are','to','raped'],
+    ]
+    classVec = [0,1] # 1 代表侮辱词汇
+    return postingList,classVec
+
+def createVocabList(dataSet):
+    vocabSet = set([])
+    for document in dataSet:
+        vocabSet = vocabSet|set(document)
+        return list(vocabSet)
+
+def setOfWords2Vec(vocabList,inputSet):
+    # vocabList: 词汇表
+    # inputSet: 测试文档
+    returnVec = [0]*len(vocabList)
+    for word in inputSet:
+        if word in vocabList:
+            returnVec[vocabList.index(word)] = 1
+        else:
+            print "word %s is not in my vocabulary" %word
+    return returnVec</pre>
+
+<p> 第一个函数<code>loadDataSet()</code>创建了一个实验样本。该函数返回的第一个变量是进行词条切分后的文档集合，而第二个函数则是返回该词条向量是否有侮辱性的留言。</p>
+<p>下一个函数<code>createVocabList()</code>则是会创建一个包含在所有文档中出现的不重复的列表，这里还使用了Python中的<code>set</code>。县创建一个空集合，然后将每篇文档返回的新词集合添加到该集合中，操作符|适用于求两个集合的并集。</p>
+<p>获得词汇表之后，就可以使用函数<code>setOfWords2Vec()</code>。函数输入参数是词汇表以及某个文档，输出的是文档向量，函数首先会创建一个和词汇表等长的向量，并将其中的元素都设置为0.接着遍历文档中所有的词汇，若出现了词汇表之中的词汇则将输出的文档中的对应的值设置为1。</p>
+<h1 id="训练算法"><a href="#训练算法" class="headerlink" title="训练算法"></a>训练算法</h1><p>这里训练主要使用的就是贝叶斯算法了，这里我们给上条件概率公式，这里w值得就是一个向量，由多个之组成：</p>
+<p>[p(c<em>{i}|w) = \frac{p(w|c</em>{i})*p(c_{i})}{p(w)}]</p>
+<p>我们是用这个公式计算每个类的值，并且比较这两个概率之的大小。在这里使用朴素贝叶斯假设，将$$w$$展开成一个个独立的特征，进而使用连乘的方式计算上述概率，这样救能够简化计算的过程。</p>
+<pre class="lang:python decode:true">def trainNB0(trainMatrix,trainCategory):
+    numTrainDocs = len(trainMatrix)
+    numWords = len(trainMatrix[0])
+    pAbusive = sum(trainCategory)/float(numTrainDocs)
+    # init ratio
+    p0Num = zeros(numWords)
+    p1Num = zeros(numWords)
+    p0Denom = 0.0
+    p1Denom = 0.0
+    for i in range(numTrainDocs):
+        if trainCategory[i] == 1:
+            # if this sentence bingo , then increase every words' value
+            p1Num += trainMatrix[i]
+            p1Denom +=sum(trainMatrix[i])
+        else:
+            p0Num += trainMatrix[i]
+            p0Denom +=sum(trainMatrix[i])
+    # divide each element
+    p1Vect = p1Num/p1Denom
+    p0Vect = p0Num/p0Denom
+    return p0Vect,p1Vect,pAbusive</pre>
+
+<p> 这里还使用了<code>numpy</code>的<code>zeros</code>这个函数。</p>
+<p>代码之中输入的参数就是文档矩阵<code>trainMatrix</code>，以及每片文档类别所构成的向量<code>trainCategory</code>。首先计算文档属于侮辱性文档的概率，也就是$$P(1)$$。因为这是一个对立问题，所以$$P(0) = 1-P(1)$$。<strong>对于其他分类问题则需要稍加修改</strong>。</p>
+<p>计算$$p(w<em>{i}|c</em>{1})$$和$$p(w<em>{i}|c</em>{0})$$，需要初始化程序之中的分子和分母变量。由于w中元素很多，所以使用NumPy数组快速计算这些值。在for循环之中需要遍历训练集<code>trainMatrix</code>中的所有文档。一单某个词汇在某一文档中出现，则对应的个数（p1Num或者p0Num）就加1，而且在所有的文档之中，该文档的总次数也相应+1.</p>
+<p>最后，对每一个元素除以该类别的总次数。利用NumPy可以很好实现，用一个数组除以浮点数即可。</p>
+<h1 id="训练算法-1"><a href="#训练算法-1" class="headerlink" title="训练算法"></a>训练算法</h1><p>利用贝叶斯分类器对文档进行分类的时候，当连乘出现的时候，如果其中的一个概率值为0，那么最终的成绩也是0，为了降低这种影响，可以把所有的词出现数初始化为1，并将分母初始化为2。</p>
+<p>这里需要把<code>trainNB0()</code>修改为：</p>
+<pre class="lang:python decode:true"># update alogrithm
+    p0Num = ones(numWords)
+    p1Num = ones(numWords)
+    p0Denom = 2.0
+    p1Denom = 2.0</pre>
+
+<p> 另一个问题就是向下溢出，这是由于太多很小的数想乘造成的，当计算连乘的时候，由于大部分的因子都太小，只是Python有可能发生四舍五入为0的情况，所以可以通过球自然对数来避免下溢出或者浮点数舍入所造成的误差。而且自然对数也不会造成精度上的缺失。</p>
+<pre class="lang:python decode:true"># divide each element
+    p1Vect = log(p1Num/p1Denom)
+    p0Vect = log(p0Num/p0Denom)</pre>
+
+<p> 所以简单的贝叶斯分类函数就是这样的了。</p>
+<pre class="lang:python decode:true">def classifyNB(vec2Classify,p0Vec,p1Vec,pClass1):
+    p1 = sum(vec2Classify*p1Vec)+log(pClass1)
+    p0 = sum(vec2Classify*p0Vec)+log(1.0-pClass1)
+    if p1&gt;p0:
+        return True
+    else:
+        return False</pre>
+
+<h1 id="准备数据-1"><a href="#准备数据-1" class="headerlink" title="准备数据"></a>准备数据</h1><p>也就是文档词袋模型了。也就是如果一个词在文档之中不止出现一次，这可能意味着这个词是否出现在文档不能表达某种信息。</p>
+<p>与之前的setOfWords2Vec()不同的是，每当遇到一个单词，他就会增加词向量中的对应值，而只是把对应的值设为1.</p>
+<pre class="lang:python decode:true">def bagOfWords2VecMN(vocabList,inputSet):
+    # navie bags of words model
+    # in this model each words can display many times while set of words can turn up once
+    returnVec = [0]*len(vocabList)
+    for word in inputSet:
+        if word in vocabList:
+            # when words show ,it will increase the value of vector's words rather than set value as 1
+            returnVec[vocabList.index(word)] +=1
+    return returnVec</pre>
+
+<h1 id="实例：使用朴素贝叶斯过滤垃圾邮件"><a href="#实例：使用朴素贝叶斯过滤垃圾邮件" class="headerlink" title="实例：使用朴素贝叶斯过滤垃圾邮件"></a>实例：使用朴素贝叶斯过滤垃圾邮件</h1><p>朴素贝叶斯分类器最著名的应用及时电子邮件垃圾过滤了，首先我们来看一下如何使用通用框架来解决这个问题。</p>
+<h2 id="准备数据：切分文本"><a href="#准备数据：切分文本" class="headerlink" title="准备数据：切分文本"></a>准备数据：切分文本</h2><p>对于一个文本字符串，可以使用Python的<span class="lang:python decode:true  crayon-inline">string.split()</span> 的方法来对其进行切分。这里由于标点符号也是切分的词，所以分割符是除了单词、数字外的任意字符。</p>
+<pre class="lang:python decode:true">import re
+regEx = re.compile('\\W*')</pre>
+
+<p> 而在实际处理之中，文本往往含有空字符串，这一点我们需要去除掉。</p>
+<p>其次，我们可以发现句子中的第一个单词往往是大写的。这对于我们查找句子是非常有用的，但是这里的文本是词袋，所以所有词的形式应该是统一的，所以可以使用<code>.lower()</code>转成小写或者<code>.upper()</code>转成大写。</p>
+<p>但是这样毕竟也是非常理想的，在邮件之中我们往往会碰见很多词，比如解析URL的时候，Get的参数往往会被解析，从而导致出现非常多的碎片。</p>
+<h1 id="测试算法：使用朴素贝叶斯进行交叉验证"><a href="#测试算法：使用朴素贝叶斯进行交叉验证" class="headerlink" title="测试算法：使用朴素贝叶斯进行交叉验证"></a>测试算法：使用朴素贝叶斯进行交叉验证</h1><pre class="lang:python decode:true">def textParse(bigString):    #input is big string, #output is word list
+    import re
+    listOfTokens = re.split(r'\W*', bigString)
+    return [tok.lower() for tok in listOfTokens if len(tok) &gt; 2] 
+
+def spamTest():
+    docList=[]; classList = []; fullText =[]
+    for i in range(1,26):
+        wordList = textParse(open('email/spam/%d.txt' % i).read())
+        docList.append(wordList)
+        fullText.extend(wordList)
+        classList.append(1)
+        wordList = textParse(open('email/ham/%d.txt' % i).read())
+        docList.append(wordList)
+        fullText.extend(wordList)
+        classList.append(0)
+    vocabList = createVocabList(docList)#create vocabulary
+    trainingSet = range(50); testSet=[]           #create test set
+    for i in range(10):
+        randIndex = int(random.uniform(0,len(trainingSet)))
+        testSet.append(trainingSet[randIndex])
+        del(trainingSet[randIndex])  
+    trainMat=[]; trainClasses = []
+    for docIndex in trainingSet:#train the classifier (get probs) trainNB0
+        trainMat.append(bagOfWords2VecMN(vocabList, docList[docIndex]))
+        trainClasses.append(classList[docIndex])
+    p0V,p1V,pSpam = trainNB0(array(trainMat),array(trainClasses))
+    errorCount = 0
+    for docIndex in testSet:        #classify the remaining items
+        wordVector = bagOfWords2VecMN(vocabList, docList[docIndex])
+        if classifyNB(array(wordVector),p0V,p1V,pSpam) != classList[docIndex]:
+            errorCount += 1
+            print "classification error",docList[docIndex]
+    print 'the error rate is: ',float(errorCount)/len(testSet)
+    #return vocabList,fullText</pre>
+
+<p> 第一个函数<code>textParse()</code>接受一个大写的字符串并且解析为字符串列表，其去除掉少于两个字符的字符串，并且把所有字符串都转成小写。</p>
+<p>第二个<code>spamTest()</code>进行自动化处理。导入文件夹spam和ham下的文本文件并且将他们解析为词列表。接下来构建一个测试集和一个训练集，两个集合都是随机选出的。选出的数字所对应的文档被添加到测试集，并且也将其从训练集之中剔除，这种方式被称为<strong>留存交叉验证</strong>（hold-out cross validation）。</p>
+<p><code>spamTest</code>会输出在10封邮件上的分类错误率。如果发现了错误的话，函数就会输出错分的词表，由此可以了解到究竟是哪些文档发生了错误。如果我们需要更好得估计错误率，那么就应该将上述过程重复多次，并且求出平均值。</p>
+<p>这里一直出现的错误是将垃圾邮件误判为正常邮件，而反之效果会比较好一些。</p>
+<h1 id="实例：使用朴素贝叶斯分类器从个人广告中获取区域倾向"><a href="#实例：使用朴素贝叶斯分类器从个人广告中获取区域倾向" class="headerlink" title="实例：使用朴素贝叶斯分类器从个人广告中获取区域倾向"></a>实例：使用朴素贝叶斯分类器从个人广告中获取区域倾向</h1><p>在这个例子之中，我们将会从美国两个城市选取一些人，通过分析征婚广告信息从而比较两个城市的人们在广告用词上是否不同。</p>
+<h2 id="收集数据：导入RSS源"><a href="#收集数据：导入RSS源" class="headerlink" title="收集数据：导入RSS源"></a>收集数据：导入RSS源</h2><p>首先需要安装<code>feedparse</code>第三方包。</p>
+<p>RSS源分类器以及高频去除函数</p>
+<pre class="lang:python decode:true ">def calcMostFreq(vocabList,fullText):
+    import operator
+    freqDict = {}
+    for token in vocabList:
+        freqDict[token] = fullText.count(token)
+    sortedFreq = sorted(freqDict.iteritems(),key=operator.itemgetter(1),reverse=True)
+    return sortedFreq[:30]
+
+def localWords(feed1,feed0):
+    import feedparser
+    docList = []
+    classList = []
+    fullText = []
+    minLen = min(len(feed1['entries']),len(feed0['entries']))
+    for i in range(minLen):
+        wordList = textParse(feed1['entries'][i]['summary'])
+        docList.append(wordList)
+        fullText.extend(wordList)
+        classList.append(1)
+        wordList = textParse(feed0['entries'][i]['summary'])
+        docList.append(wordList)
+        fullText.extend(wordList)
+        classList.append(0)
+    vocabList = createVocabList(docList)
+    topWords = calcMostFreq(vocabList,fullText)
+    for pairw in topWords :
+        # remove most frequent words
+        if pairw[0] in vocabList:
+            vocabList.remove(pairw[0])
+    trainingSet = range(2*minLen)
+    testSet = []
+    for i in range(20):
+        randIndex = int(random.uniform(0,len(trainingSet)))
+        testSet.append(trainingSet[randIndex])
+        del(trainingSet[randIndex])
+    trainMat = []
+    trainClasses = []
+    for docIndex in trainingSet:
+        trainMat.append(bagOfWords2VecMN(vocabList,docList[docIndex]))
+        trainClasses.append(classList[docIndex])
+    p0v,p1v,pSpam = trainNB0(array(trainMat),array(trainClasses))
+    errorCount = 0
+    for docIndex in testSet:
+        wordVector = bagOfWords2VecMN(vocabList,docList[docIndex])
+        if classifyNB(array(wordVector),p0v,p1v,pSpam)!= classList[docIndex]:
+            errorCount+=1
+    print 'the error rate is : ',float(errorCount)/len(testSet)
+    return vocabList,p0v,p1v</pre>
+
+<p> 上述代码引入了辅助函数<code>calcMostFreq</code>，该函数遍历词汇表中的每个词并且统计他们在文本中出现的次数，并且根据出现次数的高低对字典排序。</p>
+<p>下一个函数<code>localWords</code>使用两个RSS源作为参数，然后调用<code>clacMostFreq</code>并且移除排序最高的30个词汇。需要指出的事，往往词汇表中的一小部分单词占据了所有文本用词的已大部分，这种现象产生的原因就是语言中大部分都是冗余和结构辅助性词汇，另一种常用的方式不仅是移除高频词，并且从某个预定词表之中语出结构上的辅助词，这个词表被称为<strong>停用词表</strong>（stop word list）。</p>
+<p>为了得到错误率的精准估计，一个多次进行上述的实验，并且求平均值，这里的错误率远远高于垃圾邮件的错误率。这里可以通过移除函数<code>calcMostFreq()</code>来改变需要移除的单词数目，来观察错误率的变化。</p>
+<h2 id="分析数据：显示地域相关的用词"><a href="#分析数据：显示地域相关的用词" class="headerlink" title="分析数据：显示地域相关的用词"></a>分析数据：显示地域相关的用词</h2><p>可以先对向量pSF和pNY进行排序，然后按照排序把词打出来，这里需要写入一个最具表征性的词汇显示函数。</p>
+<pre class="lang:python decode:true ">def getTopWords(ny,sf):
+    import operator
+    vocabList,p0V,p1V=localWords(ny,sf)
+    topNY=[]; topSF=[]
+    for i in range(len(p0V)):
+        if p0V[i] &gt; -6.0 : topSF.append((vocabList[i],p0V[i]))
+        if p1V[i] &gt; -6.0 : topNY.append((vocabList[i],p1V[i]))
+    sortedSF = sorted(topSF, key=lambda pair: pair[1], reverse=True)
+    print "-----------------This is SF--------------------------"
+    for item in sortedSF:
+        print item[0]
+    sortedNY = sorted(topNY, key=lambda pair: pair[1], reverse=True)
+    print "-----------------This is NY--------------------------"
+    for item in sortedNY:
+        print item[0]</pre>
+
+<p> 最后输出的单词包含了大量的停用词，移除固定的词看看结果也是十分有趣的。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>对于分类而言，使用概率有时候比使用应规则更为有效。</p>
+<p>我们可以通过特征质检的条件独立假设来降低对于数据量的需求，独立性假设是指一个词的出现概率并不依赖其他的词，当然这个假设实在是<em>Too Young Too Navie</em>了，但是朴素贝叶斯分类器仍然是一种非常有效的分类器。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/05/09/numpy-e5-85-a5-e9-97-a8/" class="prev">上一篇</a><a href="/2016/04/08/abc-e7-ae-80-e5-8d-95-e8-af-81-e6-98-8e-e5-85-b6-e6-9c-80-e5-a4-a7-e5-80-bc/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

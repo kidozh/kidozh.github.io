@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [ANSYS]模型结果的后处理 · kidozh</title><meta name="description" content="[ANSYS]模型结果的后处理 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[ANSYS]模型结果的后处理</h1><div class="post-info">2015年12月9日</div><div class="post-content"><p>再上一个BLOG里，我们提到了如何去建模处理，这里，我们就开始后处理步骤。</p>
+<h1 id="1-后处理分析"><a href="#1-后处理分析" class="headerlink" title="1.后处理分析"></a>1.后处理分析</h1><p>  1.1 选择Utility Menu &gt; Plot Ctrls &gt; Style &gt; Displasement Scaling ，在对话框的IMULT栏中选择1.0（true scale）</p>
+<p><img src="/wp-content/uploads/2015/12/120915_0807_ANSYS1.png" alt=""></p>
+<p>  1.2（最后的设定）选择 Main Menu &gt; General Postproc &gt; Read Results &gt; Last Set。</p>
+<p>  1.3（画出轮廓）选择Main Menu &gt; General Postproc &gt; Plot Results &gt; Deformed Shape，在所弹出的对话框中，在KUND选择<span style="color:#00b050"><strong>Def+undeformed</strong></span>。单击OK<span style="color:#00b050"><br>        </span></p>
+<p><img src="/wp-content/uploads/2015/12/120915_0807_ANSYS2.png" alt=""></p>
+<p>  1.4（给出等效应力）选择Main Menu &gt; General Postproc &gt; Plot Results &gt;Contour Plot &gt;Nodal Solu，弹出的对话框中，在stress IMULT栏中选择von Mises stress(米塞斯等效应力)。</p>
+<p><img src="/wp-content/uploads/2015/12/120915_0807_ANSYS3.png" alt=""></p>
+<pre><code>![](/wp-content/uploads/2015/12/120915_0807_ANSYS4.png)
+</code></pre><p>（这个图可能不准确，因为我又手贱给出了轧辊的应力。。。）</p>
+<p><img src="/wp-content/uploads/2015/12/120915_0807_ANSYS5.png" alt=""></p>
+<p> 1.5选择Utility Menu&gt; PlotCtrls &gt; Style&gt; Symmetry Expansion &gt;Periodic/Cylic Symmetry 在所弹出的对话框中，选择1/4 Dihedral Sym</p>
+<p><img src="/wp-content/uploads/2015/12/120915_0807_ANSYS6.png" alt=""></p>
+<p>单击OK，关闭ANSYS</p>
+<h1 id="2-采用LS-PREPOST-1-0-09-FEB2005-LS-DYNA-user-input界面解决问题"><a href="#2-采用LS-PREPOST-1-0-09-FEB2005-LS-DYNA-user-input界面解决问题" class="headerlink" title="2.采用LS-PREPOST 1.0-09-FEB2005 LS-DYNA user input界面解决问题"></a>2.采用LS-PREPOST 1.0-09-FEB2005 LS-DYNA user input界面解决问题</h1><p>  2.1（安装lspreposrd.exe）在你所安装的文件夹下面找寻（<img src="/wp-content/uploads/2015/12/120915_0807_ANSYS7.png" alt="">），我的出现在D:\Program Files\ANSYS Inc\v150\ansys\bin\winx64下。</p>
+<p>  2.3安装其会生成<img src="/wp-content/uploads/2015/12/120915_0807_ANSYS8.png" alt=""></p>
+<p>  2.2选择Utility Menu &gt; File &gt;Open &gt;LS-DYNA Binary Plot在弹出的对话框中选择d3plot文件（貌似这种文件会互相覆盖，所以建议在选择工作目录的时候不要都放在一个目录下）。</p>
+<p><img src="/wp-content/uploads/2015/12/120915_0807_ANSYS9.png" alt=""></p>
+<p>  2.3选择<img src="/wp-content/uploads/2015/12/120915_0807_ANSYS10.png" alt="">中的第一个，然后在stress下选择von Mises stress 。单击Done<img src="/wp-content/uploads/2015/12/120915_0807_ANSYS11.png" alt=""></p>
+<pre><code>![](/wp-content/uploads/2015/12/120915_0807_ANSYS12.png)
+</code></pre><p>2.4你就可以看到整个过程的应力分布了。</p>
+<p>后语：同样的，你也可以在里面找到薄壁的减厚率等信息。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2015/12/09/javascriptjavascript-e5-88-9d-e6-8e-a2/" class="prev">上一篇</a><a href="/2015/12/09/ansys-e4-b8-ad-e5-8e-9a-e6-9d-bf-e8-bd-a7-e5-88-b6-e5-88-86-e6-9e-90/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

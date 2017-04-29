@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 用git部署网站代码到生产环境VPS · kidozh</title><meta name="description" content="用git部署网站代码到生产环境VPS - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">用git部署网站代码到生产环境VPS</h1><div class="post-info">2017年4月5日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>之前开发网页的时候，经常要把代码传到自己的VPS上，平常用FTP传整个代码很慢，所以就像到了用Git push到VPS上。</p>
+<h1 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h1><p>&nbsp;</p>
+<pre class="lang:sh decode:true ">cd /var
+mkdir git &amp;&amp; cd git
+mkdir your_site.git &amp;&amp; cd your_site.git
+git init --bare</pre>
+
+<p><code>--bare</code>的意思是，该文件夹是我们的代码仓库，它将不会放源代码而只是做版本控制。</p>
+<h2 id="Hook钩子"><a href="#Hook钩子" class="headerlink" title="Hook钩子"></a>Hook钩子</h2><p>我们将会使用<code>post-receive</code>钩子</p>
+<pre class="lang:sh decode:true ">ls</pre>
+
+<p>你可以看到有hooks文件夹已经为我们创建好了,而且里面也有各种钩子的样例</p>
+<pre class="lang:sh decode:true ">cd hooks</pre>
+
+<p>创建我们自己的<code>post-receive</code></p>
+<pre class="lang:sh decode:true ">vim post-receive</pre>
+
+<p>输入下面的命令到这个文件之中：</p>
+<pre class="lang:sh decode:true ">#!/bin/sh
+git --work-tree=生产环境网站文件夹位置 --git-dir=/var/git/your_site.git checkout -f</pre>
+
+<p><code>git-dir</code>指的是仓库的地址， <code>work-tree</code>则是存放代码的位置，也就是我们的网站的源代码的位置。 接下来则是要保证它可以运行：</p>
+<pre class="lang:sh decode:true ">chmod +x post-receive</pre>
+
+<h2 id="本地"><a href="#本地" class="headerlink" title="本地"></a>本地</h2><p>一般情况是你已经有了自己的git项目了，那么只需要添加vps的仓库地址就行了</p>
+<pre><code>git remote add myVPS-sitename ssh://user@mydomain.com/var/git/your_site.git`&lt;/pre&gt;
+
+&apos;myVPS-sitename&apos;只是这个远程连接的名称，你可以同时有多个远程连接，每次push的时候指定名称即可将代码上传到不同的仓库。
+
+如果你本地还没有项目代码：
+
+&lt;pre&gt;`cd 项目地址
+git init`&lt;/pre&gt;
+
+添加一个README.ME文件后
+
+&lt;pre&gt;`git add .
+git commit -m &quot;项目初始&quot;`&lt;/pre&gt;
+
+接下来我们便可以将代码push到vps了：
+
+&lt;pre&gt;`git push myVPS-sitename master
+</code></pre><p><code>master</code>指定的是master分支，如果你有其他分支也可以push其他分支。.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这只是最基本的设置，利用hook结合一些自己编写的脚本我们还可以做很多事情。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2017/04/29/hello-world/" class="prev">上一篇</a><a href="/2017/01/28/e5-9f-ba-e4-ba-8ek-gram-e7-9a-84winnowing-e7-89-b9-e5-be-81-e6-8f-90-e5-8f-96-e5-89-bd-e7-aa-83-e6-9f-a5-e9-87-8d-e6-a3-80-e6-b5-8b-e6-8a-80-e6-9c-af/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

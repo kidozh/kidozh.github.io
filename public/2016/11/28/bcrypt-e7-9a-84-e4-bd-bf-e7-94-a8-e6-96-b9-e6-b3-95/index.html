@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> bcrypt的使用方法 · kidozh</title><meta name="description" content="bcrypt的使用方法 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">bcrypt的使用方法</h1><div class="post-info">2016年11月28日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>还是因为倒腾lab.npuacm.info，看了网上的一些关于密码存储的报道，再加上我之前开发Django的经验，我选择bcrypt作为加密密码的方法。</p>
+<p>bcrypt作为一种非常有力的加密手法。它的口令必须是8至56个字符，并将在内部被转化为448位的密钥。然而，所提供的所有字符都具有十分重要的意义。密码越强大，您的数据就越安全。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>最简单的还是使用pip了：</p>
+<pre class="lang:default decode:true ">$ pip install bcrypt</pre>
+
+<h1 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h1><p>哈希然后检查这个值是否正确很简单：</p>
+<pre class="lang:python decode:true ">import bcrypt
+password = b"super secret password"
+# Hash a password for the first time, with a randomly-generated salt
+hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+# Check that a unhashed password matches one that has previously been
+#   hashed
+if bcrypt.hashpw(password, hashed) == hashed:
+     print("It Matches!")
+else:
+     print("It Does not Match :(")</pre>
+
+<h1 id="可调节的工作轮次"><a href="#可调节的工作轮次" class="headerlink" title="可调节的工作轮次"></a>可调节的工作轮次</h1><p>bcrypt的特性之一是可调的工作轮次。调节这个轮次，你只需要传入round的参数就可以了。<code>bcrypt.gensalt(rounds=12)</code> 默认的就是12</p>
+<pre class="lang:python decode:true ">import bcrypt
+password = b"super secret password"
+# Hash a password for the first time, with a certain number of rounds
+hashed = bcrypt.hashpw(password, bcrypt.gensalt(14))
+# Check that a unhashed password matches one that has previously been
+#   hashed
+if bcrypt.hashpw(password, hashed) == hashed:
+    print("It Matches!")
+else:
+    print("It Does not Match :(")</pre>
+
+<h1 id="可调节的前缀"><a href="#可调节的前缀" class="headerlink" title="可调节的前缀"></a>可调节的前缀</h1><p>你也可以调整bcrypt的前缀来决定其会兼容谁，你可以传递2a或者2b（默认值）来决定。</p>
+<pre class="lang:python decode:true ">bcrypt.gensalt(prefix=b"2b") </pre>
+
+<h1 id="兼容的版本"><a href="#兼容的版本" class="headerlink" title="兼容的版本"></a>兼容的版本</h1><p>其可以运行于Python2.6+、3.2+以及PyPy之上。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/12/01/python-e8-8e-b7-e5-8f-96-e7-b3-bb-e7-bb-9f-e7-8a-b6-e6-80-81psutil-e7-9a-84-e6-a8-a1-e5-9d-97/" class="prev">上一篇</a><a href="/2016/11/27/nginx-e5-af-b9-e4-ba-8etornado-e7-9a-84-e9-85-8d-e7-bd-ae/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

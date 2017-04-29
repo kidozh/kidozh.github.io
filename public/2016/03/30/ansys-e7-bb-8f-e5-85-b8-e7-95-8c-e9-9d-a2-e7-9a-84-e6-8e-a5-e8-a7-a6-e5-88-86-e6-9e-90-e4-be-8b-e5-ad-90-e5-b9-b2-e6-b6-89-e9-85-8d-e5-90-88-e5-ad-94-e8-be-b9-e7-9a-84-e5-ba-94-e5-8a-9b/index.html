@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [ANSYS] 经典界面的接触分析例子 – 干涉配合孔边的应力分布 · kidozh</title><meta name="description" content="[ANSYS] 经典界面的接触分析例子 – 干涉配合孔边的应力分布 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[ANSYS] 经典界面的接触分析例子 – 干涉配合孔边的应力分布</h1><div class="post-info">2016年3月30日</div><div class="post-content"><h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>一个钢销插在一个钢块中的光滑销孔中。已知钢销的半径是0.5 units, 长是2.5 units，而钢块的宽是4 Units, 长4 Units,高为1 Units,方块中的销孔半径为0.49 units,是一个通孔。钢块与钢销的弹性模量均为36e6，泊松比为0.3.</p>
+<p>由于钢销的直径比销孔的直径要大，所以它们之间是过盈配合。现在要对该问题进行两个载荷步的仿真。</p>
+<p>（1）要得到过盈配合的应力。</p>
+<p>（2）要求当把钢销从方块中拔出时，应力，接触压力及约束力。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcibM29e&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS1.png" alt=""></a></p>
+<h1 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h1><p>由于该问题关于两个坐标面对称，因此只需要取出四分之一进行分析即可。</p>
+<p>进行该分析，需要两个载荷步：</p>
+<p>第一个载荷步，过盈配合。求解没有附加位移约束的问题，钢销由于它的几何尺寸被销孔所约束，由于有过盈配合，因而产生了应力。</p>
+<p>第二个载荷步，拔出分析。往外拉动钢销1.7 units，对于耦合节点上使用位移条件。打开自动时间步长以保证求解收敛。在后处理中每10个载荷子步读一个结果。</p>
+<p>本篇先谈第一个载荷步的计算。下篇再谈第二个载荷步的计算。</p>
+<h1 id="读入几何体"><a href="#读入几何体" class="headerlink" title="读入几何体"></a>读入几何体</h1><p>首先打开ANSYS APDL14.5.</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcoui67a&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS2.png" alt=""></a></p>
+<p>然后读入已经做好的几何体。</p>
+<p>从【工具菜单】–&gt;【File】–&gt;【Read Input From】打开导入文件对话框</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVctA060e&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS3.png" alt=""></a></p>
+<p>找到ANSYS自带的文件</p>
+<p>\Program Files\Ansys Inc\V145\ANSYS\data\models\block.inp</p>
+<p>【OK】后四分之一几何模型被导入。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcxnIA80&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS4.png" alt=""></a></p>
+<h1 id="定义单元类型"><a href="#定义单元类型" class="headerlink" title="定义单元类型"></a>定义单元类型</h1><p>只定义实体单元的类型SOLID185。至于接触单元，将在下面使用接触向导来定义。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcArSRf5&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS5.png" alt=""></a></p>
+<h1 id="定义材料属性"><a href="#定义材料属性" class="headerlink" title="定义材料属性"></a>定义材料属性</h1><p>只有线弹性材料属性：弹性模量36E6和泊松比0.3</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcFpFUa2&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS6.png" alt=""></a></p>
+<h1 id="划分网格"><a href="#划分网格" class="headerlink" title="划分网格"></a>划分网格</h1><p>打开MESH TOOL,先设定关键地方的网格划分份数</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcLr8i56&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS7.png" alt=""></a></p>
+<p>然后在MESH TOOL中设定对两个体均进行扫略划分</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVcO3Jve1&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS8.png" alt=""></a></p>
+<p>按下【Sweep】按钮，在主窗口中选择两个体，进行网格划分。则结果如下</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVd5MNX21&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS9.png" alt=""></a></p>
+<p>然后创建接触单元。</p>
+<p>从主菜单的下列地方点击 contact  pair，即创建接触对。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdbPP745&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS10.png" alt=""></a></p>
+<p>则弹出了接触管理器</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdhypw9e&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS11.png" alt=""></a></p>
+<p>点击上图中红色框内的按钮，它是接触向导。则弹出一个对话框如下</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdp80Pfb&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS12.png" alt=""></a></p>
+<p>该对话框是接触向导帮助用户创建接触的第一步，它问我们，请问目标面是哪些？它们是什么类型的接触面？点击上图中的【pick target】，就是说，我们即将在主窗口中用鼠标来选择目标面。</p>
+<p>在本例子中，目标面就是销孔的四分之一孔面。因此用鼠标在图中选择该面</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdyG4H2b&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS13.png" alt=""></a></p>
+<p>选中后，在接触向导中按下【Next】，则弹出下面的对话框</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdJRuT57&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS14.png" alt=""></a></p>
+<p>该对话框进一步要选择接触面，这里是钢销的四分之一圆柱面，同样，点击上图中的【pick contact】，然后在主窗口中选择该面如下</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdNf2aaa&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS15.png" alt=""></a></p>
+<p>选中后，在接触向导中按下【Next】，则弹出下面的对话框，它要进一步设置该接触对的属性，请注意红色框内的选择。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVdSvHdb3&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS16.png" alt=""></a></p>
+<p>这里，包含了初始的渗透，使用的是1号材料，摩擦系数是0.2，然后还要按下按钮【optional settings。。。】</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVe79N650&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS17.png" alt=""></a></p>
+<p>在弹出来的接触属性设置中，首先在BASIC页中设置法向惩罚刚度因子为0.1,然后点击friction页，</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVebTLt83&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS18.png" alt=""></a></p>
+<p>在这里，设置刚度矩阵是非对称阵。然后点击【OK】，则关闭该接触属性设置对话框，又回到了前面的接触向导对话框。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVeVkqQ88&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS19.png" alt=""></a></p>
+<p>在该对话框中，点击【Create】,则接触对被创立。弹出来一个对话框</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVf187b65&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS20.png" alt=""></a></p>
+<p>其意义是说，该接触对已经创建好了，你如果想使用该接触对的话，那么请使用编号3的实常数集。</p>
+<p>此时，如果再次打开单元类型对话框，会发现里面多了两种单元。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVflN93dd&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS21.png" alt=""></a></p>
+<p>即：TARGE170是目标单元，它覆盖在销孔内表面；CONTA174是接触单元，它覆盖在钢销外表面。</p>
+<h1 id="设置边界条件"><a href="#设置边界条件" class="headerlink" title="设置边界条件"></a>设置边界条件</h1><p>首先，改变对象的查看方式，用面的方式来查看对象，从而方便设置边界条件。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVfxigXeb&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS22.png" alt=""></a></p>
+<p>然后，设置对称边界条件。从主菜单的下列地方找到设置边界条件的地方</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVfN58w2c&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS23.png" alt=""></a></p>
+<p>其含义是，要对几个面设置对称边界条件。然后用鼠标在主窗口中选择以下几个面</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVfTAUx19&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS24.png" alt=""></a></p>
+<p>则对称边界条件被设置好，主窗口中显示如下</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgnMVf85&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS25.png" alt=""></a></p>
+<p>可见，在这几个面上到处都是S，S就是对称（Symmetry）的首字母，意味着这些面被设置为对称边界了。</p>
+<p>然后还要固定钢块的一个面，从下列地方找到固定面的入口</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgqBejdb&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS26.png" alt=""></a></p>
+<p>然后在主窗口中找到该面</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgzh81bd&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS27.png" alt=""></a></p>
+<p>选择完毕后弹出一个对话框，它问，对于该面上的所有节点，你希望固定这些节点的哪几个自由度呢？</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgCQn7d9&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS28.png" alt=""></a></p>
+<p>这里选择ALL DOF，然后在下面的位移值中设置为0，就是说，该面上的所有节点，不要有任何位移。【ok】然后确认选择。如果我们变换一下视角如下</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgIIm347&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS29.png" alt=""></a></p>
+<p>就会发现该面上有几个三角符号，意味着该面上的所有节点都已经被固定了。</p>
+<h1 id="进行求解设置"><a href="#进行求解设置" class="headerlink" title="进行求解设置"></a>进行求解设置</h1><p>从下列菜单进入，选择SOL’N CONTROLS，即设置求解控制选项，这是进行求解设置的主要入口</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgLL6e66&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS30.png" alt=""></a></p>
+<p>在弹出的对话框中设置如下</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgR1mD77&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS31.png" alt=""></a></p>
+<pre><code>意思是，打开大变形开关，关闭自动时间步长，并设置该载荷步结束时的时间是100，只有一个载荷子步。
+</code></pre><p>然后进行求解。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgVZwxad&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS32.png" alt=""></a></p>
+<h1 id="后处理"><a href="#后处理" class="headerlink" title="后处理"></a>后处理</h1><p>进入后处理，查看Von Mises应力云图。从下图进入查看应力结果</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVgYAVS54&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS33.png" alt=""></a></p>
+<p>在弹出的对话框中选择二查看Von Mises应力</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVh7rCo30&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS34.png" alt=""></a></p>
+<p>【OK】后主窗口显示如下图</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVhcY0z63&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS35.png" alt=""></a></p>
+<p>可见，在接触处应力最大，越往外层，应力越来越小。这与实际情况是一致的。</p>
+<p>仍旧从这里进入，以查看接触处的情况</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVhuDyFc1&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS36.png" alt=""></a></p>
+<p>可以看到，红色框内提供一系列选项，查看接触状态，渗透情况，接触压力，摩擦应力，总应力，滑动距离，间隙距离等等。</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVhByj8b2&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS37.png" alt=""></a></p>
+<p>下面是接触处的渗透图</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVhIlgi96&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS38.png" alt=""></a></p>
+<p>可见，最大渗透量是0.003226.</p>
+<p>下图是接触压力</p>
+<p><a href="http://photo.blog.sina.com.cn/list/blogpic.php?pid=002TvzhFzy6JNVhQhXDc5&amp;bid=9e19c10b0101kyjz&amp;uid=2652487947" target="_blank" rel="external"><img src="/wp-content/uploads/2016/03/033016_1510_ANSYS39.png" alt=""></a></p>
+<p>最后，存盘为file.db。</p>
+<h1 id="结果展示"><a href="#结果展示" class="headerlink" title="结果展示"></a>结果展示</h1><p>[playlist type=”video” ids=”1000”]</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/04/08/abc-e7-ae-80-e5-8d-95-e8-af-81-e6-98-8e-e5-85-b6-e6-9c-80-e5-a4-a7-e5-80-bc/" class="prev">上一篇</a><a href="/2016/03/29/ansysflexlm-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

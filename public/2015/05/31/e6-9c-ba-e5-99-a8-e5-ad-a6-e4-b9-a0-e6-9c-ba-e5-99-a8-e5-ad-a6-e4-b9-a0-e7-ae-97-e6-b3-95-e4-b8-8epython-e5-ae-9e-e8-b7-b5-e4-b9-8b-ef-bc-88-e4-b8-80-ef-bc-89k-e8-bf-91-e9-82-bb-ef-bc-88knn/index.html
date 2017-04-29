@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [机器学习] 机器学习算法与Python实践之（一）k近邻（KNN） · kidozh</title><meta name="description" content="[机器学习] 机器学习算法与Python实践之（一）k近邻（KNN） - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[机器学习] 机器学习算法与Python实践之（一）k近邻（KNN）</h1><div class="post-info">2015年5月31日</div><div class="post-content"><p>机器学习算法与Python实践这个系列主要是参考<a href="http://www.manning.com/pharrington/" target="_blank" rel="external">《机器学习实战》</a>这本书。因为自己想学习Python，然后也想对一些机器学习算法加深下了解，所以就想通过Python来实现几个比较常用的机器学习算法。恰好遇见这本同样定位的书籍，所以就参考这本书的过程来学习了。</p>
+<p><strong>一、kNN算法分析</strong></p>
+<p>K最近邻（k-Nearest Neighbor，KNN）分类算法可以说是最简单的机器学习算法了。它采用测量不同特征值之间的距离方法进行分类。它的思想很简单：如果一个样本在特征空间中的k个最相似（即特征空间中最邻近）的样本中的大多数属于某一个类别，则该样本也属于这个类别。</p>
+<p><img src="/wp-content/uploads/2015/05/053115_1106_P1.png" alt=""></p>
+<p>比如上面这个图，我们有两类数据，分别是蓝色方块和红色三角形，他们分布在一个上图的二维中间中。那么假如我们有一个绿色圆圈这个数据，需要判断这个数据是属于蓝色方块这一类，还是与红色三角形同类。怎么做呢？我们先把离这个绿色圆圈最近的几个点找到，因为我们觉得离绿色圆圈最近的才对它的类别有判断的帮助。那到底要用多少个来判断呢？这个个数就是k了。如果k=3，就表示我们选择离绿色圆圈最近的3个点来判断，由于红色三角形所占比例为2/3，所以我们认为绿色圆是和红色三角形同类。如果k=5，由于蓝色四方形比例为3/5，因此绿色圆被赋予蓝色四方形类。从这里可以看到，k的值还是很重要的。</p>
+<p>KNN算法中，所选择的邻居都是已经正确分类的对象。该方法在定类决策上只依据最邻近的一个或者几个样本的类别来决定待分样本所属的类别。由于KNN方法主要靠周围有限的邻近的样本，而不是靠判别类域的方法来确定所属类别的，因此对于类域的交叉或重叠较多的待分样本集来说，KNN方法较其他方法更为适合。</p>
+<p>该算法在分类时有个主要的不足是，当样本不平衡时，如一个类的样本容量很大，而其他类样本容量很小时，有可能导致当输入一个新样本时，该样本的K个邻居中大容量类的样本占多数。因此可以采用权值的方法（和该样本距离小的邻居权值大）来改进。该方法的另一个不足之处是计算量较大，因为对每一个待分类的文本都要计算它到全体已知样本的距离，才能求得它的K个最近邻点。目前常用的解决方法是事先对已知样本点进行剪辑，事先去除对分类作用不大的样本。该算法比较适用于样本容量比较大的类域的自动分类，而那些样本容量较小的类域采用这种算法比较容易产生误分[参考机器学习十大算法]。</p>
+<p>总的来说就是我们已经存在了一个带标签的数据库，然后输入没有标签的新数据后，将新数据的每个特征与样本集中数据对应的特征进行比较，然后算法提取样本集中特征最相似（最近邻）的分类标签。一般来说，只选择样本数据库中前k个最相似的数据。最后，选择k个最相似数据中出现次数最多的分类。其算法描述如下：</p>
+<p>1）计算已知类别数据集中的点与当前点之间的距离；</p>
+<p>2）按照距离递增次序排序；</p>
+<p>3）选取与当前点距离最小的k个点；</p>
+<p>4）确定前k个点所在类别的出现频率；</p>
+<p>5）返回前k个点出现频率最高的类别作为当前点的预测分类。</p>
+<p><strong>二、Python实现</strong></p>
+<p>对于机器学习而已，Python需要额外安装三件宝，分别是Numpy，scipy和Matplotlib。前两者用于数值计算，后者用于画图。安装很简单，直接到各自的官网下载回来安装即可。安装程序会自动搜索我们的python版本和目录，然后安装到python支持的搜索路径下。反正就python和这三个插件都默认安装就没问题了。</p>
+<p>另外，如果我们需要添加我们的脚本目录进Python的目录（这样Python的命令行就可以直接import），可以在系统环境变量中添加：PYTHONPATH环境变量，值为我们的路径，例如：E:\Python\Machine Learning in Action</p>
+<p><strong>2.1、kNN基础实践</strong></p>
+<p>一般实现一个算法后，我们需要先用一个很小的数据库来测试它的正确性，否则一下子给个大数据给它，它也很难消化，而且还不利于我们分析代码的有效性。</p>
+<p>首先，我们新建一个kNN.py脚本文件，文件里面包含两个函数，一个用来生成小数据库，一个实现kNN分类算法。代码如下：<br>[python]</p>
+<p>#########################################</p>
+<h1 id="kNN-k-Nearest-Neighbors"><a href="#kNN-k-Nearest-Neighbors" class="headerlink" title="kNN: k Nearest Neighbors"></a>kNN: k Nearest Neighbors</h1><h1 id="Input-newInput-vector-to-compare-to-existing-dataset-1xN"><a href="#Input-newInput-vector-to-compare-to-existing-dataset-1xN" class="headerlink" title="Input:      newInput: vector to compare to existing dataset (1xN)"></a>Input:      newInput: vector to compare to existing dataset (1xN)</h1><h1 id="dataSet-size-m-data-set-of-known-vectors-NxM"><a href="#dataSet-size-m-data-set-of-known-vectors-NxM" class="headerlink" title="dataSet:  size m data set of known vectors (NxM)"></a>dataSet:  size m data set of known vectors (NxM)</h1><h1 id="labels-data-set-labels-1xM-vector"><a href="#labels-data-set-labels-1xM-vector" class="headerlink" title="labels:     data set labels (1xM vector)"></a>labels:     data set labels (1xM vector)</h1><h1 id="k-number-of-neighbors-to-use-for-comparison"><a href="#k-number-of-neighbors-to-use-for-comparison" class="headerlink" title="k:         number of neighbors to use for comparison"></a>k:         number of neighbors to use for comparison</h1><h1 id="Output-the-most-popular-class-label"><a href="#Output-the-most-popular-class-label" class="headerlink" title="Output:     the most popular class label"></a>Output:     the most popular class label</h1><p>#########################################</p>
+<p>from numpy import *<br>import operator</p>
+<h1 id="create-a-dataset-which-contains-4-samples-with-2-classes"><a href="#create-a-dataset-which-contains-4-samples-with-2-classes" class="headerlink" title="create a dataset which contains 4 samples with 2 classes"></a>create a dataset which contains 4 samples with 2 classes</h1><p>def createDataSet():</p>
+<pre><code># create a matrix: each row as a sample
+group = array([[1.0, 0.9], [1.0, 1.0], [0.1, 0.2], [0.0, 0.1]])
+labels = [&apos;A&apos;, &apos;A&apos;, &apos;B&apos;, &apos;B&apos;] # four samples and two classes
+return group, labels
+</code></pre><h1 id="classify-using-kNN"><a href="#classify-using-kNN" class="headerlink" title="classify using kNN"></a>classify using kNN</h1><p>def kNNClassify(newInput, dataSet, labels, k):<br>    numSamples = dataSet.shape[0] # shape[0] stands for the num of row</p>
+<pre><code>## step 1: calculate Euclidean distance
+# tile(A, reps): Construct an array by repeating A reps times
+# the following copy numSamples rows for dataSet
+diff = tile(newInput, (numSamples, 1)) - dataSet # Subtract element-wise
+squaredDiff = diff ** 2 # squared for the subtract
+squaredDist = sum(squaredDiff, axis = 1) # sum is performed by row
+distance = squaredDist ** 0.5
+
+## step 2: sort the distance
+# argsort() returns the indices that would sort an array in a ascending order
+sortedDistIndices = argsort(distance)
+
+classCount = {} # define a dictionary (can be append element)
+for i in xrange(k):
+    ## step 3: choose the min k distance
+    voteLabel = labels[sortedDistIndices[i]]
+
+    ## step 4: count the times labels occur
+    # when the key voteLabel is not in dictionary classCount, get()
+    # will return 0
+    classCount[voteLabel] = classCount.get(voteLabel, 0) + 1
+
+## step 5: the max voted class will return
+maxCount = 0
+for key, value in classCount.items():
+    if value &gt; maxCount:
+        maxCount = value
+        maxIndex = key
+
+return maxIndex    
+</code></pre><p>[/python]</p>
+<p>然后我们在命令行中这样测试即可：<br>[python]<br>import kNN<br>from numpy import * </p>
+<p>dataSet, labels = kNN.createDataSet()</p>
+<p>testX = array([1.2, 1.0])<br>k = 3<br>outputLabel = kNN.kNNClassify(testX, dataSet, labels, 3)<br>print “Your input is:”, testX, “and classified to class: “, outputLabel</p>
+<p>testX = array([0.1, 0.3])<br>outputLabel = kNN.kNNClassify(testX, dataSet, labels, 3)<br>print “Your input is:”, testX, “and classified to class: “, outputLabel<br>[/python]<br>这时候会输出：<br>[python]<br>Your input is: [ 1.2  1.0] and classified to class:  A<br>Your input is: [ 0.1  0.3] and classified to class:  B<br>[/python]<br><strong>2.2、kNN进阶</strong></p>
+<p>这里我们用kNN来分类一个大点的数据库，包括数据维度比较大和样本数比较多的数据库。这里我们用到一个手写数字的数据库，可以到<a href="http://download.csdn.net/detail/zouxy09/6610571" target="_blank" rel="external">这里</a>下载。这个数据库包括数字0-9的手写体。每个数字大约有200个样本。每个样本保持在一个txt文件中。手写体图像本身的大小是32x32的二值图，转换到txt文件保存后，内容也是32x32个数字，0或者1，如下：</p>
+<p><img src="/wp-content/uploads/2015/05/053115_1106_P2.png" alt=""></p>
+<p>数据库解压后有两个目录：目录trainingDigits存放的是大约2000个训练数据，testDigits存放大约900个测试数据。</p>
+<p>这里我们还是新建一个kNN.py脚本文件，文件里面包含四个函数，一个用来生成将每个样本的txt文件转换为对应的一个向量，一个用来加载整个数据库，一个实现kNN分类算法。最后就是实现这个加载，测试的函数。<br>[python]</p>
+<p>#########################################</p>
+<h1 id="kNN-k-Nearest-Neighbors-1"><a href="#kNN-k-Nearest-Neighbors-1" class="headerlink" title="kNN: k Nearest Neighbors"></a>kNN: k Nearest Neighbors</h1><h1 id="Input-inX-vector-to-compare-to-existing-dataset-1xN"><a href="#Input-inX-vector-to-compare-to-existing-dataset-1xN" class="headerlink" title="Input:      inX: vector to compare to existing dataset (1xN)"></a>Input:      inX: vector to compare to existing dataset (1xN)</h1><h1 id="dataSet-size-m-data-set-of-known-vectors-NxM-1"><a href="#dataSet-size-m-data-set-of-known-vectors-NxM-1" class="headerlink" title="dataSet: size m data set of known vectors (NxM)"></a>dataSet: size m data set of known vectors (NxM)</h1><h1 id="labels-data-set-labels-1xM-vector-1"><a href="#labels-data-set-labels-1xM-vector-1" class="headerlink" title="labels: data set labels (1xM vector)"></a>labels: data set labels (1xM vector)</h1><h1 id="k-number-of-neighbors-to-use-for-comparison-1"><a href="#k-number-of-neighbors-to-use-for-comparison-1" class="headerlink" title="k: number of neighbors to use for comparison"></a>k: number of neighbors to use for comparison</h1><h1 id="Output-the-most-popular-class-label-1"><a href="#Output-the-most-popular-class-label-1" class="headerlink" title="Output:     the most popular class label"></a>Output:     the most popular class label</h1><p>#########################################</p>
+<p>from numpy import *<br>import operator<br>import os</p>
+<h1 id="classify-using-kNN-1"><a href="#classify-using-kNN-1" class="headerlink" title="classify using kNN"></a>classify using kNN</h1><p>def kNNClassify(newInput, dataSet, labels, k):<br>    numSamples = dataSet.shape[0] # shape[0] stands for the num of row</p>
+<pre><code>## step 1: calculate Euclidean distance
+# tile(A, reps): Construct an array by repeating A reps times
+# the following copy numSamples rows for dataSet
+diff = tile(newInput, (numSamples, 1)) - dataSet # Subtract element-wise
+squaredDiff = diff ** 2 # squared for the subtract
+squaredDist = sum(squaredDiff, axis = 1) # sum is performed by row
+distance = squaredDist ** 0.5
+
+## step 2: sort the distance
+# argsort() returns the indices that would sort an array in a ascending order
+sortedDistIndices = argsort(distance)
+
+classCount = {} # define a dictionary (can be append element)
+for i in xrange(k):
+    ## step 3: choose the min k distance
+    voteLabel = labels[sortedDistIndices[i]]
+
+    ## step 4: count the times labels occur
+    # when the key voteLabel is not in dictionary classCount, get()
+    # will return 0
+    classCount[voteLabel] = classCount.get(voteLabel, 0) + 1
+
+## step 5: the max voted class will return
+maxCount = 0
+for key, value in classCount.items():
+    if value &gt; maxCount:
+        maxCount = value
+        maxIndex = key
+
+return maxIndex    
+</code></pre><h1 id="convert-image-to-vector"><a href="#convert-image-to-vector" class="headerlink" title="convert image to vector"></a>convert image to vector</h1><p>def  img2vector(filename):<br>     rows = 32<br>     cols = 32<br>     imgVector = zeros((1, rows <em> cols))<br>     fileIn = open(filename)<br>     for row in xrange(rows):<br>         lineStr = fileIn.readline()<br>         for col in xrange(cols):<br>             imgVector[0, row </em> 32 + col] = int(lineStr[col])</p>
+<pre><code>return imgVector
+</code></pre><h1 id="load-dataSet"><a href="#load-dataSet" class="headerlink" title="load dataSet"></a>load dataSet</h1><p>def loadDataSet():</p>
+<pre><code>## step 1: Getting training set
+print &quot;---Getting training set...&quot;
+dataSetDir = &apos;E:/Python/Machine Learning in Action/&apos;
+trainingFileList = os.listdir(dataSetDir + &apos;trainingDigits&apos;) # load the training set
+numSamples = len(trainingFileList)
+
+train_x = zeros((numSamples, 1024))
+train_y = []
+for i in xrange(numSamples):
+    filename = trainingFileList[i]
+
+    # get train_x
+    train_x[i, :] = img2vector(dataSetDir + &apos;trainingDigits/%s&apos; % filename) 
+
+    # get label from file name such as &quot;1_18.txt&quot;
+    label = int(filename.split(&apos;_&apos;)[0]) # return 1
+    train_y.append(label)
+
+## step 2: Getting testing set
+print &quot;---Getting testing set...&quot;
+testingFileList = os.listdir(dataSetDir + &apos;testDigits&apos;) # load the testing set
+numSamples = len(testingFileList)
+test_x = zeros((numSamples, 1024))
+test_y = []
+for i in xrange(numSamples):
+    filename = testingFileList[i]
+
+    # get train_x
+    test_x[i, :] = img2vector(dataSetDir + &apos;testDigits/%s&apos; % filename) 
+
+    # get label from file name such as &quot;1_18.txt&quot;
+    label = int(filename.split(&apos;_&apos;)[0]) # return 1
+    test_y.append(label)
+
+return train_x, train_y, test_x, test_y
+</code></pre><h1 id="test-hand-writing-class"><a href="#test-hand-writing-class" class="headerlink" title="test hand writing class"></a>test hand writing class</h1><p>def testHandWritingClass():</p>
+<pre><code>## step 1: load data
+print &quot;step 1: load data...&quot;
+train_x, train_y, test_x, test_y = loadDataSet()
+
+## step 2: training...
+print &quot;step 2: training...&quot;
+pass
+
+## step 3: testing
+print &quot;step 3: testing...&quot;
+numTestSamples = test_x.shape[0]
+matchCount = 0
+for i in xrange(numTestSamples):
+    predict = kNNClassify(test_x[i], train_x, train_y, 3)
+    if predict == test_y[i]:
+        matchCount += 1
+accuracy = float(matchCount) / numTestSamples
+
+## step 4: show the result
+print &quot;step 4: show the result...&quot;
+print &apos;The classify accuracy is: %.2f%%&apos; % (accuracy * 100)
+</code></pre><p>[/python]</p>
+<p>测试非常简单，只需要在命令行中输入：<br>[python]<br>import kNN<br>kNN.testHandWritingClass()<br>[/python]</p>
+<p>输出结果如下：<br>[python]<br>step 1: load data…<br>—Getting training set…<br>—Getting testing set…<br>step 2: training…<br>step 3: testing…<br>step 4: show the result…<br>The classify accuracy is: 98.84%<br>[/python]</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2015/07/14/acmbestcoder-e4-b8-a4-e6-ac-a1-e7-9a-84dp/" class="prev">上一篇</a><a href="/2015/05/31/e6-9d-82-e8-b0-882015531/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

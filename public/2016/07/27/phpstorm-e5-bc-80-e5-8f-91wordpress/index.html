@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> phpstorm开发wordpress · kidozh</title><meta name="description" content="phpstorm开发wordpress - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">phpstorm开发wordpress</h1><div class="post-info">2016年7月27日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>众所周知，phpstorm是一个非常易用的PHP的IDE，而wordpress则是一款比较常见的博客后台。这里就可以使用PHPStorm来开发wordpress（比如插件，主题以及核心）。</p>
+<h1 id="把wordpress集成到一个现存的PHPStorm工程"><a href="#把wordpress集成到一个现存的PHPStorm工程" class="headerlink" title="把wordpress集成到一个现存的PHPStorm工程"></a>把wordpress集成到一个现存的PHPStorm工程</h1><p>你可以这样创建一个WordPress插件工程。</p>
+<p><img src="/wp-content/uploads/2016/07/创建WordPress.png" alt="创建WordPress"></p>
+<p>当你就绪的工程被认为是wordPress的插件的时候，你就能够在事件日志（Event Log）中启用对于WordPress的支持。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_enable_integration.png?version=1&amp;modificationDate=1395243268000&amp;api=v2" alt=""></p>
+<p>你需要提供WordPress的一个安装路径（也就是WordPress的根目录，里面需要包含wp-admin和wp-include这两个子文件夹）</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_enable_integration_dialog.png?version=1&amp;modificationDate=1395243403000&amp;api=v2" alt=""></p>
+<p>WordPress集成可以在<code>Setting/WordPress</code>下设置：</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_integration_settings.png?version=1&amp;modificationDate=1395243492000&amp;api=v2" alt=""></p>
+<p>而在我的PHPStorm里是这样的：<img src="/wp-content/uploads/2016/07/WordPress设置-1-1024x693.jpg" alt="WordPress设置"></p>
+<h1 id="创建一个WordPress的新插件"><a href="#创建一个WordPress的新插件" class="headerlink" title="创建一个WordPress的新插件"></a>创建一个WordPress的新插件</h1><p>新的WordPress插件可以在欢迎屏幕中通过选择<code>File | New Project</code>来创建。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorual_new_project_plugin.png?version=1&amp;modificationDate=1395243626000&amp;api=v2" alt=""></p>
+<p>工程类型应该被设置为WordPress Plugin。在点到OK之后，你需要提供WordPress的安装路径。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_new_project_plugin_path.png?version=1&amp;modificationDate=1395243763000&amp;api=v2" alt=""></p>
+<p>初始的插件文件就会被自动创建（插件名称和一个合适的元信息摘要）</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_new_project_structure.png?version=1&amp;modificationDate=1395243914000&amp;api=v2" alt=""></p>
+<h1 id="开发环境的配置"><a href="#开发环境的配置" class="headerlink" title="开发环境的配置"></a>开发环境的配置</h1><p>不管你是否做了上面的事情，IDE都会检查开发环境是否为WordPress开发所正确配置。如果配置不满足要求的话，气泡就会弹出一个修复的建议。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_enable_integration_event_log.png?version=1&amp;modificationDate=1395244820000&amp;api=v2" alt=""></p>
+<h2 id="路径配置"><a href="#路径配置" class="headerlink" title="路径配置"></a>路径配置</h2><p>你所处于的<code>wp-content</code>文件夹和插件需要都在WordPress安装文件夹之外。为了利用PHPStorm的智能代码，代码补全还有其他特征，WordPress的安装文件夹需要包含在外部引用中。只要WordPress安装路径在WordPress集成配置之中提供了，IDE把WordPress安装路径添加到你工程的<code>Include Path</code>之中。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_include_path_notification.png?version=1&amp;modificationDate=1395245104000&amp;api=v2" alt=""></p>
+<p>你也可以在<code>Setting | PHP | Include Path</code>中变更Include Path：</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_include_path_settings.png?version=1&amp;modificationDate=1395245203000&amp;api=v2" alt=""></p>
+<p>在这个使用案例之中，WordPress安装路径需要被添加到一个外部库之中（此时所有WordPress核心文件夹都被索引了），但是其他的插件和主题默认是不会被添加了，并且为了把他们安装到<code>Settings | PHP | Include path</code>之中。</p>
+<h2 id="内容根目录配置"><a href="#内容根目录配置" class="headerlink" title="内容根目录配置"></a>内容根目录配置</h2><p>如果你开发的WordPress插件安装在WordPress安装文件夹之中，IDE就会建议把整个WordPress安装目录加到目录之中接着移除初始文件根目录。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_content_root_notification.png?version=1&amp;modificationDate=1395245507000&amp;api=v2" alt=""></p>
+<p>内容目录也可以在<code>Setting | Directories</code>中设置：</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_settings_directories_content_root.png?version=1&amp;modificationDate=1395245612000&amp;api=v2" alt=""></p>
+<h2 id="WordPress代码风格"><a href="#WordPress代码风格" class="headerlink" title="WordPress代码风格"></a>WordPress代码风格</h2><p>当WordPress集成被启用之后，你就能够基于代码格式来设置WordPress的代码风格。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_coding_style_notification.png?version=1&amp;modificationDate=1395249434000&amp;api=v2" alt=""></p>
+<p>代码风格可以在Setting | Code Style | PHP 中重新配置。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_set_code_style.png?version=3&amp;modificationDate=1395249724000&amp;api=v2" alt=""></p>
+<h1 id="WordPress钩子函数的支持"><a href="#WordPress钩子函数的支持" class="headerlink" title="WordPress钩子函数的支持"></a>WordPress钩子函数的支持</h1><h2 id="WordPress的action和filter函数参数的补齐"><a href="#WordPress的action和filter函数参数的补齐" class="headerlink" title="WordPress的action和filter函数参数的补齐"></a>WordPress的action和filter函数参数的补齐</h2><p>所有在WordPress核心函数以及插件的钩子函数都会被IDE检索，并且钩子名称也可以使用Ctrl+Space来补齐<code>add_action</code>和<code>add_filter</code>的参数。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_hook_completion.png?version=1&amp;modificationDate=1395318637000&amp;api=v2" alt=""></p>
+<h2 id="action和filter钩子函数的导航"><a href="#action和filter钩子函数的导航" class="headerlink" title="action和filter钩子函数的导航"></a>action和filter钩子函数的导航</h2><p>从WordPress的钩子注册中你从一个导航图标可以寻找到其来源。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_hook_invokation_nav.png?version=1&amp;modificationDate=1395319085000&amp;api=v2" alt=""></p>
+<p>你可以在特定的一行中找到来源：</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_hook_invokation_nav_res.png?version=2&amp;modificationDate=1395319196000&amp;api=v2" alt=""></p>
+<h2 id="钩子函数注册的回调函数"><a href="#钩子函数注册的回调函数" class="headerlink" title="钩子函数注册的回调函数"></a>钩子函数注册的回调函数</h2><p>第二个钩子函数参数如果被声明是一个函数(<code>add_action</code>和<code>add_filter</code>)的话，你可以使用<code>Ctrl+B</code>或者<code>Ctrl+单击</code>来查看这个函数的来源。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_goto_declaration.png?version=1&amp;modificationDate=1395319687000&amp;api=v2" alt=""></p>
+<p>你可以点击这个名称到相关函数的声明处。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_goto_declaration_res.png?version=1&amp;modificationDate=1395319758000&amp;api=v2" alt=""></p>
+<h2 id="钩子函数的导航"><a href="#钩子函数的导航" class="headerlink" title="钩子函数的导航"></a>钩子函数的导航</h2><p>通过在<code>Ctrl+Alt+Shift+N</code>键（<code>Navigate | Symbol</code>），你就能够轻松的搜索钩子并且轻松的找到他们。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_goto_symbol.png?version=1&amp;modificationDate=1395320131000&amp;api=v2" alt=""></p>
+<p>你也可以使用双击<code>Shift</code>来找到钩子函数。如果有必要的话，同样需要确保开启纳入非工程文件选项。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_goto_symbol_everywhere.png?version=3&amp;modificationDate=1395320419000&amp;api=v2" alt=""></p>
+<h2 id="找到钩子注册函数的用法"><a href="#找到钩子注册函数的用法" class="headerlink" title="找到钩子注册函数的用法"></a>找到钩子注册函数的用法</h2><p>你也可以使用<code>Alt+F7</code>来找到钩子函数的用法，这样会提供一系列可能的选项（在<code>find usage of XXX</code>中找到）</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_find_usages.png?version=1&amp;modificationDate=1395321271000&amp;api=v2" alt=""></p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_find_usages_options.png?version=2&amp;modificationDate=1395321325000&amp;api=v2" alt=""></p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_find_usages_results.png?version=1&amp;modificationDate=1395321335000&amp;api=v2" alt=""></p>
+<h2 id="从WordPress-org上找到详情"><a href="#从WordPress-org上找到详情" class="headerlink" title="从WordPress.org上找到详情"></a>从WordPress.org上找到详情</h2><p>WordPress文档可以在IDE通过搜索文档上得到消息，你需要做的仅仅是选择你所需要的文本，右键转到<code>Search on WordPress.org</code>就可以了。</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_search_wordpress_org.png?version=1&amp;modificationDate=1395321743000&amp;api=v2" alt=""></p>
+<p>默认浏览器也能够接受到IDE的请求，并且访问请求</p>
+<p><img src="http://confluence.jetbrains.com/download/attachments/53335443/wordpress_tutorial_search_wordpress_org_res.png?version=1&amp;modificationDate=1395321890000&amp;api=v2" alt=""></p>
+<h1 id="WordPress命令行WP-CLI集成"><a href="#WordPress命令行WP-CLI集成" class="headerlink" title="WordPress命令行WP-CLI集成"></a>WordPress命令行WP-CLI集成</h1></div></article></div></main><footer><div class="paginator"><a href="/2016/07/30/python-e8-af-bb-e5-8f-96-e7-bd-91-e9-a1-b5-e4-ba-a7-e7-94-9f-e7-9a-84octet-stream-e6-96-87-e4-bb-b6/" class="prev">上一篇</a><a href="/2016/07/21/e6-94-af-e6-8c-81-e5-90-91-e9-87-8f-e8-87-aa-e5-8a-a8-e6-9c-ba/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

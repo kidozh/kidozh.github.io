@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 构建WordPress主题函数 · kidozh</title><meta name="description" content="构建WordPress主题函数 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">构建WordPress主题函数</h1><div class="post-info">2016年12月20日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我们已经创建了一个文件结构，那么现在就让我们开始一个主题把。</p>
+<p>我们需要添加一些主题函数到我们的主题之中，这些函数将会完成下面的任务：</p>
+<ul>
+<li>为WordPress主题特征添加一些支持，比如自定义的背景，页首，博文格式等</li>
+<li>设置主题的默认值</li>
+<li>对于主题的代码复用</li>
+</ul>
+<h1 id="编辑文件"><a href="#编辑文件" class="headerlink" title="编辑文件"></a>编辑文件</h1><p>首先，让我们创建以及编辑这些文件</p>
+<ul>
+<li>functions.php</li>
+<li>inc/template-tags.php</li>
+<li>inc/tweaks.php<br>如果你是PHP新人的话，那么PHP的函数的保留字为<code>function</code>，比如这样：<br><pre class="lang:php decode:true ">function my_function() {<br>…contents of the function<br>}</pre><br>当我们创建这个函数之后，我们就可以在主题之中调用这个函数了。函数能够被调用：<br><pre class="lang:php decode:true ">&lt;div&gt;<br>&lt;?php my_function(); ?&gt;<br>&lt;/div&gt;</pre><br>其他的函数调用方法就可能有些复杂了：<br><pre class="lang:php decode:true ">&lt;div&gt;<br>&lt;?php my_second_function( ‘parameter 1’, ‘parameter 2’ ); ?&gt;<br>&lt;/div&gt;</pre><br>在上面的例子之中，我们都会向函数之中传递参数，这个函数将会使用其并将其作为最终的输出结果。</li>
+</ul>
+<h1 id="Functions-php"><a href="#Functions-php" class="headerlink" title="Functions.php"></a>Functions.php</h1><p>事不宜迟，我们就开始把。</p>
+<p>在上节课创建的主题目录之中，打开functions.php文件，在文件最上面，粘贴下面的值：</p>
+<p><pre class="lang:php decode:true ">&lt;?php<br>/**</pre></p>
+<ul>
+<li>Shape functions and definitions<br>*</li>
+<li>@package Shape</li>
+<li>@since Shape 1.0<br>*/<br>如果你是PHP新手的话，我们就从<code>&amp;lt;?php</code>开始编辑文件吧。</li>
+</ul>
+<p>接下来，我们就有描述内联信息的块注释：一个文件的简短的介绍，接着就是PHP文档的标签：@package和@since。你能够在WordPress Codex的<a href="http://codex.wordpress.org/Inline_Documentation" target="_blank" rel="external">内联文档</a>之中找到更多的信息。</p>
+<p>php的注释和C语言的注释是很像的。<code>/* ... */</code>就是多行注释，而<code>//</code> 则是单行注释。</p>
+<h2 id="content-width"><a href="#content-width" class="headerlink" title="$content_width"></a>$content_width</h2><p><code>$content_width</code> 是一个设置内容（比如图片）最大宽度的全局变量。其能够防止超大图片溢出主要的内容区域。我们应该设置这个值来限制我们主要内容区域的宽度。想想我们之前的HTML结构，这个区域其实就是<code>#content div</code>。我们将会使用CSS来设置div的宽度。然而，我们还没有CSS文件。所以在这里，我会告诉你div将会是654px宽。</p>
+<p>在<code>functions.php</code>之中，无视最后的一个<code>*/</code>，粘贴下面的代码：</p>
+<p><pre class="lang:php decode:true ">/**</pre></p>
+<ul>
+<li>Set the content width based on the theme’s design and stylesheet.<br>*</li>
+<li>@since Shape 1.0<br><em>/<br>if ( ! isset( $content_width ) )<br> $content_width = 654; /</em> pixels */<br>所以<code>$content_width</code>就被设置好了，PHP变量有一个美元符<code>$</code>置于名称之前，在分配值之后，会有一个半角的<code>;</code>。</li>
+</ul>
+<h2 id="shape-setup"><a href="#shape-setup" class="headerlink" title="shape_setup()"></a>shape_setup()</h2><p>接下来，我们将会创建一个函数来新建一个默认主题并且添加一个对于众多WordPress特性支持的函数，跳过在$content_width之后的那一行，添加这个：</p>
+<p><pre class="lang:php decode:true ">if ( ! function_exists( ‘shape_setup’ ) ):<br>/**</pre></p>
+<ul>
+<li>Sets up theme defaults and registers support for various WordPress features.<br>*</li>
+<li>Note that this function is hooked into the after_setup_theme hook, which runs</li>
+<li>before the init hook. The init hook is too late for some features, such as indicating</li>
+<li>support post thumbnails.<br>*</li>
+<li><p>@since Shape 1.0<br>*/<br>function shape_setup() {</p>
+<p> /**</p>
+<ul>
+<li><p>Custom template tags for this theme.<br>*/<br>require( get_template_directory() . ‘/inc/template-tags.php’ );</p>
+<p>/**</p>
+</li>
+<li><p>Custom functions that act independently of the theme templates<br>*/<br>require( get_template_directory() . ‘/inc/tweaks.php’ );</p>
+<p>/**</p>
+</li>
+<li>Make theme available for translation</li>
+<li>Translations can be filed in the /languages/ directory</li>
+<li>If you’re building a theme based on Shape, use a find and replace</li>
+<li><p>to change ‘shape’ to the name of your theme in all the template files<br>*/<br>load_theme_textdomain( ‘shape’, get_template_directory() . ‘/languages’ );</p>
+<p>/**</p>
+</li>
+<li><p>Add default posts and comments RSS feed links to head<br>*/<br>add_theme_support( ‘automatic-feed-links’ );</p>
+<p>/**</p>
+</li>
+<li><p>Enable support for the Aside Post Format<br>*/<br>add_theme_support( ‘post-formats’, array( ‘aside’ ) );</p>
+<p>/**</p>
+</li>
+<li>This theme uses wp_nav_menu() in one location.<br>*/<br>register_nav_menus( array(<br> ‘primary’ =&gt; __( ‘Primary Menu’, ‘shape’ ),<br>) );<br>}<br>endif; // shape_setup<br>add_action( ‘after_setup_theme’, ‘shape_setup’ );<br>代码都是很好注释过的，所以你能很好的了解他们正在做什么。</li>
+</ul>
+</li>
+</ul>
+<p>那么我们就一一说明把：</p>
+<p>我们将会引用在inc/文件夹下的两个文件template-tags.php和tweak.php。我们将会在稍后创建这两个文件。</p>
+<p>接下来，我们调用了<code>load_theme_textdomain()</code>这个函数，这个函数会告诉我们WordPress将会使用我们文件夹下的languages这个来作为翻译的标准。如果你正要创建一个WordPress主题，你一个穷尽你的可能来保证所有字符串都是可翻译的。你永远不知道在啥时候其他人是否需要在其他语言中硬编码。下面有些好的方法来翻译文章，我也会说一些出来，<a href="http://codex.wordpress.org/I18n_for_WordPress_Developers" target="_blank" rel="external">I18n for WordPress Developers</a>将会是一个非常好的入门。</p>
+<p>接着，下面的两个函数为RSS反馈以及侧边博文格式提供了支持链接。最后一个函数注册了一个导航菜单位置，我们将会在我们的主要菜单中用到。</p>
+<p>接下来，我们会用<code>}</code>来闭合这个函数，并且使用钩子（hook）的方法将其加到我们的主题函数之中。</p>
+<p><pre class="lang:php decode:true ">add_action( ‘after_setup_theme’, ‘shape_setup’ );</pre><br>简而言之，我们将会告诉WordPress在运行<code>after_setup_theme()</code>之后运行<code>shape_setup()</code>函数。</p>
+<p>我们将会在functions.php之中加入更多东西。</p>
+<p>你可能注意到functions.php文件没有任何PHP的闭合符号?&gt;，这是因为这个文件绝大多数都是PHP代码，所以吞掉闭合符号也是非常安全的。至于我们为什么要这么做的原因，自然是因为其能帮助我们免于闭合PHP代码之后引入的空白符。</p>
+<h2 id="Template-tags-php和Tweak-php"><a href="#Template-tags-php和Tweak-php" class="headerlink" title="Template-tags.php和Tweak.php"></a>Template-tags.php和Tweak.php</h2><p>还记得下面的代码吗？</p>
+<p><pre class="lang:php decode:true ">/**</pre></p>
+<pre><code> * Custom template tags for this theme.
+ */
+require( get_template_directory() . &apos;/inc/template-tags.php&apos; );
+
+/**
+ * Custom functions that act independently of the theme templates
+ */
+require( get_template_directory() . &apos;/inc/tweaks.php&apos; );&lt;/pre&gt;
+</code></pre><p>在inc文件夹中创建template-tags.php和tweak.php文件。为什么我们要把自定义的函数分散在众多的文件之中呢？大多数情况下，我们像保持functions.php代码中的干净整洁，但更多的是保证我们主题的模块化，如果你并不需要这些函数的话，你只需要移除这一行就可以了。</p>
+<h3 id="template-tags-php"><a href="#template-tags-php" class="headerlink" title="template-tags.php"></a>template-tags.php</h3><p>首先，什么是模板标签？自然是一个函数了。特殊而言，他们是你可以插入到你主题之中来显示动态页面的WordPress函数。你可以在 <a href="https://codex.wordpress.org/Template_Tags" target="_blank" rel="external">everything you want to know about template tags</a>找到一些关于模板标签的信息。</p>
+<p>在大多数情况下，我们会在任何我们想要的时候将模板标签添加到我们的主题之中。然而，还是有时候我们需要将多个模板标签输出到一起。把所有的标签放到一起自然是一个很好的主意，所以想想我们要添加的模板函数，我们把他们视为一个乐符，最终我们把他们组成到一起成为一个交响乐，就像这样：一句描述博文何时发表，被谁，或者一个上一个和下一个博文的链接，或者是一个评论列表，你就能知道了。我们首先写下了乐符，然后播放多次。或者，从专业的角度上来说，写了一个函数，把他调用多次。</p>
+<p>为了保证这个教程不会过于冗长，我们将返回到template-tags.php之中来添加一些我们需要的函数。对现在而言，让我们在文件首添加一些基本的文档信息把。</p>
+<p><pre class="lang:php decode:true ">&lt;?php<br>/**</pre></p>
+<ul>
+<li>Custom template tags for this theme.<br>*</li>
+<li>Eventually, some of the functionality here could be replaced by core features<br>*</li>
+<li>@package Shape</li>
+<li>@since Shape 1.0<br>*/<br>最后需要提到一点：“一些在template-tags.php之中的函数功能也许会被核心特性所替代”。这些我们添加的函数将会和WordPress核心特征一样有用。当我们添加了这些函数之后，这回变得更加有意义。</li>
+</ul>
+<p>现在，我们就能够正常的闭合PHP标签了。</p>
+<h3 id="tweak-php"><a href="#tweak-php" class="headerlink" title="tweak.php"></a>tweak.php</h3><p>这些我们放在文件中的函数并不会影响到模板标签，而相反的是他们将会提升我们主题的品质。他们提供了一个很好的后台任务，这样使得我们的主题更好。</p>
+<p>在文件的页首，粘贴一些寻常的文档信息到里面。</p>
+<p><pre class="lang:php decode:true ">&lt;?php<br>/**</pre></p>
+<ul>
+<li>Custom functions that act independently of the theme templates<br>*</li>
+<li>Eventually, some of the functionality here could be replaced by core features<br>*</li>
+<li>@package Shape</li>
+<li>@since Shape 1.0<br><em>/<br>接下来，我们要粘贴下面的函数：<br><pre class="lang:php decode:true ">/*</pre></em></li>
+<li>Get our wp_nav_menu() fallback, wp_page_menu(), to show a home link.<br>*</li>
+<li>@since Shape 1.0<br>*/<br>function shape_page_menu_args( $args ) {<br> $args[‘show_home’] = true;<br> return $args;<br>}<br>add_filter( ‘wp_page_menu_args’, ‘shape_page_menu_args’ );</li>
+</ul>
+<p>/**</p>
+<ul>
+<li>Adds custom classes to the array of body classes.<br>*</li>
+<li><p>@since Shape 1.0<br>*/<br>function shape_body_classes( $classes ) {<br> // Adds a class of group-blog to blogs with more than 1 published author<br> if ( is_multi_author() ) {</p>
+<pre><code>$classes[] = &apos;group-blog&apos;;
+</code></pre><p> }</p>
+<p> return $classes;<br>}<br>add_filter( ‘body_class’, ‘shape_body_classes’ );</p>
+</li>
+</ul>
+<p>/**</p>
+<ul>
+<li>Filter in a link to a content ID attribute for the next/previous image links on image attachment pages<br>*</li>
+<li><p>@since Shape 1.0<br>*/<br>function shape_enhanced_image_navigation( $url, $id ) {<br> if ( ! is_attachment() &amp;&amp; ! wp_attachment_is_image( $id ) )</p>
+<pre><code>return $url;
+</code></pre><p> $image = get_post( $id );<br> if ( ! empty( $image-&gt;post_parent ) &amp;&amp; $image-&gt;post_parent != $id )</p>
+<pre><code>$url .= &apos;#main&apos;;
+</code></pre><p> return $url;<br>}<br>add_filter( ‘attachment_link’, ‘shape_enhanced_image_navigation’, 10, 2 );<br>第一个函数<code>shape_page_menu_args</code>，将会影响到我们主要的导航菜单。我们在之前就已经为导航菜单申请了支持，在<code>shape_setup()</code>之中。如果导航菜单并没有被配置，WordPress将会显示一连串的页面（由<code>wp_page_menu()</code>所决定）</p>
+</li>
+</ul>
+<p>在第二个函数<code>shape_body_classes()</code>，我们将会添加一个新的CSS类，<code>group-blog</code>，到我们的主题标签之中。我们将会在WordPress Header 模板之中提及到<a href="http://codex.wordpress.org/Function_Reference/body_class" target="_blank" rel="external">body class</a>。但是现在，你只需要理解body classes使得我们能够在不同的情况下装饰我们的主题的一些部分（比如我们正在访问的页面类型或者是我们作者的数目）。</p>
+<p>最终，第三个函数shape_enhanced_image_navigation()，把#main这个id添加到上一个/下一个图像连接之中。回想一下，“#main”是包装我们的内容和小部件区域的div的ID名称。 ID也是页面内的锚点。 当用户点击您的下一个/上一个图片链接时，他们不必从页面顶部向下滚动来查看每个图片。</p>
+<p>这就是tweak.php。记着，我们不需要PHP的闭合标签。</p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>Woo，这里有好多函数，我们已经在这个教程之中做出了大量的工作。但是不要太高兴，这只是万里长征的第一步路罢了。</p>
+<p>敬请关注</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/12/30/e4-bd-bf-e4-bd-a0-e7-9a-84-e4-b8-bb-e9-a2-98-e6-9b-b4-e5-8a-a0-e5-ae-89-e5-85-a8/" class="prev">上一篇</a><a href="/2016/12/15/peewee-e5-85-a5-e9-97-a8/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

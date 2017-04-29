@@ -1,0 +1,2402 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 支持向量自动机 · kidozh</title><meta name="description" content="支持向量自动机 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">支持向量自动机</h1><div class="post-info">2016年7月21日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>SVM，支持向量自动机，是目前分类器不加修改可以直接使用的最好的现成的分类器。其中最流行的一种实现，也就是序列最小优化(Sequential Minimal Optimization)算法。</p>
+<h1 id="基于最大间隔分隔数据"><a href="#基于最大间隔分隔数据" class="headerlink" title="基于最大间隔分隔数据"></a>基于最大间隔分隔数据</h1><h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><p>泛化错误率低，计算开销不打，结果易解释。</p>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><p>对参数调节和核函数的选择比较敏感，原始分类器不加修改的话只能用于处理二类问题</p>
+<h3 id="适用类型"><a href="#适用类型" class="headerlink" title="适用类型"></a>适用类型</h3><p>数值型和标称型数据</p>
+<h2 id="线性可分"><a href="#线性可分" class="headerlink" title="线性可分"></a>线性可分</h2><p>我们首先需要解释线性可分的这个概念，先考虑A中两组数据，它们之间已经分隔的足够开，因此很容易可以在途中画出一条曲线将这两组数据点分开。这种情况下，这组数据被成为线性可分（linearly separable）数据。</p>
+<p><img src="/wp-content/uploads/2016/07/linearly-separable.png" alt="linearly separable"></p>
+<p>上述将数据集分隔开来的直线成为分隔超平面（separating hyperplane）。在上面给出的例子中，由于数据点都在二维平面上，所以此时分隔超平面就只是一条直线。但是，如果所给的数据是三维的，那么就是一个平面。这个时候分隔超平面也就是作为分类的决策边界，分布在超平面一侧的所有数据都属于某个类别，而分布在另一侧的所有数据则属于另一个类别。</p>
+<p>下面给出了线性可分的数据集的几种划分方式。</p>
+<p><img src="/wp-content/uploads/2016/07/divide.png" alt="divide"></p>
+<p>这个时候，如果数据点离决策边界越远，那么其最后的预测结果也就越可信。但是考虑到B到D中的三条直线，他们都能够将数据分隔开，但是哪个会更好呢？是不是有点寻找最佳拟合直线的感觉，是的，上述做法确实有点像直线拟合，但这并不是最佳的方案。这个时候我们希望找到离分隔超平面最近的点，确保他们离分隔面的距离尽可能的远。同时我们也希望间隔尽可能的大，这样我们的分类器也能足够的健壮。</p>
+<p>支持向量就是离分隔超平面最近的那些点。接下来试着就需要最大化支持向量到分隔面的距离。</p>
+<h1 id="寻找最大间隔"><a href="#寻找最大间隔" class="headerlink" title="寻找最大间隔"></a>寻找最大间隔</h1><p>分隔超平面的形式可以写成( w^{T}x+b )。如果要计算点A到分隔超平面的距离，就必须给出点到分隔面的法线或者垂线的长度。这个值应该是( |w^{T}A+b|/||w|| )。这里的常熟b类似于logistic回归中的截距。这里向量w和b一起描述了所给数据的分割线或者超平面。<img src="/wp-content/uploads/2016/07/function-distance.png" alt="function distance"></p>
+<h2 id="分类器求解的优化问题"><a href="#分类器求解的优化问题" class="headerlink" title="分类器求解的优化问题"></a>分类器求解的优化问题</h2><p>输入数据给分类器会输出一个类别标签，这相当于一个Sigmoid的函数在作用。下面将使用类似单位阶跃函数的函数对( w^{T}x+b )作用得到( f(w^{T}x+b) )，其中当u&lt;0时候f(u)输出-1，反之则输出+1。这和前一章的Logistic回归有所不同，那里的类别标签是0和1。</p>
+<p>这里的类别标签为什么采用-1和+1而不采用0和1呢？这是由于-1和+1仅仅相差一个符号方便数学上的处理，这个时候可以通过一个统一的公式来表示间隔或者数据点到分隔超平面的距离，同时不需要担心数据到底是属于+1还是-1.</p>
+<p>当计算数据点到分隔面的距离并且确定分隔面的放置位置时候，间隔通过( label\times (w^{T}x+b) )来计算，这个时候就能体现出-1和+1类的好处了。如果数据点处于正方向并且离分隔超平面很远的位置时候，( w^{T}x+b )将会是一个很大的正数，同时( label\times (w^{x}+b) )也会是一个很大的正数。如果处于负方向并且离超平面很远的位置的时候，类别标签是-1，则( label\times (w^{T}x+b))仍然是一个很大的正数。</p>
+<p>现在的目标就是找出分类器定义的w和b。为此，我们必须找到具有最小间隔的数据点，这些数据点也就是前面提到的支持向量。一旦找到具有最小间隔的数据点，我们就需要对这个间隔最大化，这样可以写作：[ \arg \max\limits<em>{w,k}\left\lbrace \min\limits</em>{n}(label\cdot (w^{T}x+b))\cdot \frac{1}{\left| \left| w\right| \right| } \right\rbrace]直接求解上述问题相当困难，所以我们将其转换成一个更容易求解的方法。首先考虑一下式子中大括号的部分。由于对乘积进行优化是一种很复杂的事情，因此我们要做的事情就是固定其中的一个因子来最大化另一个因子。如果令所有支持向量的( label \times (w<em>{T}x+b))都等于1，那么就可以通过(||w||</em>{-1})的最大值来的到最终解。但是并非所有的数据点( label \times (w<em>{T}x+b))都等于1，只有那些离分隔超平面最近的点得到的值才是1。离超平面越远的数据点，其( label \times (w</em>{T}x+b))的值也越大。</p>
+<p>再上面的优化问题中，给定了一些约束条件然后求最优值，因此该问题是一个带约束条件的优化问题。这里的约束条件就是( label*(w^{T}x+b)\geq 1.0 )。对于此类优化问题，有一个非常著名的求解方法，就是拉格朗日乘子法。通过引入拉格朗日乘子，我们就可以基于约束条件来表述原来的问题。由于这里的约束条件都是基于数据点的，因此我们就可以把超平面写成数据点的形式。于是优化目标函数可以写成：[\max\limits<em>{\alpha}\left[ \sum</em>{i=1}^{m}\alpha -\frac{1}{2}\sum<em>{i,j=1}^{m}label^{(i)}\cdot label^{(j)}\cdot a</em>{i}\cdot a<em>{j}\left\langle x^{(i)},x^{(j)} \right\rangle\right]]其约束条件为：[\alpha \geq 0,\sum</em>{i-1}^{m}\alpha_{i}\cdot label^{(i)}=0]</p>
+<p>至此，这个非常完美，但是这里有个假设就是：数据必须是100%线性可分。目前未知，我们都知道所有的数据都不那么干净，所以我们可以通过引入所谓的松弛变量(slack variable)，来允许有些数据点可以处于分隔面的错误的一侧。这样我们的优化目标就能过保持不变，但是此时的约束条件则变为：[C\geq\alpha \geq 0,\sum<em>{i-1}^{m}\alpha</em>{i}\cdot label^{(i)}=0]这里的常数C用于控制最大化间隔和保证大部分的函数间隔小于1.0这两个目标的权重。在优化算法的实现算法的实现代码中，常数C是一个参数，因此我们就可以通过调节这个参数得到不同的结果，一但求出了所有的alpha，那么分隔超平面就可以通过这些alpha表达。这个问题十分直接，SVM中的主要工作就是求出这些alpha。</p>
+<h2 id="SVM应用的一般框架"><a href="#SVM应用的一般框架" class="headerlink" title="SVM应用的一般框架"></a>SVM应用的一般框架</h2><p>我们需要给出SVM的一般流程：</p>
+<ol>
+<li>收集数据：任何方法</li>
+<li>准备数据：需要数值型数据</li>
+<li>分析数据：有助于可视化分隔超平面</li>
+<li>训练算法：SVM大部分时间都源于训练，这个过程主要实现两个参数的调优</li>
+<li>测试算法：十分简单的计算过程就能够实现</li>
+<li>使用算法：几乎所有分类问题都可以使用SVM，值得一提的是，SVM本身就是一个二类分类器，对多类问题则需要修改代码。</li>
+</ol>
+<h1 id="SMO的高效优化算法"><a href="#SMO的高效优化算法" class="headerlink" title="SMO的高效优化算法"></a>SMO的高效优化算法</h1><p>我们所需要做的围绕优化的事情就是训练分类器，一旦得到了alpha的最优值，我们就能够得到了分隔超平面（二维平面就是直线）并能用于数据分类。</p>
+<h2 id="Platt的SMO算法"><a href="#Platt的SMO算法" class="headerlink" title="Platt的SMO算法"></a>Platt的SMO算法</h2><p>SMO，序列最小化。Platt的SMO算法是将大优化问题分解为小优化问题来求解的。这些小问题是比较容易求解的，并且对顺序求解的结果于将他们作为整体求解的结果是完全一致的。在结果完全相同的时候，SMO的算法的求解时间会短很多。</p>
+<h2 id="应用简化版算法处理小规模数据集"><a href="#应用简化版算法处理小规模数据集" class="headerlink" title="应用简化版算法处理小规模数据集"></a>应用简化版算法处理小规模数据集</h2><p>简化版代码虽然量少但是执行速度慢。Platt SMO算法中的外循环需要确定最佳alpha对。而简化版则会跳过这个部分，首先直接在数据集上遍历每个alpha，然后在剩下的alpha集合中随机选择另一个alpha，从而构建alpha对。这里，我们需要同时改变两个alpha。之所以这样做是因为我们有个约束条件[\sum \alpha_{i}\cdot label^{(i)}=0]由于改变一个alpha可能会导致约束条件失效，所以我们总是同时改变两个alpha。</p>
+<p>为此我们将构建一个辅助函数，用于在某个区间范围内随机选择一个整数。同时也需要另一个辅助函数，用于在数值很大时候对其进行调整。下面的程序清单给出了这两个函数的实现。</p>
+<pre class="lang:python decode:true" title="SMO算法中的辅助函数">def loadDataSet(fileName):
+    dataMat = []; labelMat = []
+    fr = open(fileName)
+    for line in fr.readlines():
+        lineArr = line.strip().split('\t')
+        dataMat.append([float(lineArr[0]), float(lineArr[1])])
+        labelMat.append(float(lineArr[2]))
+    return dataMat,labelMat
+
+def selectJrand(i,m):
+    j=i #we want to select any J not equal to i
+    while (j==i):
+        j = int(random.uniform(0,m))
+    return j
+
+def clipAlpha(aj,H,L):
+    if aj &gt; H: 
+        aj = H
+    if L &gt; aj:
+        aj = L
+    return aj</pre>
+在testSet.txt文件中保存了之前图片中的数据。接下来我们就将在这个文见上应用SMO算法。第一个函数就是之前熟悉的`loadDatSet()`，这个函数打开文件并且逐行解析，从而得到每行的类标签和整个数据矩阵。
+
+下一个函数`selectJrand()`有两个参数值，其中i是第一个alpha的下标，m是所有alpha的数目。只要函数值不等于输入值i，函数就会随机选择。
+
+最后一个辅助函数就是`clipAlpha()`，它是用于调整大于H或者小于L的alpha值。尽管上述3个辅助函数本身做的事情不多，但是用于分类器却很有用处。
+
+在输入并保存程序清单6-1中的代码之后，运行如下命令：
+<pre class="lang:sh decode:true">&gt;&gt;&gt; import svmMLiA
+&gt;&gt;&gt; dataArr,labelArr=svmMLiA.loadDataSet('testSet.txt')
+&gt;&gt;&gt; labelArr
+[-1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0]
+</pre>
+可以看的出来，这里采用的类别标签是-1和1，而不是0和1
+
+上述工作完成后，就可以使用SMO算法的第一个版本了：
+<pre class="lang:default decode:true">创建一个alpha向量并将初始化为0向量
+当迭代次数小于最大迭代次数时：
+    对数据集中的每个数据向量：
+        如果该数据向量可以被优化：
+            随机选择另一个数据向量
+            同时优化这两个向量
+            如果两个向量都不能被优化，退出内循环
+    如果所有向量都没有被优化，增加迭代次数，继续下一次循环</pre>
+上面是SMO的一个有效版本。在Python中，因为我们代码很长，所以使用了`\`结尾来表示一行代码。
+<pre class="lang:default decode:true" title="简化版SMO算法">def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
+    dataMatrix = mat(dataMatIn); labelMat = mat(classLabels).transpose()
+    b = 0; m,n = shape(dataMatrix)
+    alphas = mat(zeros((m,1)))
+    iter = 0
+    while (iter &lt; maxIter):
+        alphaPairsChanged = 0
+        for i in range(m):
+            fXi = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[i,:].T)) + b
+            Ei = fXi - float(labelMat[i])#if checks if an example violates KKT conditions
+            if ((labelMat[i]*Ei &lt; -toler) and (alphas[i] &lt; C)) or ((labelMat[i]*Ei &gt; toler) and (alphas[i] &gt; 0)):
+                j = selectJrand(i,m)
+                fXj = float(multiply(alphas,labelMat).T*(dataMatrix*dataMatrix[j,:].T)) + b
+                Ej = fXj - float(labelMat[j])
+                alphaIold = alphas[i].copy(); alphaJold = alphas[j].copy();
+                if (labelMat[i] != labelMat[j]):
+                    L = max(0, alphas[j] - alphas[i])
+                    H = min(C, C + alphas[j] - alphas[i])
+                else:
+                    L = max(0, alphas[j] + alphas[i] - C)
+                    H = min(C, alphas[j] + alphas[i])
+                if L==H: print "L==H"; continue
+                eta = 2.0 * dataMatrix[i,:]*dataMatrix[j,:].T - dataMatrix[i,:]*dataMatrix[i,:].T - dataMatrix[j,:]*dataMatrix[j,:].T
+                if eta &gt;= 0: print "eta&gt;=0"; continue
+                alphas[j] -= labelMat[j]*(Ei - Ej)/eta
+                alphas[j] = clipAlpha(alphas[j],H,L)
+                if (abs(alphas[j] - alphaJold) &lt; 0.00001): print "j not moving enough"; continue
+                alphas[i] += labelMat[j]*labelMat[i]*(alphaJold - alphas[j])#update i by the same amount as j
+                                                                        #the update is in the oppostie direction
+                b1 = b - Ei- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[i,:].T - labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[i,:]*dataMatrix[j,:].T
+                b2 = b - Ej- labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[j,:].T - labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[j,:]*dataMatrix[j,:].T
+                if (0 &lt; alphas[i]) and (C &gt; alphas[i]): b = b1
+                elif (0 &lt; alphas[j]) and (C &gt; alphas[j]): b = b2
+                else: b = (b1 + b2)/2.0
+                alphaPairsChanged += 1
+                print "iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged)
+        if (alphaPairsChanged == 0): iter += 1
+        else: iter = 0
+        print "iteration number: %d" % iter
+    return b,alphas
+</pre>
+这个函数非常大。其具有5个输入参数，分别是数据集、类别标签、常数C、容错率和退出前的最大循环次数。
+
+在每次循环中，将`alphaPairsChanged`设为0，然后再对整个集合顺序遍历。变量`alphaPairsChanged`用于记录alpha是否进行优化。当然，在循环结束的时候就可以得知这一点。首先，`fXi`能够计算出来，这就是我们预测的类别。然后，基于这个实例的预测结果和真实结果的比对，就可以计算出误差`Ei`。如果误差很大，那么可以对该数据实例所对应的`alpha`值进行优化。在`if`语句中，不论是正间隔还是负间隔都会被测试。并且在该`if`语句中，也要同事检查`alpha`值，以保证其不等于0或者C。由于后面`alpha`小于0或者大于C会被调整成0或者C，所以一旦在if语句之中他们等于这两个值的话，他们已经就在边界上了，是不值得对其进行优化的。
+
+接下来，可以利用辅助函数来随机选择另一个`alpha`值，也就是`alpha[j]`。同样的，可以采用第一个`alpha`值（`alpha[i]`）的误差计算方法，来计算这个`alpha`值的误差。这个过程可以通过`copy()`的方法来实现，因此稍后可以将新的`alpha`值和老的`alpha`值进行比较，Python会通过引用的方式来传递所有的列表，所以必须明确的告知Python要为`alphaIold`和`alphaJold`分配新的内存，否则的话，再对新值和旧值进行比较的时候，就看不到新旧值的变化。之后我们开始计算L和H，他们用于将`alpha[j]`调整在0和C之间，如果L=H，就不做任何改变，直接执行`continue`语句。这在Python中，则意味着本次循环结束直接运行下一次的for循环。
+
+`Eta`是`alpha[j]`的最优修改值。如果其为0，那就是说需要退出for循环的当前迭代过程。这个过程对真实的算法进行了简化处理。如果`eta`为0，那么计算新的`alpha[j]`就比较麻烦了。然而现实中这种情况却很少发生，因此我们这里忽略这个情况。于是可以计算出一个新的`alpha[j]`。
+
+然后，就是需要检查`alpha[j]`是否有轻微的改变。如果是的话，就需要退出for循环，然后同时改变`alpha[i]`和`alpha[j]`，虽然改变的大小一样，但是方向却正好相反。经过优化之后，就可以队这两个`alpha`值设定一个常数值。
+
+最后，在优化过程结束的同时，必须确保在合适的时机结束循环。如果程序执行到for循环的最后一行都不执行continue语句，那么就已经成功的改变了一对`alpha`，同时可以增加`alphaPairsChanged`的值。在for循环以外，需要检查`alpha`值是否已经做了更新，如果有更新则设定`iter`为0后继续运行程序。只有在所有数据集上遍历`maxIter`次，且不在发生任何`alpha`修改后，程序才会停止并且退出`while`循环。
+
+所以可以执行命令
+<pre class="lang:python decode:true">&gt;&gt;&gt; b,alphas=svmMLiA.smoSimple(dataArr,labelArr,0.6,0.001,40)</pre>
+然后会输出：
+<pre class="minimize:true lang:default decode:true" title="超长的计算过程">L==H
+L==H
+iter: 0 i:2, pairs changed 1
+L==H
+L==H
+iter: 0 i:7, pairs changed 2
+iter: 0 i:8, pairs changed 3
+L==H
+L==H
+iter: 0 i:22, pairs changed 4
+iter: 0 i:23, pairs changed 5
+j not moving enough
+j not moving enough
+iter: 0 i:28, pairs changed 6
+L==H
+j not moving enough
+iter: 0 i:31, pairs changed 7
+j not moving enough
+L==H
+iter: 0 i:52, pairs changed 8
+iter: 0 i:54, pairs changed 9
+j not moving enough
+L==H
+j not moving enough
+L==H
+L==H
+j not moving enough
+L==H
+j not moving enough
+L==H
+L==H
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+iter: 0 i:2, pairs changed 1
+L==H
+iter: 0 i:7, pairs changed 2
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:17, pairs changed 3
+iter: 0 i:22, pairs changed 4
+j not moving enough
+L==H
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:54, pairs changed 5
+iter: 0 i:55, pairs changed 6
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+iter: 0 i:0, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:24, pairs changed 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:99, pairs changed 3
+iteration number: 0
+j not moving enough
+j not moving enough
+iter: 0 i:7, pairs changed 1
+iter: 0 i:8, pairs changed 2
+j not moving enough
+iter: 0 i:17, pairs changed 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:54, pairs changed 4
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+iteration number: 0
+j not moving enough
+iter: 0 i:2, pairs changed 1
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+L==H
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+L==H
+iter: 0 i:52, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+iter: 0 i:8, pairs changed 1
+iter: 0 i:14, pairs changed 2
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:25, pairs changed 3
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+iter: 0 i:69, pairs changed 4
+j not moving enough
+L==H
+L==H
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+iteration number: 1
+j not moving enough
+iter: 1 i:1, pairs changed 1
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 1 i:25, pairs changed 2
+j not moving enough
+L==H
+j not moving enough
+iter: 1 i:45, pairs changed 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 1 i:69, pairs changed 4
+j not moving enough
+iter: 1 i:94, pairs changed 5
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:69, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:55, pairs changed 1
+j not moving enough
+j not moving enough
+L==H
+L==H
+L==H
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:24, pairs changed 1
+j not moving enough
+iter: 0 i:29, pairs changed 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:30, pairs changed 1
+j not moving enough
+iter: 0 i:52, pairs changed 2
+j not moving enough
+iter: 0 i:55, pairs changed 3
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+iter: 2 i:30, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+L==H
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+iter: 0 i:26, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:55, pairs changed 1
+iter: 0 i:65, pairs changed 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+L==H
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:17, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+L==H
+j not moving enough
+iter: 0 i:52, pairs changed 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:62, pairs changed 1
+iter: 0 i:65, pairs changed 2
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+L==H
+iter: 0 i:11, pairs changed 1
+iter: 0 i:17, pairs changed 2
+iter: 0 i:23, pairs changed 3
+j not moving enough
+j not moving enough
+iter: 0 i:46, pairs changed 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:54, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:97, pairs changed 2
+iteration number: 0
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:62, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:55, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 1 i:26, pairs changed 1
+j not moving enough
+iter: 1 i:45, pairs changed 2
+j not moving enough
+j not moving enough
+iter: 1 i:55, pairs changed 3
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 0 i:30, pairs changed 1
+j not moving enough
+j not moving enough
+iter: 0 i:55, pairs changed 2
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 1 i:69, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 3 i:97, pairs changed 1
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+iter: 3 i:23, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+iter: 2 i:29, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+iter: 1 i:23, pairs changed 1
+j not moving enough
+iter: 1 i:52, pairs changed 2
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+iter: 2 i:29, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+iter: 4 i:54, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 9 i:55, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iter: 1 i:69, pairs changed 1
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+iter: 14 i:29, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+iter: 8 i:52, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+iter: 0 i:17, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+iter: 10 i:55, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 18
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 19
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 20
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 21
+j not moving enough
+iter: 21 i:52, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+iter: 7 i:17, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 18
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 19
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 20
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 21
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 22
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 23
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 24
+j not moving enough
+j not moving enough
+iteration number: 25
+j not moving enough
+j not moving enough
+iteration number: 26
+j not moving enough
+j not moving enough
+iteration number: 27
+j not moving enough
+j not moving enough
+iteration number: 28
+iter: 28 i:29, pairs changed 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+iter: 5 i:55, pairs changed 1
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 18
+j not moving enough
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 19
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 20
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 21
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 22
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 23
+j not moving enough
+L==H
+j not moving enough
+j not moving enough
+iteration number: 24
+j not moving enough
+L==H
+iter: 24 i:29, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+iter: 1 i:17, pairs changed 1
+iter: 1 i:29, pairs changed 2
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+iter: 17 i:55, pairs changed 1
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+iter: 3 i:54, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 18
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 19
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 20
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 21
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 22
+j not moving enough
+j not moving enough
+iter: 22 i:55, pairs changed 1
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+iter: 3 i:52, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+iter: 14 i:54, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+j not moving enough
+iteration number: 3
+iter: 3 i:17, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+iteration number: 18
+j not moving enough
+j not moving enough
+iteration number: 19
+j not moving enough
+j not moving enough
+iteration number: 20
+j not moving enough
+j not moving enough
+iteration number: 21
+j not moving enough
+j not moving enough
+iteration number: 22
+j not moving enough
+j not moving enough
+iteration number: 23
+j not moving enough
+j not moving enough
+iteration number: 24
+j not moving enough
+j not moving enough
+iteration number: 25
+j not moving enough
+j not moving enough
+iteration number: 26
+j not moving enough
+j not moving enough
+iteration number: 27
+j not moving enough
+j not moving enough
+iteration number: 28
+j not moving enough
+j not moving enough
+iteration number: 29
+j not moving enough
+j not moving enough
+iteration number: 30
+j not moving enough
+j not moving enough
+iteration number: 31
+j not moving enough
+j not moving enough
+iteration number: 32
+j not moving enough
+j not moving enough
+iteration number: 33
+j not moving enough
+j not moving enough
+iteration number: 34
+j not moving enough
+j not moving enough
+iteration number: 35
+j not moving enough
+j not moving enough
+iteration number: 36
+j not moving enough
+j not moving enough
+iteration number: 37
+j not moving enough
+j not moving enough
+iteration number: 38
+j not moving enough
+j not moving enough
+iteration number: 39
+j not moving enough
+iter: 39 i:55, pairs changed 1
+iteration number: 0
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+iter: 6 i:54, pairs changed 1
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+iteration number: 2
+iter: 2 i:17, pairs changed 1
+j not moving enough
+j not moving enough
+iteration number: 0
+j not moving enough
+j not moving enough
+iteration number: 1
+j not moving enough
+j not moving enough
+iteration number: 2
+j not moving enough
+j not moving enough
+iteration number: 3
+j not moving enough
+j not moving enough
+iteration number: 4
+j not moving enough
+j not moving enough
+iteration number: 5
+j not moving enough
+j not moving enough
+iteration number: 6
+j not moving enough
+j not moving enough
+iteration number: 7
+j not moving enough
+j not moving enough
+iteration number: 8
+j not moving enough
+j not moving enough
+iteration number: 9
+j not moving enough
+j not moving enough
+iteration number: 10
+j not moving enough
+j not moving enough
+iteration number: 11
+j not moving enough
+j not moving enough
+iteration number: 12
+j not moving enough
+j not moving enough
+iteration number: 13
+j not moving enough
+j not moving enough
+iteration number: 14
+j not moving enough
+j not moving enough
+iteration number: 15
+j not moving enough
+j not moving enough
+iteration number: 16
+j not moving enough
+j not moving enough
+iteration number: 17
+j not moving enough
+j not moving enough
+iteration number: 18
+j not moving enough
+j not moving enough
+iteration number: 19
+j not moving enough
+j not moving enough
+iteration number: 20
+j not moving enough
+j not moving enough
+iteration number: 21
+j not moving enough
+j not moving enough
+iteration number: 22
+j not moving enough
+j not moving enough
+iteration number: 23
+j not moving enough
+j not moving enough
+iteration number: 24
+j not moving enough
+j not moving enough
+iteration number: 25
+j not moving enough
+j not moving enough
+iteration number: 26
+j not moving enough
+j not moving enough
+iteration number: 27
+j not moving enough
+j not moving enough
+iteration number: 28
+j not moving enough
+j not moving enough
+iteration number: 29
+j not moving enough
+j not moving enough
+iteration number: 30
+j not moving enough
+j not moving enough
+iteration number: 31
+j not moving enough
+j not moving enough
+iteration number: 32
+j not moving enough
+j not moving enough
+iteration number: 33
+j not moving enough
+j not moving enough
+iteration number: 34
+j not moving enough
+j not moving enough
+iteration number: 35
+j not moving enough
+j not moving enough
+iteration number: 36
+j not moving enough
+j not moving enough
+iteration number: 37
+j not moving enough
+j not moving enough
+iteration number: 38
+j not moving enough
+j not moving enough
+iteration number: 39
+j not moving enough
+j not moving enough
+iteration number: 40</pre>
+一旦运行结束，我们可以观察：
+<pre class="lang:default decode:true">&gt;&gt;&gt; b
+matrix([[-3.80280169]])</pre>
+我们可以直接观察alpha矩阵本身，但是由于其是一个稀疏矩阵。我们可以观察其大于0的元素以及数量：
+<pre class="lang:default decode:true">&gt;&gt;&gt; alphas[alphas&gt;0]
+matrix([[ 0.09156089,  0.27271215,  0.04642864,  0.31783978]])</pre>
+由于SMO的随机性，我们得到的数据可能不一样。在原是数据及上对这些支持向量标记之后是这样的：
+
+![SMO example](/wp-content/uploads/2016/07/SMO-example.png)
+
+而经过实测发现时间还是略长的。所以我们还是需要完整的SMO算法来加快其运算速度。
+
+# 利用完整的Platt SMO算法加速优化
+
+在小规模的数据范围内运行简化版的SMO自然是没什么问题的，但是一旦数据集过大就容易GG。现在我们就开始讨论完整版的Platt SMO算法。在这两个版本中，实现alpha的更改和代数运算的优化算法一模一样。在优化过程中，唯一的不同就是选择`alpha`的方法。完整版的Platt SMO算法应用了一些能够提速的启发方法。
+
+Platt SMO算法是通过一个外循环来选择第一个`alpha`值的，并且其选择过程会在两种方式之间进行交替：一种方式是在所有数据集上进行单遍扫描，另一种方式则是在非边界`alpha`中实现单遍扫描。而所谓费边界alpha指的是那些不等于边界0或者C的`alpha`值。对整个数据集的扫描相当容易，而实现非边界`alpha`值的扫描的时候，首先需要建立这些`alpha`值的列表，然后再对这些表进行遍历。同事，这个步骤可以跳过那些已知的不会改变的`alpha`值。
+
+在选择第一个值`alpha`后，算法会通过一个内循环来选择第二个`alpha`值。在优化过程中，会通过最大化步长的方式来获得第二个`alpha`值。在简化版SMO算法中，我们会在选择j之后计算错误率`Ej`。但在这里，我们会建立一个全局的缓存用于保存误差值，并从中选择使得步长或者`Ei-Ej`最大的`alpha`值。
+
+所以我们应该包含用于清理代码的数据结构和3个用于对E缓存的辅助函数。
+<pre class="lang:python decode:true" title="完整版Platt SMO的支持函数">class optStruct:
+    def __init__(self,dataMatIn, classLabels, C, toler, kTup):  # Initialize the structure with the parameters 
+        self.X = dataMatIn
+        self.labelMat = classLabels
+        self.C = C
+        self.tol = toler
+        self.m = shape(dataMatIn)[0]
+        self.alphas = mat(zeros((self.m,1)))
+        self.b = 0
+        self.eCache = mat(zeros((self.m,2))) #first column is valid flag
+        self.K = mat(zeros((self.m,self.m)))
+        for i in range(self.m):
+            self.K[:,i] = kernelTrans(self.X, self.X[i,:], kTup)
+
+def calcEk(oS, k):
+    fXk = float(multiply(oS.alphas,oS.labelMat).T*oS.K[:,k] + oS.b)
+    Ek = fXk - float(oS.labelMat[k])
+    return Ek
+
+def selectJ(i, oS, Ei):         #this is the second choice -heurstic, and calcs Ej
+    maxK = -1; maxDeltaE = 0; Ej = 0
+    oS.eCache[i] = [1,Ei]  #set valid #choose the alpha that gives the maximum delta E
+    validEcacheList = nonzero(oS.eCache[:,0].A)[0]
+    if (len(validEcacheList)) &gt; 1:
+        for k in validEcacheList:   #loop through valid Ecache values and find the one that maximizes delta E
+            if k == i: continue #don't calc for i, waste of time
+            Ek = calcEk(oS, k)
+            deltaE = abs(Ei - Ek)
+            if (deltaE &gt; maxDeltaE):
+                maxK = k; maxDeltaE = deltaE; Ej = Ek
+        return maxK, Ej
+    else:   #in this case (first time around) we don't have any valid eCache values
+        j = selectJrand(i, oS.m)
+        Ej = calcEk(oS, j)
+    return j, Ej
+
+def updateEk(oS, k):#after any alpha has changed update the new value in the cache
+    Ek = calcEk(oS, k)
+    oS.eCache[k] = [1,Ek]</pre>
+首要的事情就是建立一个数据结构来保存所有的重要值，而这个过程可以通过一个对象来完成。这里使用对象的目的是为了作为一个数据结构来使用对象。这样数据就可以通过一个对象来进行传递。实际上，当完成其实现时，可以容易通过Python的字典来完成。但是在访问对象成员变量时，这样做会有更多的手工输入操作，所以我们还是使用一个包含`__init__`的方法的`optStruct`类。该方法可以实现成员变量的填充。除了增加一个\(m\times 2\)的矩阵或者`eCache`外，这些做法和简化版的SMO一模一样。`eCache`的第一列给出的是`eCache`是否有效的标志位，而第二列给出的是实际的E值。
+
+对于给定的`alpha`值，第一个辅助函数`calcEK()`能够计算E值并且返回。以前，这个过程是采用内嵌的方法来完成的，但是由于这个过程在这个版本的SMO算法中出现频繁，所以还是写成函数比较好。
+
+下一个函数`selectJ()`用于选择第二个`alpha`或者内循环中的`alpha`值。回想一下，这里的目标实际上是选择第二个`alpha`值以保证每次优化中采用最大步长。这个函数的误差值与第一个`alpha`值`Ei`和下标`i`有关。首先将输入值Ei缓存中设置为长期有效的，也就是说其一直都是计算好的。在eCache中，代码`nonzero(oS.eCache[:,0].A)[0]`构建除了一个非零表。`nonzero()`返回了一个列表，这个列表包含以输入列表为目录的列表值，非零。`nozero()`语句返回的是非零E值所对应的`alpha`值，而不是`E`本身。程序会在所有值上进行循环并选择其中使得改变最大的那个值。如果这是第一个循环，那么就随机选择一个`alpha`值。当然，也有其他的方法。
+<pre class="lang:python decode:true" title="完整Platt SMP算法中的优化流程">def innerL(i, oS):
+    Ei = calcEk(oS, i)
+    if ((oS.labelMat[i]*Ei &lt; -oS.tol) and (oS.alphas[i] &lt; oS.C)) or ((oS.labelMat[i]*Ei &gt; oS.tol) and (oS.alphas[i] &gt; 0)):
+        j,Ej = selectJ(i, oS, Ei) #this has been changed from selectJrand
+        alphaIold = oS.alphas[i].copy(); alphaJold = oS.alphas[j].copy();
+        if (oS.labelMat[i] != oS.labelMat[j]):
+            L = max(0, oS.alphas[j] - oS.alphas[i])
+            H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])
+        else:
+            L = max(0, oS.alphas[j] + oS.alphas[i] - oS.C)
+            H = min(oS.C, oS.alphas[j] + oS.alphas[i])
+        if L==H: print "L==H"; return 0
+        eta = 2.0 * oS.K[i,j] - oS.K[i,i] - oS.K[j,j] #changed for kernel
+        if eta &gt;= 0: print "eta&gt;=0"; return 0
+        oS.alphas[j] -= oS.labelMat[j]*(Ei - Ej)/eta
+        oS.alphas[j] = clipAlpha(oS.alphas[j],H,L)
+        updateEk(oS, j) #added this for the Ecache
+        if (abs(oS.alphas[j] - alphaJold) &lt; 0.00001): print "j not moving enough"; return 0
+        oS.alphas[i] += oS.labelMat[j]*oS.labelMat[i]*(alphaJold - oS.alphas[j])#update i by the same amount as j
+        updateEk(oS, i) #added this for the Ecache                    #the update is in the oppostie direction
+        b1 = oS.b - Ei- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.K[i,i] - oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.K[i,j]
+        b2 = oS.b - Ej- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.K[i,j]- oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.K[j,j]
+        if (0 &lt; oS.alphas[i]) and (oS.C &gt; oS.alphas[i]): oS.b = b1
+        elif (0 &lt; oS.alphas[j]) and (oS.C &gt; oS.alphas[j]): oS.b = b2
+        else: oS.b = (b1 + b2)/2.0
+        return 1
+    else: return 0</pre>
+程序清单的代码几乎和之前给出的`smoSimple()`的函数一模一样，但是这里的代码已经使用了自己的数据结构。这个结构在参数`oS`中传递。第二个重要的修改就是使用程序清单的`selectJ`来选择第二个`alpha`的值。最后在`alpha`值改变的时候更新`Ecache`。程序订单把上述过程打包在一起的代码片段。这就是选择第一个`alpha`值的外循环。
+<pre class="lang:default decode:true" title="完整版Platt SMO的外循环代码">def smoP(dataMatIn, classLabels, C, toler, maxIter,kTup=('lin', 0)):    #full Platt SMO
+    oS = optStruct(mat(dataMatIn),mat(classLabels).transpose(),C,toler, kTup)
+    iter = 0
+    entireSet = True; alphaPairsChanged = 0
+    while (iter &lt; maxIter) and ((alphaPairsChanged &gt; 0) or (entireSet)):
+        alphaPairsChanged = 0
+        if entireSet:   #go over all
+            for i in range(oS.m):        
+                alphaPairsChanged += innerL(i,oS)
+                print "fullSet, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged)
+            iter += 1
+        else:#go over non-bound (railed) alphas
+            nonBoundIs = nonzero((oS.alphas.A &gt; 0) * (oS.alphas.A &lt; C))[0]
+            for i in nonBoundIs:
+                alphaPairsChanged += innerL(i,oS)
+                print "non-bound, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged)
+            iter += 1
+        if entireSet: entireSet = False #toggle entire set loop
+        elif (alphaPairsChanged == 0): entireSet = True  
+        print "iteration number: %d" % iter
+    return oS.b,oS.alphas</pre>
+程序清单给出的是完整的Platt SMO算法，其输入和函数`smoSimple()`完全一样。函数一开始构建一个数据结构来容纳所有的数据，然后需要对控制函数退出的一些变量进行初始化。整个代码的主体是`while`循环，这与`smoSimple()`有些类似，但是这里的循环退出条件就更多一些。如果整个代码的主体是`while`循环，这与`smoSimple()`有些类似，但是哲理的循环条件退出条件就更多一些。当迭代次数超过指定的最大值，或者遍历整个集合都未对任何`alpha`值进行修改的时候，就退出循环。这里的`maxIter`变量和函数`smoSimple()`中的作用有一点不同，后者当没有任何`alpha`发生改变时会将整个集合的第一次遍历过程记成一次迭代，而这里的一次迭代定义为一次循环过程，而不论其做了什么事情。此时，如果在优化过程中存在波动就会停止，因此这里的做法优于`smoSimple()`函数中的计数方法。
+
+`while`循环的内部与`smoSimple()`有所不同，一开始的`for`循环在数据集上遍历任何可能的`alpha`。我们通过调用`innerL()`来选择第二个`alpha`，并在可能时候对其进行优化处理，如果有任意一对`alpha`值发生改变，那么就会返回1.第二个`for`循环遍历所有的非边界`alpha`值，也就是不再边界0或者C上的值。
+
+接下来，我们对for循环在非边界循环和完整遍历之间进行切换，并打印出迭代次数。最后程序将会返回常数b和`alpha`值。
+<pre class="lang:python decode:true">&gt;&gt;&gt; dataArr,labelArr=svmMLiA.loadDataSet('testSet.txt')
+&gt;&gt;&gt; b,alphas=svmMLiA.smoP(dataArr,labelArr,0.6,0.001,40)</pre>
+然后可以得出下面的结果：
+<pre class="minimize:true lang:default decode:true" title="结果">fullSet, iter: 0 i:0, pairs changed 1
+fullSet, iter: 0 i:1, pairs changed 1
+fullSet, iter: 0 i:2, pairs changed 2
+fullSet, iter: 0 i:3, pairs changed 3
+L==H
+fullSet, iter: 0 i:4, pairs changed 3
+L==H
+fullSet, iter: 0 i:5, pairs changed 3
+L==H
+fullSet, iter: 0 i:6, pairs changed 3
+fullSet, iter: 0 i:7, pairs changed 3
+fullSet, iter: 0 i:8, pairs changed 4
+fullSet, iter: 0 i:9, pairs changed 4
+j not moving enough
+fullSet, iter: 0 i:10, pairs changed 4
+fullSet, iter: 0 i:11, pairs changed 4
+fullSet, iter: 0 i:12, pairs changed 4
+fullSet, iter: 0 i:13, pairs changed 4
+fullSet, iter: 0 i:14, pairs changed 4
+fullSet, iter: 0 i:15, pairs changed 4
+fullSet, iter: 0 i:16, pairs changed 4
+j not moving enough
+fullSet, iter: 0 i:17, pairs changed 4
+L==H
+fullSet, iter: 0 i:18, pairs changed 4
+fullSet, iter: 0 i:19, pairs changed 4
+fullSet, iter: 0 i:20, pairs changed 4
+fullSet, iter: 0 i:21, pairs changed 4
+fullSet, iter: 0 i:22, pairs changed 4
+fullSet, iter: 0 i:23, pairs changed 5
+fullSet, iter: 0 i:24, pairs changed 5
+L==H
+fullSet, iter: 0 i:25, pairs changed 5
+L==H
+fullSet, iter: 0 i:26, pairs changed 5
+fullSet, iter: 0 i:27, pairs changed 5
+fullSet, iter: 0 i:28, pairs changed 5
+fullSet, iter: 0 i:29, pairs changed 5
+fullSet, iter: 0 i:30, pairs changed 5
+L==H
+fullSet, iter: 0 i:31, pairs changed 5
+fullSet, iter: 0 i:32, pairs changed 5
+fullSet, iter: 0 i:33, pairs changed 5
+L==H
+fullSet, iter: 0 i:34, pairs changed 5
+fullSet, iter: 0 i:35, pairs changed 5
+fullSet, iter: 0 i:36, pairs changed 5
+fullSet, iter: 0 i:37, pairs changed 5
+fullSet, iter: 0 i:38, pairs changed 5
+L==H
+fullSet, iter: 0 i:39, pairs changed 5
+fullSet, iter: 0 i:40, pairs changed 5
+fullSet, iter: 0 i:41, pairs changed 5
+fullSet, iter: 0 i:42, pairs changed 5
+fullSet, iter: 0 i:43, pairs changed 5
+j not moving enough
+fullSet, iter: 0 i:44, pairs changed 5
+L==H
+fullSet, iter: 0 i:45, pairs changed 5
+L==H
+fullSet, iter: 0 i:46, pairs changed 5
+j not moving enough
+fullSet, iter: 0 i:47, pairs changed 5
+fullSet, iter: 0 i:48, pairs changed 5
+fullSet, iter: 0 i:49, pairs changed 5
+j not moving enough
+fullSet, iter: 0 i:50, pairs changed 5
+L==H
+fullSet, iter: 0 i:51, pairs changed 5
+L==H
+fullSet, iter: 0 i:52, pairs changed 5
+fullSet, iter: 0 i:53, pairs changed 5
+fullSet, iter: 0 i:54, pairs changed 6
+L==H
+fullSet, iter: 0 i:55, pairs changed 6
+fullSet, iter: 0 i:56, pairs changed 6
+fullSet, iter: 0 i:57, pairs changed 6
+fullSet, iter: 0 i:58, pairs changed 6
+fullSet, iter: 0 i:59, pairs changed 6
+fullSet, iter: 0 i:60, pairs changed 6
+fullSet, iter: 0 i:61, pairs changed 6
+fullSet, iter: 0 i:62, pairs changed 6
+fullSet, iter: 0 i:63, pairs changed 6
+fullSet, iter: 0 i:64, pairs changed 6
+fullSet, iter: 0 i:65, pairs changed 6
+fullSet, iter: 0 i:66, pairs changed 6
+fullSet, iter: 0 i:67, pairs changed 6
+fullSet, iter: 0 i:68, pairs changed 6
+fullSet, iter: 0 i:69, pairs changed 6
+fullSet, iter: 0 i:70, pairs changed 6
+fullSet, iter: 0 i:71, pairs changed 6
+fullSet, iter: 0 i:72, pairs changed 6
+fullSet, iter: 0 i:73, pairs changed 6
+fullSet, iter: 0 i:74, pairs changed 6
+fullSet, iter: 0 i:75, pairs changed 6
+fullSet, iter: 0 i:76, pairs changed 6
+fullSet, iter: 0 i:77, pairs changed 6
+fullSet, iter: 0 i:78, pairs changed 6
+fullSet, iter: 0 i:79, pairs changed 6
+fullSet, iter: 0 i:80, pairs changed 6
+fullSet, iter: 0 i:81, pairs changed 6
+fullSet, iter: 0 i:82, pairs changed 6
+fullSet, iter: 0 i:83, pairs changed 6
+fullSet, iter: 0 i:84, pairs changed 6
+fullSet, iter: 0 i:85, pairs changed 6
+fullSet, iter: 0 i:86, pairs changed 6
+fullSet, iter: 0 i:87, pairs changed 6
+fullSet, iter: 0 i:88, pairs changed 6
+fullSet, iter: 0 i:89, pairs changed 6
+fullSet, iter: 0 i:90, pairs changed 6
+fullSet, iter: 0 i:91, pairs changed 6
+fullSet, iter: 0 i:92, pairs changed 6
+fullSet, iter: 0 i:93, pairs changed 6
+fullSet, iter: 0 i:94, pairs changed 6
+fullSet, iter: 0 i:95, pairs changed 6
+fullSet, iter: 0 i:96, pairs changed 6
+fullSet, iter: 0 i:97, pairs changed 6
+fullSet, iter: 0 i:98, pairs changed 6
+fullSet, iter: 0 i:99, pairs changed 6
+iteration number: 1
+j not moving enough
+non-bound, iter: 1 i:0, pairs changed 0
+j not moving enough
+non-bound, iter: 1 i:2, pairs changed 0
+j not moving enough
+non-bound, iter: 1 i:6, pairs changed 0
+j not moving enough
+non-bound, iter: 1 i:8, pairs changed 0
+j not moving enough
+non-bound, iter: 1 i:23, pairs changed 0
+non-bound, iter: 1 i:52, pairs changed 0
+non-bound, iter: 1 i:54, pairs changed 0
+iteration number: 2
+j not moving enough
+fullSet, iter: 2 i:0, pairs changed 0
+fullSet, iter: 2 i:1, pairs changed 0
+j not moving enough
+fullSet, iter: 2 i:2, pairs changed 0
+fullSet, iter: 2 i:3, pairs changed 0
+fullSet, iter: 2 i:4, pairs changed 0
+fullSet, iter: 2 i:5, pairs changed 0
+j not moving enough
+fullSet, iter: 2 i:6, pairs changed 0
+fullSet, iter: 2 i:7, pairs changed 0
+j not moving enough
+fullSet, iter: 2 i:8, pairs changed 0
+fullSet, iter: 2 i:9, pairs changed 0
+fullSet, iter: 2 i:10, pairs changed 0
+fullSet, iter: 2 i:11, pairs changed 0
+fullSet, iter: 2 i:12, pairs changed 0
+fullSet, iter: 2 i:13, pairs changed 0
+fullSet, iter: 2 i:14, pairs changed 0
+fullSet, iter: 2 i:15, pairs changed 0
+fullSet, iter: 2 i:16, pairs changed 0
+fullSet, iter: 2 i:17, pairs changed 0
+fullSet, iter: 2 i:18, pairs changed 0
+fullSet, iter: 2 i:19, pairs changed 0
+fullSet, iter: 2 i:20, pairs changed 0
+fullSet, iter: 2 i:21, pairs changed 0
+fullSet, iter: 2 i:22, pairs changed 0
+j not moving enough
+fullSet, iter: 2 i:23, pairs changed 0
+fullSet, iter: 2 i:24, pairs changed 0
+fullSet, iter: 2 i:25, pairs changed 0
+fullSet, iter: 2 i:26, pairs changed 0
+fullSet, iter: 2 i:27, pairs changed 0
+fullSet, iter: 2 i:28, pairs changed 0
+fullSet, iter: 2 i:29, pairs changed 0
+fullSet, iter: 2 i:30, pairs changed 0
+fullSet, iter: 2 i:31, pairs changed 0
+fullSet, iter: 2 i:32, pairs changed 0
+fullSet, iter: 2 i:33, pairs changed 0
+fullSet, iter: 2 i:34, pairs changed 0
+fullSet, iter: 2 i:35, pairs changed 0
+fullSet, iter: 2 i:36, pairs changed 0
+fullSet, iter: 2 i:37, pairs changed 0
+fullSet, iter: 2 i:38, pairs changed 0
+fullSet, iter: 2 i:39, pairs changed 0
+fullSet, iter: 2 i:40, pairs changed 0
+fullSet, iter: 2 i:41, pairs changed 0
+fullSet, iter: 2 i:42, pairs changed 0
+fullSet, iter: 2 i:43, pairs changed 0
+fullSet, iter: 2 i:44, pairs changed 0
+fullSet, iter: 2 i:45, pairs changed 0
+fullSet, iter: 2 i:46, pairs changed 0
+fullSet, iter: 2 i:47, pairs changed 0
+fullSet, iter: 2 i:48, pairs changed 0
+fullSet, iter: 2 i:49, pairs changed 0
+fullSet, iter: 2 i:50, pairs changed 0
+fullSet, iter: 2 i:51, pairs changed 0
+fullSet, iter: 2 i:52, pairs changed 0
+fullSet, iter: 2 i:53, pairs changed 0
+fullSet, iter: 2 i:54, pairs changed 0
+L==H
+fullSet, iter: 2 i:55, pairs changed 0
+fullSet, iter: 2 i:56, pairs changed 0
+fullSet, iter: 2 i:57, pairs changed 0
+fullSet, iter: 2 i:58, pairs changed 0
+fullSet, iter: 2 i:59, pairs changed 0
+fullSet, iter: 2 i:60, pairs changed 0
+fullSet, iter: 2 i:61, pairs changed 0
+fullSet, iter: 2 i:62, pairs changed 0
+fullSet, iter: 2 i:63, pairs changed 0
+fullSet, iter: 2 i:64, pairs changed 0
+fullSet, iter: 2 i:65, pairs changed 0
+fullSet, iter: 2 i:66, pairs changed 0
+fullSet, iter: 2 i:67, pairs changed 0
+fullSet, iter: 2 i:68, pairs changed 0
+fullSet, iter: 2 i:69, pairs changed 0
+fullSet, iter: 2 i:70, pairs changed 0
+fullSet, iter: 2 i:71, pairs changed 0
+fullSet, iter: 2 i:72, pairs changed 0
+fullSet, iter: 2 i:73, pairs changed 0
+fullSet, iter: 2 i:74, pairs changed 0
+fullSet, iter: 2 i:75, pairs changed 0
+fullSet, iter: 2 i:76, pairs changed 0
+fullSet, iter: 2 i:77, pairs changed 0
+fullSet, iter: 2 i:78, pairs changed 0
+fullSet, iter: 2 i:79, pairs changed 0
+fullSet, iter: 2 i:80, pairs changed 0
+fullSet, iter: 2 i:81, pairs changed 0
+fullSet, iter: 2 i:82, pairs changed 0
+fullSet, iter: 2 i:83, pairs changed 0
+fullSet, iter: 2 i:84, pairs changed 0
+fullSet, iter: 2 i:85, pairs changed 0
+fullSet, iter: 2 i:86, pairs changed 0
+fullSet, iter: 2 i:87, pairs changed 0
+fullSet, iter: 2 i:88, pairs changed 0
+fullSet, iter: 2 i:89, pairs changed 0
+fullSet, iter: 2 i:90, pairs changed 0
+fullSet, iter: 2 i:91, pairs changed 0
+fullSet, iter: 2 i:92, pairs changed 0
+fullSet, iter: 2 i:93, pairs changed 0
+fullSet, iter: 2 i:94, pairs changed 0
+fullSet, iter: 2 i:95, pairs changed 0
+fullSet, iter: 2 i:96, pairs changed 0
+fullSet, iter: 2 i:97, pairs changed 0
+fullSet, iter: 2 i:98, pairs changed 0
+fullSet, iter: 2 i:99, pairs changed 0
+iteration number: 3</pre>
+这样的结果更快。
+
+![support vector compelete](/wp-content/uploads/2016/07/support-vector-compelete.png)
+
+图中画圈的支持向量就给出了满足算法的一种解。如果数据集非线性可分，就会发现支持向量会在超平面附近聚集成团。
+
+刚才我们花了大量的时间来计算alpha值，但是如何利用它们进行分类呢？这不成问题，首先必须基于alpha得到超平面，这也包括了w的计算。下面列出的一个小函数可以用于实现上述任务：
+<pre class="lang:python decode:true">def calcWs(alphas,dataArr,classLabels):
+    X = mat(dataArr); labelMat = mat(classLabels).transpose()
+    m,n = shape(X)
+    w = zeros((n,1))
+    for i in range(m):
+        w += multiply(alphas[i]*labelMat[i],X[i,:].T)
+    return w</pre>
+上述代码最重要的部分是for循环，虽然在循环中实现的只是多个数的乘积。前面计算出的任何一个`alpha`值，就不会忘记大部分alpha值为0.而非零`alpha`所对应的也就是支持向量。虽然上述for循环遍历了数据集中的所有数据，但是最终起作用的只有支持向量。由于对w计算毫无作用，所以数据中其他的数据点会被很容易舍弃。
+
+为了使用前面给出的函数，输入下面的命令：
+<pre class="lang:default decode:true">&gt;&gt;&gt; ws=svmMLiA.calcWs(alphas,dataArr,labelArr)
+&gt;&gt;&gt; ws
+array([[ 0.73660705],
+       [-0.33184906]])</pre>
+如果这个值大于0，则输入1类；如果这个值小于0，则属于-1类。对于数据点0，应该得到的类别标签是-1.可以通过如下的命令确定分类结果的正确性：
+<pre class="lang:default decode:true">&gt;&gt;&gt; labelArr[0]
+-1.0</pre>
+这样我们可以成功的训练出分类器了，但是如果两类数据点分别分布在一个圆的内外部，那么会的到怎么样的分类面呢？
+
+# 在复杂数据上应用核函数
+
+![complex_data](/wp-content/uploads/2016/07/complex_data.png)
+
+我们现在就需要使用一种成为核函数（kernel）的工具将数据转换成易于分类器理解的形式。首先解释核函数的概念，并且介绍它们在支持向量自动机的使用方法，然后我们介绍一种成为径向基函数（radial basis function）的最流行的核函数。最终将这个核函数应用与我们前面得到的分类器。
+
+## 利用核函数将数据映射到高维空间
+
+在上图中，数据点处于一个圆中，我们可以对圆中的数据进行转换，也就是把数据从一个特征空间转换到另一个特征空间，也就是一个映射。
+
+从某个特征空间到另一个特征空间的映射会通过核函数来实现的，它能把数据从一个很难处理的形式转换成一个比较容易处理的形式，同时，核函数也有很多种类型，经过空间转换之后，我们就能够在高维空间解决线性问题，等价于在低维空间解决非线性问题。
+
+SVM中，所有的运算都可以写成内积的形式，这样我们就可以把内积运算替换成核函数的形式。核函数不仅仅应用于支持向量自动机，很多其他机器学习算法也用到核函数。
+
+# 径向基核函数
+
+径向基函数是一个采用向量作为自变量的函数，能够基于向量距离运算输出一个标量。这个距离可以是从&lt;0,0&gt;向量或者其他向量开始计算的距离，其具体公式为：\[k(x,y)=exp\left(\dfrac{-||x-y||^{2}}{2\sigma^{2}}\right)\]，其中\[\sigma\]是我们定义的用于确认函数跌落到0的速度参数。
+
+上述高斯函数核函数将数据映射至高维空间（具体来说是一个无穷远的空间）。可以在已有代码中使用核函数。首先我们输入函数kernelTrans()。然后对optStruct类进行修改，得到核转换函数。
+<pre class="lang:python decode:true " title="核转换函数">def kernelTrans(X, A, kTup): #calc the kernel or transform data to a higher dimensional space
+    m,n = shape(X)
+    K = mat(zeros((m,1)))
+    if kTup[0]=='lin': K = X * A.T   #linear kernel
+    elif kTup[0]=='rbf':
+        for j in range(m):
+            deltaRow = X[j,:] - A
+            K[j] = deltaRow*deltaRow.T
+        K = exp(K/(-1*kTup[1]**2)) #divide in NumPy is element-wise not matrix like Matlab
+    else: raise NameError('Houston We Have a Problem -- \
+    That Kernel is not recognized')
+    return K
+
+class optStruct:
+    def __init__(self,dataMatIn, classLabels, C, toler, kTup):  # Initialize the structure with the parameters 
+        self.X = dataMatIn
+        self.labelMat = classLabels
+        self.C = C
+        self.tol = toler
+        self.m = shape(dataMatIn)[0]
+        self.alphas = mat(zeros((self.m,1)))
+        self.b = 0
+        self.eCache = mat(zeros((self.m,2))) #first column is valid flag
+        self.K = mat(zeros((self.m,self.m)))
+        for i in range(self.m):
+            self.K[:,i] = kernelTrans(self.X, self.X[i,:], kTup)</pre>
+`optStruct`除了引入一个新变量`kTup`外，该版本和原来的`optStruct`一模一样。`kTup`是一个包含核函数信息的元祖，在初始化方法结束的时候，矩阵K先被构建，然后再通过调用函数`kernelTrans()`进行填充。全局K值只需要计算一次。当需要使用核函数的时候，就能过对他进行调用，也节省了很多的冗余的计算开销。
+
+当计算矩阵K时，这个过程多次调用了`kernelTrans()`。这个过程有三个输入参数：2个数值型变量和1个元祖。元祖`kTup`给出的是核函数的信息。元祖的第一个参数是描述所用核函数类型的字符串，其他2个参数则都是核函数可能需要的可选参数。这个函数首先构建了一个列向量，然后检查元祖来确定核函数的类型。
+
+在线性核函数的情况下，内积计算在“所有数据集”和“数据集中的一行”这两个输入间展开。在径向基函数的情况下，在for循环中对于矩阵的每个元素计算高斯函数的值。而在for循环结束之后，我们将计算过程应用到整个向量上去。
+
+于是我们要对`innerL`和`calcEk`函数进行修改
+<pre class="lang:python decode:true " title="对calcEK函数进行修改">def calcEk(oS, k):
+    fXk = float(multiply(oS.alphas,oS.labelMat).T*oS.K[:,k] + oS.b)
+    Ek = fXk - float(oS.labelMat[k])
+    return Ek</pre>
+
+<h2 id="测试中使用核函数"><a href="#测试中使用核函数" class="headerlink" title="测试中使用核函数"></a>测试中使用核函数</h2><p>接下来我们将构建一个对数据点进行有效分类的分类器，这个分类器使用了径向基函数。前面提到基函数有一个用户定义的$\sigma$。首先我们需要确定其大小，然后利用该核函数构建出一个分类器。</p>
+<p><pre class="lang:python decode:true " title="利用核函数进行分类的径向基测试函数">def testRbf(k1=1.3):<br>    dataArr,labelArr = loadDataSet(‘testSetRBF.txt’)<br>    b,alphas = smoP(dataArr, labelArr, 200, 0.0001, 10000, (‘rbf’, k1)) #C=200 important<br>    datMat=mat(dataArr); labelMat = mat(labelArr).transpose()<br>    svInd=nonzero(alphas.A&gt;0)[0]<br>    sVs=datMat[svInd] #get matrix of only support vectors<br>    labelSV = labelMat[svInd];<br>    print “there are %d Support Vectors” % shape(sVs)[0]<br>    m,n = shape(datMat)<br>    errorCount = 0<br>    for i in range(m):<br>        kernelEval = kernelTrans(sVs,datMat[i,:],(‘rbf’, k1))<br>        predict=kernelEval.T <em> multiply(labelSV,alphas[svInd]) + b<br>        if sign(predict)!=sign(labelArr[i]): errorCount += 1<br>    print “the training error rate is: %f” % (float(errorCount)/m)<br>    dataArr,labelArr = loadDataSet(‘testSetRBF2.txt’)<br>    errorCount = 0<br>    datMat=mat(dataArr); labelMat = mat(labelArr).transpose()<br>    m,n = shape(datMat)<br>    for i in range(m):<br>        kernelEval = kernelTrans(sVs,datMat[i,:],(‘rbf’, k1))<br>        predict=kernelEval.T </em> multiply(labelSV,alphas[svInd]) + b<br>        if sign(predict)!=sign(labelArr[i]): errorCount += 1<br>    print “the test error rate is: %f” % (float(errorCount)/m)</pre><br>上述代码只有一个可选的输入参数，这个输入参数是高斯径向基函数中的一个用户定义变量。整个代码主要是由以前定义的函数类型构成的。首先，程序从文件中读取输入数据集，然后在这些数据集上运行Platt SMO算法，其中核函数的类型为<strong>rbf</strong>。</p>
+<p>整个代码最重要的就是for循环开始的两行，他们给出了如何利用核函数进行分类。首先利用结构初始化方法使用过的kernelTrans()函数，得到转换后的数据。然后，在使用之前的alpha以及类别标签求积。需要特别注意的是，在这几行代码中，是如何做到只需要支持向量数据就进行分类的。</p>
+<p>与第一个for循环相比，第二个for循环仅仅只有数据集不同，后者采用的是测试数据集。可以输入下面的命令：</p>
+<p><pre class="lang:sh decode:true " title="测试代码">&gt;&gt;&gt; import svmMLiA<br>&gt;&gt;&gt; svmMLiA.testRbf()</pre><br>这个是结果</p>
+<p><pre class="font:tahoma minimize:true lang:default decode:true " title="测试结果">fullSet, iter: 0 i:0, pairs changed 1<br>fullSet, iter: 0 i:1, pairs changed 2<br>fullSet, iter: 0 i:2, pairs changed 3<br>fullSet, iter: 0 i:3, pairs changed 4<br>fullSet, iter: 0 i:4, pairs changed 5<br>fullSet, iter: 0 i:5, pairs changed 6<br>fullSet, iter: 0 i:6, pairs changed 7<br>fullSet, iter: 0 i:7, pairs changed 7<br>fullSet, iter: 0 i:8, pairs changed 8<br>fullSet, iter: 0 i:9, pairs changed 8<br>fullSet, iter: 0 i:10, pairs changed 9<br>fullSet, iter: 0 i:11, pairs changed 10<br>j not moving enough<br>fullSet, iter: 0 i:12, pairs changed 10<br>fullSet, iter: 0 i:13, pairs changed 11<br>fullSet, iter: 0 i:14, pairs changed 12<br>fullSet, iter: 0 i:15, pairs changed 13<br>fullSet, iter: 0 i:16, pairs changed 14<br>fullSet, iter: 0 i:17, pairs changed 14<br>fullSet, iter: 0 i:18, pairs changed 15<br>fullSet, iter: 0 i:19, pairs changed 16<br>fullSet, iter: 0 i:20, pairs changed 16<br>fullSet, iter: 0 i:21, pairs changed 17<br>j not moving enough<br>fullSet, iter: 0 i:22, pairs changed 17<br>j not moving enough<br>fullSet, iter: 0 i:23, pairs changed 17<br>fullSet, iter: 0 i:24, pairs changed 18<br>j not moving enough<br>fullSet, iter: 0 i:25, pairs changed 18<br>fullSet, iter: 0 i:26, pairs changed 18<br>fullSet, iter: 0 i:27, pairs changed 19<br>fullSet, iter: 0 i:28, pairs changed 19<br>fullSet, iter: 0 i:29, pairs changed 19<br>j not moving enough<br>fullSet, iter: 0 i:30, pairs changed 19<br>fullSet, iter: 0 i:31, pairs changed 20<br>fullSet, iter: 0 i:32, pairs changed 20<br>fullSet, iter: 0 i:33, pairs changed 20<br>fullSet, iter: 0 i:34, pairs changed 21<br>fullSet, iter: 0 i:35, pairs changed 21<br>fullSet, iter: 0 i:36, pairs changed 21<br>fullSet, iter: 0 i:37, pairs changed 21<br>fullSet, iter: 0 i:38, pairs changed 21<br>fullSet, iter: 0 i:39, pairs changed 21<br>j not moving enough<br>fullSet, iter: 0 i:40, pairs changed 21<br>fullSet, iter: 0 i:41, pairs changed 22<br>fullSet, iter: 0 i:42, pairs changed 23<br>L==H<br>fullSet, iter: 0 i:43, pairs changed 23<br>fullSet, iter: 0 i:44, pairs changed 23<br>fullSet, iter: 0 i:45, pairs changed 24<br>L==H<br>fullSet, iter: 0 i:46, pairs changed 24<br>fullSet, iter: 0 i:47, pairs changed 24<br>fullSet, iter: 0 i:48, pairs changed 24<br>fullSet, iter: 0 i:49, pairs changed 24<br>fullSet, iter: 0 i:50, pairs changed 24<br>fullSet, iter: 0 i:51, pairs changed 24<br>fullSet, iter: 0 i:52, pairs changed 24<br>L==H<br>fullSet, iter: 0 i:53, pairs changed 24<br>fullSet, iter: 0 i:54, pairs changed 24<br>fullSet, iter: 0 i:55, pairs changed 24<br>fullSet, iter: 0 i:56, pairs changed 24<br>fullSet, iter: 0 i:57, pairs changed 24<br>L==H<br>fullSet, iter: 0 i:58, pairs changed 24<br>fullSet, iter: 0 i:59, pairs changed 24<br>fullSet, iter: 0 i:60, pairs changed 24<br>fullSet, iter: 0 i:61, pairs changed 25<br>fullSet, iter: 0 i:62, pairs changed 26<br>fullSet, iter: 0 i:63, pairs changed 26<br>fullSet, iter: 0 i:64, pairs changed 26<br>fullSet, iter: 0 i:65, pairs changed 26<br>fullSet, iter: 0 i:66, pairs changed 26<br>fullSet, iter: 0 i:67, pairs changed 26<br>fullSet, iter: 0 i:68, pairs changed 26<br>fullSet, iter: 0 i:69, pairs changed 26<br>fullSet, iter: 0 i:70, pairs changed 26<br>fullSet, iter: 0 i:71, pairs changed 26<br>fullSet, iter: 0 i:72, pairs changed 26<br>fullSet, iter: 0 i:73, pairs changed 26<br>fullSet, iter: 0 i:74, pairs changed 27<br>fullSet, iter: 0 i:75, pairs changed 27<br>fullSet, iter: 0 i:76, pairs changed 27<br>fullSet, iter: 0 i:77, pairs changed 27<br>fullSet, iter: 0 i:78, pairs changed 27<br>fullSet, iter: 0 i:79, pairs changed 27<br>fullSet, iter: 0 i:80, pairs changed 27<br>fullSet, iter: 0 i:81, pairs changed 27<br>L==H<br>fullSet, iter: 0 i:82, pairs changed 27<br>fullSet, iter: 0 i:83, pairs changed 27<br>fullSet, iter: 0 i:84, pairs changed 27<br>fullSet, iter: 0 i:85, pairs changed 27<br>fullSet, iter: 0 i:86, pairs changed 27<br>fullSet, iter: 0 i:87, pairs changed 27<br>fullSet, iter: 0 i:88, pairs changed 27<br>fullSet, iter: 0 i:89, pairs changed 27<br>fullSet, iter: 0 i:90, pairs changed 27<br>fullSet, iter: 0 i:91, pairs changed 27<br>fullSet, iter: 0 i:92, pairs changed 27<br>fullSet, iter: 0 i:93, pairs changed 27<br>fullSet, iter: 0 i:94, pairs changed 27<br>fullSet, iter: 0 i:95, pairs changed 27<br>L==H<br>fullSet, iter: 0 i:96, pairs changed 27<br>fullSet, iter: 0 i:97, pairs changed 27<br>fullSet, iter: 0 i:98, pairs changed 27<br>L==H<br>fullSet, iter: 0 i:99, pairs changed 27<br>iteration number: 1<br>j not moving enough<br>non-bound, iter: 1 i:1, pairs changed 0<br>non-bound, iter: 1 i:2, pairs changed 1<br>j not moving enough<br>non-bound, iter: 1 i:3, pairs changed 1<br>j not moving enough<br>non-bound, iter: 1 i:6, pairs changed 1<br>non-bound, iter: 1 i:8, pairs changed 2<br>j not moving enough<br>non-bound, iter: 1 i:10, pairs changed 2<br>non-bound, iter: 1 i:11, pairs changed 3<br>j not moving enough<br>non-bound, iter: 1 i:13, pairs changed 3<br>j not moving enough<br>non-bound, iter: 1 i:14, pairs changed 3<br>non-bound, iter: 1 i:15, pairs changed 4<br>j not moving enough<br>non-bound, iter: 1 i:16, pairs changed 4<br>j not moving enough<br>non-bound, iter: 1 i:18, pairs changed 4<br>j not moving enough<br>non-bound, iter: 1 i:19, pairs changed 4<br>j not moving enough<br>non-bound, iter: 1 i:21, pairs changed 4<br>j not moving enough<br>non-bound, iter: 1 i:23, pairs changed 4<br>j not moving enough<br>non-bound, iter: 1 i:27, pairs changed 4<br>non-bound, iter: 1 i:31, pairs changed 5<br>j not moving enough<br>non-bound, iter: 1 i:34, pairs changed 5<br>j not moving enough<br>non-bound, iter: 1 i:41, pairs changed 5<br>j not moving enough<br>non-bound, iter: 1 i:42, pairs changed 5<br>non-bound, iter: 1 i:45, pairs changed 6<br>j not moving enough<br>non-bound, iter: 1 i:61, pairs changed 6<br>j not moving enough<br>non-bound, iter: 1 i:62, pairs changed 6<br>non-bound, iter: 1 i:74, pairs changed 7<br>iteration number: 2<br>j not moving enough<br>non-bound, iter: 2 i:1, pairs changed 0<br>j not moving enough<br>non-bound, iter: 2 i:2, pairs changed 0<br>j not moving enough<br>non-bound, iter: 2 i:3, pairs changed 0<br>j not moving enough<br>non-bound, iter: 2 i:6, pairs changed 0<br>j not moving enough<br>non-bound, iter: 2 i:10, pairs changed 0<br>j not moving enough<br>non-bound, iter: 2 i:13, pairs changed 0<br>j not moving enough<br>non-bound, iter: 2 i:14, pairs changed 0<br>non-bound, iter: 2 i:15, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:16, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:18, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:19, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:21, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:23, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:27, pairs changed 1<br>j not moving enough<br>non-bound, iter: 2 i:30, pairs changed 1<br>non-bound, iter: 2 i:31, pairs changed 2<br>j not moving enough<br>non-bound, iter: 2 i:34, pairs changed 2<br>j not moving enough<br>non-bound, iter: 2 i:41, pairs changed 2<br>j not moving enough<br>non-bound, iter: 2 i:42, pairs changed 2<br>non-bound, iter: 2 i:45, pairs changed 3<br>j not moving enough<br>non-bound, iter: 2 i:58, pairs changed 3<br>j not moving enough<br>non-bound, iter: 2 i:61, pairs changed 3<br>j not moving enough<br>non-bound, iter: 2 i:62, pairs changed 3<br>j not moving enough<br>non-bound, iter: 2 i:74, pairs changed 3<br>iteration number: 3<br>j not moving enough<br>non-bound, iter: 3 i:2, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:3, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:6, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:10, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:13, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:14, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:15, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:16, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:18, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:19, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:21, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:23, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:27, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:30, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:34, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:41, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:42, pairs changed 0<br>non-bound, iter: 3 i:45, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:58, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:61, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:62, pairs changed 0<br>j not moving enough<br>non-bound, iter: 3 i:74, pairs changed 0<br>iteration number: 4<br>fullSet, iter: 4 i:0, pairs changed 0<br>fullSet, iter: 4 i:1, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:2, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:3, pairs changed 0<br>fullSet, iter: 4 i:4, pairs changed 0<br>fullSet, iter: 4 i:5, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:6, pairs changed 0<br>fullSet, iter: 4 i:7, pairs changed 0<br>fullSet, iter: 4 i:8, pairs changed 0<br>fullSet, iter: 4 i:9, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:10, pairs changed 0<br>fullSet, iter: 4 i:11, pairs changed 0<br>fullSet, iter: 4 i:12, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:13, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:14, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:15, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:16, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:17, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:18, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:19, pairs changed 0<br>fullSet, iter: 4 i:20, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:21, pairs changed 0<br>fullSet, iter: 4 i:22, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:23, pairs changed 0<br>fullSet, iter: 4 i:24, pairs changed 0<br>fullSet, iter: 4 i:25, pairs changed 0<br>fullSet, iter: 4 i:26, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:27, pairs changed 0<br>fullSet, iter: 4 i:28, pairs changed 0<br>fullSet, iter: 4 i:29, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:30, pairs changed 0<br>fullSet, iter: 4 i:31, pairs changed 0<br>fullSet, iter: 4 i:32, pairs changed 0<br>fullSet, iter: 4 i:33, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:34, pairs changed 0<br>fullSet, iter: 4 i:35, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:36, pairs changed 0<br>fullSet, iter: 4 i:37, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:38, pairs changed 0<br>fullSet, iter: 4 i:39, pairs changed 0<br>fullSet, iter: 4 i:40, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:41, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:42, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:43, pairs changed 0<br>fullSet, iter: 4 i:44, pairs changed 0<br>fullSet, iter: 4 i:45, pairs changed 0<br>fullSet, iter: 4 i:46, pairs changed 0<br>fullSet, iter: 4 i:47, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:48, pairs changed 0<br>fullSet, iter: 4 i:49, pairs changed 0<br>fullSet, iter: 4 i:50, pairs changed 0<br>fullSet, iter: 4 i:51, pairs changed 0<br>fullSet, iter: 4 i:52, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:53, pairs changed 0<br>fullSet, iter: 4 i:54, pairs changed 0<br>fullSet, iter: 4 i:55, pairs changed 0<br>fullSet, iter: 4 i:56, pairs changed 0<br>fullSet, iter: 4 i:57, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:58, pairs changed 0<br>fullSet, iter: 4 i:59, pairs changed 0<br>fullSet, iter: 4 i:60, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:61, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:62, pairs changed 0<br>fullSet, iter: 4 i:63, pairs changed 0<br>fullSet, iter: 4 i:64, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:65, pairs changed 0<br>fullSet, iter: 4 i:66, pairs changed 0<br>fullSet, iter: 4 i:67, pairs changed 0<br>fullSet, iter: 4 i:68, pairs changed 0<br>fullSet, iter: 4 i:69, pairs changed 0<br>fullSet, iter: 4 i:70, pairs changed 0<br>fullSet, iter: 4 i:71, pairs changed 0<br>fullSet, iter: 4 i:72, pairs changed 0<br>fullSet, iter: 4 i:73, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:74, pairs changed 0<br>fullSet, iter: 4 i:75, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:76, pairs changed 0<br>fullSet, iter: 4 i:77, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:78, pairs changed 0<br>fullSet, iter: 4 i:79, pairs changed 0<br>fullSet, iter: 4 i:80, pairs changed 0<br>fullSet, iter: 4 i:81, pairs changed 0<br>j not moving enough<br>fullSet, iter: 4 i:82, pairs changed 0<br>fullSet, iter: 4 i:83, pairs changed 0<br>fullSet, iter: 4 i:84, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:85, pairs changed 0<br>fullSet, iter: 4 i:86, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:87, pairs changed 0<br>fullSet, iter: 4 i:88, pairs changed 0<br>fullSet, iter: 4 i:89, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:90, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:91, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:92, pairs changed 0<br>L==H<br>fullSet, iter: 4 i:93, pairs changed 0<br>fullSet, iter: 4 i:94, pairs changed 0<br>fullSet, iter: 4 i:95, pairs changed 0<br>fullSet, iter: 4 i:96, pairs changed 0<br>fullSet, iter: 4 i:97, pairs changed 0<br>fullSet, iter: 4 i:98, pairs changed 0<br>fullSet, iter: 4 i:99, pairs changed 0<br>iteration number: 5<br>there are 22 Support Vectors<br>the training error rate is: 0.110000<br>the test error rate is: 0.170000</pre><br>共有100个数据点，其中85个是支持向量，而当k从0.1变动到1.3的时候，支持向量少了很多，此时测试的错误率也在下降。该数据集在这个设置的某处存在最优值。如果降低了$\sigma$，那么训练错误率就会降低，但是测试错误率回升高。</p>
+<p>支持向量的数目会存在一个最优值。SVM的优点在于他能够对数据进行高效分类。如果支持向量很少，那么就会得到一个很差的决策边界；如果支持向量很多，那么就相当于每次都利用整个数据集进行分类，这种方法成为k近邻。</p>
+<p>&nbsp;</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/07/27/phpstorm-e5-bc-80-e5-8f-91wordpress/" class="prev">上一篇</a><a href="/2016/07/15/python-e8-af-86-e5-88-ab-e9-aa-8c-e8-af-81-e7-a0-81/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 主题开发工具 · kidozh</title><meta name="description" content="主题开发工具 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">主题开发工具</h1><div class="post-info">2016年10月21日</div><div class="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在我们开始开发wordpress主题之前，我们也需要把我们的工具带到位。在这一片博文中，我们将使用最好最强大的跨平台编译工具。</p>
+<h1 id="本地开发工具XAMPP或者MAPP"><a href="#本地开发工具XAMPP或者MAPP" class="headerlink" title="本地开发工具XAMPP或者MAPP"></a>本地开发工具XAMPP或者MAPP</h1><p>开发wordpress最好的地方并不是在服务器上，而是在本地环境里。为了做到这个，你需要把你的电脑变成一个本地的服务器，特别是要把主题移植到一个常见的网页服务器（Apache、MySQL和PHP），这也意味着你可以在你的电脑上安装WordPress。</p>
+<p>分开安装这些程序在技术上是一个很大的挑战，但是有些程序仍能够帮助我们安装并且管理他们。</p>
+<p>如果你是Windows用户，你就可以试试<a href="http://www.apachefriends.org/en/xampp-windows.html" target="_blank" rel="external">XAMPP</a>。</p>
+<p>如果你运行的是Mac，你就需要下载<a href="http://www.mamp.info/en/index.html" target="_blank" rel="external">MAPP</a>。</p>
+<p>如果你是Linux用户，用命令行把骚年。</p>
+<h1 id="在远程服务器上开发代码"><a href="#在远程服务器上开发代码" class="headerlink" title="在远程服务器上开发代码"></a>在远程服务器上开发代码</h1><p>如果你想在远程服务器上开发主题的话（比如HostGator、Blue Host），你就需要使用FTP客户端来访问站点，对于更多关于FTP的客户端，你也可以在<a href="http://codex.wordpress.org/FTP_Clients" target="_blank" rel="external">Codex page</a>上看到更多信息。</p>
+<p>如果你没有一个FTP的客户端，你就需要安装一个，这里有一些免费的工具：</p>
+<ul>
+<li>CyberDuck - 针对Mac和Windows</li>
+<li>FileZilla - 针对Mac，PC和Linux</li>
+</ul>
+<p>在你下载并且安装了FTP客户端之后，你就需要通过它来连接到你的网站。你可以通过查看你选择的客户端文档来知道如何做到。</p>
+<p>一旦你连接到了你的站点，你就可以安装WordPress了。</p>
+<h1 id="虚拟内容"><a href="#虚拟内容" class="headerlink" title="虚拟内容"></a>虚拟内容</h1><p>你的WordPress的安装需要一些样本，有些还可能是虚构的。在你的WordPress的后台中，在<strong>工具 &gt; 导入</strong>中选择<strong>从wordpress中导入</strong>。现在我们只需要<code>WXR</code>格式的博文数据来导入。</p>
+<h2 id="现在有一些你可以用的选项"><a href="#现在有一些你可以用的选项" class="headerlink" title="现在有一些你可以用的选项"></a>现在有一些你可以用的选项</h2><ul>
+<li><a href="http://codex.wordpress.org/Theme_Unit_Test" target="_blank" rel="external">The Theme Unit Test data</a></li>
+<li><a href="http://wpcandy.com/articles/easier-theme-development-with-the-sample-post-collection.html" target="_blank" rel="external">WPCandy Sample Content</a></li>
+</ul>
+<p>每一个测试数据集都有他们的发布的信息。我喜欢干的一件事情就是尽可能导入所有的虚拟文件。这样就不会丢失任何信息。当你想你怎么做的时候，你就可以使用博文导航来浏览每一个博文。你可以检出按照年月或者目录排序的历史记录。有着稳健的虚拟内容的支撑，当有些东西没考虑到的话，我们也可以轻易发现。</p>
+<h2 id="添加一些真实的内容"><a href="#添加一些真实的内容" class="headerlink" title="添加一些真实的内容"></a>添加一些真实的内容</h2><p>除了虚拟的内容，添加一些真实的内容也是很机智的。事实上，动态内容并不只是Lorem Ipsum和Little Blind Text的重复显示。从来自一个真实的博客和计算机中的文档中获得信息并且从中创建一些博文都是很必要的。一个真实的内容将会渲染一个非常精准的内容，内容将会显示主题在实际环境中是怎么起作用的（如果你想知道相关的信息，你可以看这一片文章 <a href="https://themeshaper.com/2012/02/27/dont-let-lorem-ipsum-decide-the-fonts-used-in-your-wordpress-themes/" target="_blank" rel="external">Don’t let Lorem Ipsum decide the fonts used in your WordPress Themes</a>）。</p>
+<h1 id="开发指导"><a href="#开发指导" class="headerlink" title="开发指导"></a>开发指导</h1><p>如果你对当前主题开发感兴趣，<a href="http://codex.wordpress.org/Theme_Review" target="_blank" rel="external">主题检查指导</a>也是一个非常好的起点。</p>
+<h1 id="必要的插件"><a href="#必要的插件" class="headerlink" title="必要的插件"></a>必要的插件</h1><p>如果你想获得开发插件的副本的话，你可以到<a href="http://automattic.com/" target="_blank" rel="external">Automattic</a>中获得进一步情况。在激活之后，他会给出成吨的你可以安装的插件来帮助你优化你的WordPress开发环境并且测试你的WordPress主题是否是最佳的代码体验。如果您想获得更多的信息，你就可以查看 <a href="https://themeshaper.com/2012/09/20/developer-plugin-v1-1-optimize-your-theme-development-environment/" title="Developer plugin v1.1: Optimize Your Theme Development Environment" target="_blank" rel="external">our brief overview of the Developer Plugin</a>。</p>
+<p>由 <a href="http://wordpress.mfields.org/" target="_blank" rel="external">Michael Fields</a>开发的<a href="https://themeshaper.com/2012/05/15/introducing-the-monster-widget/" title="Introducing the Monster Widget" target="_blank" rel="external">Monster Widget</a>，也是一个对于开发者必备的插件。通过把monster小组件拖拽到你的侧边栏，你就能够一次性测试WordPress的核心小组件了。</p>
+<h1 id="文本编辑器"><a href="#文本编辑器" class="headerlink" title="文本编辑器"></a>文本编辑器</h1><p>你不需要任何特殊的针对WordPress主题开发的图形界面，也许一个简陋的文本编辑器也是可以的。当然有总比没有好。</p>
+<p>对于Windows来说，你可以尝试<a href="http://notepad-plus.sourceforge.net/uk/site.htm" target="_blank" rel="external">Notepad++</a>。它是个免费而且开源的软件，并且也被<a href="http://lifehacker.com/385929/best-text-editors" target="_blank" rel="external">Lifehacker</a>所推荐的。</p>
+<p>对于Mac来说，我推荐<a href="http://www.barebones.com/products/TextWrangler/" target="_blank" rel="external">Text Wrangler</a>。</p>
+<p>对于Linux来说，Visual Code Editor也是很好用的。</p>
+<h1 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h1><h2 id="Firefox"><a href="#Firefox" class="headerlink" title="Firefox"></a>Firefox</h2><p>自然，你可以使用任何针对网页开发的浏览器，但是我很推荐火狐浏览器。特别是接下来的两个插件，当提到WordPress开发的时候，他们会让你的开发更加简洁。</p>
+<p><a href="https://addons.mozilla.org/en-US/firefox/addon/60" target="_blank" rel="external">Web Developer Add-on for Firefox</a>会添加一个工具条，这个工具条会给你提供从禁用CSS样式到验证本地HTML代码的一整套的检查和调试的方案。</p>
+<p><a href="https://addons.mozilla.org/en-US/firefox/addon/1843" target="_blank" rel="external">Firebug Add-on for Firefox</a>也是必不可少的。有了Firefox之后，你就可以在浏览器窗口中点击任何元素来获得对应的源代码。你也能够检查每个单独的样式规则。你也可以禁用这个规则来观察效果。你甚至可以添加或者修改规则以便观察实时变化。</p>
+<p>Firefox 10+将会有一个类似firebug的内建的网页探测器。他也能够在浏览器窗口中点击任何元素来获得对应的源代码。这个网页探测器，虽然好用，但是终究不能替代Firebug的特性和功能。</p>
+<h2 id="Safari和Chrome"><a href="#Safari和Chrome" class="headerlink" title="Safari和Chrome"></a>Safari和Chrome</h2><p>如果Firefox不是你的那碗菜，Safari和Google Chrome也是很值得推荐的。这两个浏览器都包含一个类似Firebug的内建开发工具。</p>
+<p>这里是<a href="https://developer.apple.com/technologies/safari/developer-tools.html" target="_blank" rel="external">Safari</a>的开发文档，这里则是<a href="http://developers.google.com/chrome-developer-tools/docs/overview" target="_blank" rel="external">Chrome</a>的开发工具文档。</p>
+<h1 id="HTML和CSS"><a href="#HTML和CSS" class="headerlink" title="HTML和CSS"></a>HTML和CSS</h1><p>对于HTML和CSS的熟识将会帮助您的WordPress开发。我推荐关于HTML的这两本书。</p>
+<ul>
+<li><a href="http://htmldog.com/guides/htmlbeginner/" target="_blank" rel="external">HTML Beginner Tutorial</a></li>
+<li><a href="http://www.htmldog.com/guides/cssbeginner/" target="_blank" rel="external">CSS Beginner Tutorial</a></li>
+</ul>
+<p>如果你想快速上手，你就可以看<a href="http://html5doctor.com/element-index/" target="_blank" rel="external"> Element Index from HTML5 Doctor</a>。阅读这些指南是完全可选的，他们对您理解一些基本概念有益无害。</p>
+<h2 id="PHP"><a href="#PHP" class="headerlink" title="PHP"></a>PHP</h2><p>那PHP呢？你难道不应该知道PHP来创建一个WordPress主题吗？这个答案是肯定的。但是我会告诉你充足的关于WordPress主题的一些雷区。当然这也是不必须的，你所需要的仅仅是学习一些基本的常识。</p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>这篇博文将会告诉你如何从草图中创建一个强大的WordPress主题，从头开始阅读并且亲自码代码是一件非常美妙的事情。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/10/30/e5-88-9b-e5-bb-ba-e4-b8-80-e4-b8-aawordpress-e7-9a-84-e4-b8-bb-e9-a2-98html-e7-bb-93-e6-9e-84/" class="prev">上一篇</a><a href="/2016/10/20/e4-b8-bb-e9-a2-98-e6-84-9f/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

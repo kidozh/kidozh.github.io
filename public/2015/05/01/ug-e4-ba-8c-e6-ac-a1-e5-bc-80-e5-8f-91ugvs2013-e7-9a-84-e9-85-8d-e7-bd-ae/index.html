@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> [UG二次开发]UG+VS2013 的配置 · kidozh</title><meta name="description" content="[UG二次开发]UG+VS2013 的配置 - kido zhang"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://kidozh.com/atom.xml" title="kidozh"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/u/1793490853" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/kidozh" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">[UG二次开发]UG+VS2013 的配置</h1><div class="post-info">2015年5月1日</div><div class="post-content"><p><span style="color:black; font-family:宋体"><span style="font-size:14pt">手工搭建Win32项目文件？？<span style="color:red">（测试VS2005可行，VS2013可行）<span style="color:black"><br>                    </span></span></span><span style="font-size:12pt"><br>            </span></span></p>
+<ol>
+<li><div><span style="color:black; font-size:14pt">在工程属性的 C/C++ <span style="font-family:Cambria Math">→</span> General常规 <span style="font-family:Cambria Math">→</span> Additional Include Directories附加包含目录中添加NXOpen链接库路径$(UGII_BASE_DIR)\ugopen </span><br>        </div>
+
+<p><img src="/wp-content/uploads/2015/05/050115_1536_UGUGVS201.png" alt=""><span style="font-family:宋体; font-size:12pt"></span></p>
+<pre><code>&lt;/span&gt;
+</code></pre></li>
+<li><div><span style="color:black; font-size:14pt">Linker连接器<span style="font-family:Cambria Math">→</span> General常规<span style="font-family:Cambria Math">→</span>Additional Include Directories附加包含目录中添加NXOpen链接库路径$(UGII_BASE_DIR)\ugopen </span><br>        </div>
+
+<p><img src="/wp-content/uploads/2015/05/050115_1536_UGUGVS202.png" alt=""><span style="font-family:宋体; font-size:12pt"></span></p>
+<pre><code>&lt;/span&gt;
+</code></pre></li>
+<li><div><span style="color:black; font-size:14pt">添加预编译宏_SECURE_SCL=0; 到工程属性C/C++<span style="font-family:Cambria Math">→</span> Preprocessor预处理器<span style="font-family:Cambria Math">→</span> Preprocessor Definitions预处理器定义 </span><br>        </div>
+
+<p><img src="/wp-content/uploads/2015/05/050115_1536_UGUGVS203.png" alt=""><span style="font-family:宋体; font-size:12pt"></span></p>
+<pre><code>&lt;/span&gt;
+</code></pre></li>
+<li><div><span style="color:black; font-size:14pt">在工程属性的 Linker链接器<span style="font-family:Cambria Math">→</span> Input输入<span style="font-family:Cambria Math">→</span> Additional Dependencies附加依赖项 根据需要添加以下链接库 </span><br>        </div>
+
+<p><span style="font-family:宋体"><span style="color:black; font-size:14pt">libufun.lib  支持 UFUNC API 函数库 </span><span style="font-size:12pt"></span></span></p>
+<pre><code>&lt;/span&gt;&lt;/span&gt;
+</code></pre></li>
+</ol>
+<p><span style="font-family:宋体"><span style="color:black; font-size:14pt">libugopenint.lib  支持 UFUNC对话框 API 函数库 </span><span style="font-size:12pt"><br>                    </span></span></p>
+<p><span style="font-family:宋体"><span style="color:black; font-size:14pt">libnxopencpp.lib  支持 NXOpenAPI函数库 </span><span style="font-size:12pt"><br>                    </span></span></p>
+<p><span style="font-family:宋体"><span style="color:black; font-size:14pt">libnxopenuicpp.lib  支持 NXOpen对话框即Block UI Styler API 函数库 </span><span style="font-size:12pt"><br>                    </span></span></p>
+<p><img src="/wp-content/uploads/2015/05/050115_1536_UGUGVS204.png" alt=""><span style="font-family:宋体; font-size:12pt"><br>                </span></p>
+<p><span style="font-family:宋体"><span style="color:black; font-size:14pt">注意：在调试时使用多线程调试 </span><span style="font-size:12pt"><br>            </span></span></p>
+<p><img src="/wp-content/uploads/2015/05/050115_1536_UGUGVS205.png" alt=""></p>
+</div></article></div></main><footer><div class="paginator"><a href="/2015/05/02/linuxlinux-e4-b8-8b-e7-9a-84-e5-a4-9a-e7-ba-bf-e7-a8-8b-e5-a4-9a-e8-bf-9b-e7-a8-8b-e9-80-9a-e4-bf-a1/" class="prev">上一篇</a><a href="/2015/04/30/282/" class="next">下一篇</a></div><div class="copyright"><p>© 2013 - 2017 <a href="http://kidozh.com">kido zhang</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

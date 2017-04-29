@@ -1,0 +1,64 @@
+---
+title: '[Python] 科学计算：Python VS. MATLAB (2)----准备与前提'
+tags:
+  - MATLAB
+  - Python
+id: 331
+categories:
+  - Python
+date: 2015-05-03 14:39:14
+---
+
+<span style="font-family:微软雅黑; font-size:14pt">**一、搭建平台环境**
+		</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        自己动手搭建Python科学计算平台，逐个下载安装各个模块毕竟是一个麻烦的事情。Python(x,y)项目想我们之所想，急我们之所急，将科学计算常用的工具进行打包，组成一个发行版。（在Python(x,y)的项目主页有项目介绍、入门指导和下载入口。网址：http://code.google.com/p/pythonxy/）
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        Python(x,y)主要特征：1）集合了用于科学计算的Python库和开发环境工具。2）集合了几乎所有的相关的自由文档。3）提供了Python/Qt/Spyder快速入门教程。4）提供了一键装/卸程序，只需一次点击即可安装或卸载所有包和工具。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        在Window$下，在上述网址下载Python(x,y)的最新版本，安装十分简单。安装后，打开Python(x,y)程序。可以看到，第一个标签Shortcuts有启动各个独立程序的入口以及选项。第二个标签Documentation是各个模块或者程序的文档入口，有本地版也要web版。本地版的文档十分丰富，基本能满足需求。所以，即使不联网，使用Python(x,y)进行Python科学计算的学习也是没有问题的。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        推荐一款Python的IDE，PyCharm，简直是开发神器！百度即可，PyCharm Community Edition是免费的哟~
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">--------------------俺是花钱的分割线------------------------------------------
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        对于MATLAB，更是简单，下载安装程序，我用的MATLAB2014a有7.2GB大小，相比Python(x,y)的400MB，只能感叹。安装的时候使用crack的序列号和license文件，等上半个小时，就装好了。这个版本安装后并不生成快捷方式，在"开始→所有程序"中也没有。启动它的两种方式：1）到安装路径X:\Program Files\MATLAB\R2014a\bin中找到名为MATLAB的应用程序，双击之；最好发送快捷方式到桌面，方便下次使用。2）先使用Win+R呼出运行，然后输入MATLAB（不区分大小写），回车或者用鼠标点确定。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">** 二、简单预备工作**
+		</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        交互式控制台（Interactive consoles）一般用IPython，相比IDLE具有自动补全等加强功能。编写脚本，它自己带的SciTE或者IDLE都可以用，当然，我们也可以使用Notepad++、Eclipse+Pydev、VIM、UltraEdit等编辑器或者集成环境。不管使用什么编辑器或者集成环境，先进行一下个性化设置：代码折叠、代码高亮、行号显示、自己喜欢的字体字号、一些快捷键等等。这些，对于有一点程序设计基础的人来讲，都不陌生。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">------------------------ 俺是花钱的分割线 ------------------------------------
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        MATLAB完全类似，敲入preferences，呼出个性化设置界面，按照自己的喜好进行设置。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">**三、作者计算机配置**
+		</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        科学计算很讲究时间效率，后面肯定会不断的向时间宣战。所以，未免误会，在此给出我的计算机的配置很有必要：
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">         联想G500商务台式机，安装Windows 7专业版64位系统。Intel core i7-3240 CPU@3.10GHz，8GB RAM。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        MATLAB 2014a，64位版本。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        Python(x,y) 2.7.2.0版本。
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">--------------------------------------------------------------------------------------
+</span>
+
+<span style="font-family:微软雅黑; font-size:14pt">        有了这些工作，从下篇文章开始真正的科学计算研究。
+</span>
