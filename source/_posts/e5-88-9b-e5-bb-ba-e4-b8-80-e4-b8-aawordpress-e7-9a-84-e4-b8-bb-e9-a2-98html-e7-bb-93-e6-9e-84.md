@@ -27,32 +27,35 @@ date: 2016-10-30 01:09:47
 
 让我们看一看我们将会使用在WordPress主题主体的HTML结构。
 
-<pre class="lang:xhtml decode:true ">&lt;div id="page" class="hfeed site"&gt;
-     &lt;header id="masthead" class="site-header" role="banner"&gt;
-          &lt;hgroup&gt;&lt;/hgroup&gt;
-          &lt;nav role="navigation" class="site-navigation main-navigation"&gt;&lt;/nav&gt;&lt;!-- .site-navigation .main-navigation --&gt;
-     &lt;/header&gt;&lt;!-- #masthead .site-header --&gt;
-     &lt;div id="main" class="site-main"&gt;
-          &lt;div id="primary" class="content-area"&gt;
-               &lt;div id="content" class="site-content"&gt;
-               &lt;/div&gt;&lt;!-- #content .site-content --&gt;&lt;/div&gt;
-          &lt;!-- #primary .content-area --&gt;
-          &lt;div id="secondary" class="widget-area"&gt;
-          &lt;/div&gt;&lt;!-- #secondary .widget-area --&gt;
-          &lt;div id="tertiary" class="widget-area"&gt;
-          &lt;/div&gt;&lt;!-- #tertiary .widget-area --&gt;&lt;/div&gt;
-     &lt;!-- #main .site-main --&gt;
-     &lt;footer id="colophon" class="site-footer" role="contentinfo"&gt;
-          &lt;div class="site-info"&gt;
-          &lt;/div&gt;&lt;!-- .site-info --&gt;
-     &lt;/footer&gt;&lt;!-- #colophon .site-footer --&gt;
-&lt;/div&gt; &lt;!-- #page .hfeed .site --&gt;</pre>
+```xhtml
+<div id="page" class="hfeed site">
+     <header id="masthead" class="site-header" role="banner">
+          <hgroup></hgroup>
+          <nav role="navigation" class="site-navigation main-navigation"></nav><!-- .site-navigation .main-navigation -->
+     </header><!-- #masthead .site-header -->
+     <div id="main" class="site-main">
+          <div id="primary" class="content-area">
+               <div id="content" class="site-content">
+               </div><!-- #content .site-content --></div>
+          <!-- #primary .content-area -->
+          <div id="secondary" class="widget-area">
+          </div><!-- #secondary .widget-area -->
+          <div id="tertiary" class="widget-area">
+          </div><!-- #tertiary .widget-area --></div>
+     <!-- #main .site-main -->
+     <footer id="colophon" class="site-footer" role="contentinfo">
+          <div class="site-info">
+          </div><!-- .site-info -->
+     </footer><!-- #colophon .site-footer -->
+</div> <!-- #page .hfeed .site -->
+```
+
 
 事实上，这个HTML组成了_s的脊梁。继续把这个粘到你的文本编辑器并且把他存到一个顺手的地方，当我们勾践文件结构的时候，我们将会稍后使用到它。但是在这之前，我们还是要看一些事情。
 
 # WordPress主题HTML快速的预览
 
-[caption id="attachment_1390" align="aligncenter" width="768"]![一个HTML的样例，点击获得大尺寸图片](http://kidozh.com/wp-content/uploads/2016/10/html-visual1.png) 一个HTML的样例，点击获得大尺寸图片[/caption]
+[caption id="attachment_1390" align="aligncenter" width="768"]![一个HTML的样例，点击获得大尺寸图片](/wp-content/uploads/2016/10/html-visual1.png) 一个HTML的样例，点击获得大尺寸图片[/caption]
 
 看一下上面的HTML结构。块的颜色越深，也就代表其布局也越深。这些块的布局是由CSS所大致决定的，这些内容我们在后面会提到。
 

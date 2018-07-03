@@ -25,24 +25,30 @@ date: 2016-01-13 15:57:24
 # 2 创建一个工程
 
 首先打开Shell命令行，进入一个需要创建Django工程的文件夹，使用以下命令：
-<pre class="lang:sh decode:true">$ django-admin startproject mysite</pre>
+```sh
+$ django-admin startproject mysite
+```
+
 
  这样在正常安装的情况下就能够创建一个名为mysite的工程。
 
 _需要注意的是，该工程不能和现有的Django以及测试工程重名，比如django或者test。而对于Django文件夹所在的位置，一般最好不要和网络服务器文件夹的根目录重合，因为这样有可能导致代码泄露。例如在Linux系统下就是`/var/www/`而在Windows下，就有比如`htdocs`这样的网关文件夹。_
 
 Django命令创建的文件目录树如下：
-<pre class="lang:default decode:true">mysite/
+```default
+mysite/
     manage.py
     mysite/
         __init__.py
         settings.py
         urls.py
-        wsgi.py</pre>
+        wsgi.py
+```
+
 
  这些文件的功能有以下关系：
 
-*   <span style="line-height: 1.42857;">根目录mysite只是一个承载Django工程的文件夹，这个名字对于Django来说并不重要，你可以任意对其重命名</span>
+*   根目录mysite只是一个承载Django工程的文件夹，这个名字对于Django来说并不重要，你可以任意对其重命名
 *   manage.py主要用于与Django工程发生交互，在[这里](https://docs.djangoproject.com/en/1.8/ref/django-admin/)也能看到Django和admin之间的关系
 *   在mysite工程内的文件夹的mysite，其命名空间就是需要引入的python的包，比如mysite.urls
 *   mysite/__init__.py:告诉Python解释器这是一个Python的一个库
@@ -60,7 +66,7 @@ Django命令创建的文件目录树如下：
 
 *   ENGINE：对于数据库连接后台，在上篇文章里就介绍了：'django.db.backends.sqlite3', 'django.db.backends.postgresql_psycopg2', 'django.db.backends.mysql',和'django.db.backends.oracle'都是可以得，其他数据库需要点击[这里](https://docs.djangoproject.com/en/1.8/ref/databases/#third-party-notes)
 *   NAME：数据库的名称，当时用SQLite的时候是安装到里面的文件，这个时候NAME就必须使用绝对路径来指明地点，默认值是 `os.path.join(BASE_DIR, 'db.sqlite3')`，将会当必要的时候SQLite就会存储在工程文件夹里。
-*   当不使用SQLite的时候，账号（USER），密码（PASSWORD），端口（HOST）必须被添加，同时也必须创建一个数据库，可以使用<span class="lang:plsql decode:true crayon-inline">CREATE DATABASE database_name;</span>来创建一个数据库
+*   当不使用SQLite的时候，账号（USER），密码（PASSWORD），端口（HOST）必须被添加，同时也必须创建一个数据库，可以使用CREATE DATABASE database_name;来创建一个数据库
 
 当设定setting.py的时候，也需要设定时区`TIME_ZONE`到目前计算机的时区。同时需要注意的是`INSTALLED_APP`指示了Django中所有活动的实例，应用可以在多个库中或者其他文件中进行调用。
 
@@ -74,51 +80,61 @@ Django命令创建的文件目录树如下：
 *   django.contrib.staticfiles –静态文件管理框架
 
 由于这些应用都会创建数据库，所以需要使用以下命令来自动创建数据库：
-<pre class="lang:sh decode:true">$ python manage.py migrate</pre>
+```sh
+$ python manage.py migrate
+```
 
- migrate命令会按照setting.py中的设定创建一些必要的数据库，你可以键入<span class="lang:plsql decode:true  crayon-inline "> \dt (PostgreSQL)</span> ,
 
-<span class="lang:plsql decode:true crayon-inline">SHOW TABLES;</span>(MySQL), <span class="lang:scheme decode:true  crayon-inline ">.schema</span>  (SQLite), 或者<span class="lang:plsql decode:true crayon-inline crayon-selected">SELECT TABLE_NAME FROM USER_TABLES;</span>(Oracle)来显示Django所创建的表。
+ migrate命令会按照setting.py中的设定创建一些必要的数据库，你可以键入 \dt (PostgreSQL) ,
+
+SHOW TABLES;(MySQL), .schema  (SQLite), 或者SELECT TABLE_NAME FROM USER_TABLES;(Oracle)来显示Django所创建的表。
 
 # 4 服务器开发
 
-cd到外层的mysite文件夹（工程文件根目录），就可以<span class="lang:default decode:true  crayon-inline ">$ python manage.py runserver</span> 使用来启动django的服务器了。
+cd到外层的mysite文件夹（工程文件根目录），就可以$ python manage.py runserver 使用来启动django的服务器了。
 
 在命令行里面就会输出信息：
-<pre class="lang:default decode:true">Performing system checks...
+```default
+Performing system checks...
 
 0 errors found
 January 12, 2016 - 15:50:53
 Django version 1.8, using settings 'mysite.settings'
 Starting development server at http://127.0.0.1:8000/
-Quit the server with CONTROL-C.</pre>
+Quit the server with CONTROL-C.
+```
+
 
  这样就启动了一个纯粹由Python编写的轻量级服务器了，除非是真的需要部署到生产环境之中，否则我们在不使用Apache的情况下是可以直接调试我们的Django程序的。在生产环境之中还是乖乖使用Apache服务器吧，否则带不起来的。
 
 注意到输出信息里已经给出了网址http://127.0.0.1:8000/，我们只要访问就可以看到我们的Django网页了，在没有部署任何应用的情况下，你应该会看到一个淡蓝色的欢迎页，这样就调试成功了。
 
-如果你需要改变端口号的话，还是通过命令后加一个端口的参数<span class="lang:ps decode:true  crayon-inline ">$ python manage.py runserver 8080</span> 来实现，这样就能开启8080，如果你同样需要改变IPv4的IP地址的话，也是同样的道理，补全即可。<span class="lang:ps decode:true  crayon-inline ">$ python manage.py runserver 0.0.0.0:8000</span> ，更为详尽的改变的办法请参考官方文档：[https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-runserver](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-runserver)
+如果你需要改变端口号的话，还是通过命令后加一个端口的参数$ python manage.py runserver 8080 来实现，这样就能开启8080，如果你同样需要改变IPv4的IP地址的话，也是同样的道理，补全即可。$ python manage.py runserver 0.0.0.0:8000 ，更为详尽的改变的办法请参考官方文档：[https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-runserver](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-runserver)
 
 # 5 创建模型
 
-每个Django之中的应用是由多个python库组成的，而且可以保存在任何一个地方，但是保存在工程文件下在引用的时候是非常优雅的，当然，你可以使用命令<span class="lang:sh decode:true  crayon-inline ">$ python manage.py startapp polls</span> 来创建一个新的应用。
+每个Django之中的应用是由多个python库组成的，而且可以保存在任何一个地方，但是保存在工程文件下在引用的时候是非常优雅的，当然，你可以使用命令$ python manage.py startapp polls 来创建一个新的应用。
 
 这样他的文件的布局就是这样了
-<pre class="lang:default decode:true">polls/
+```default
+polls/
     __init__.py
     admin.py
     migrations/
         __init__.py
     models.py
     tests.py
-    views.py</pre>
+    views.py
+```
+
 
  在开始一个带有数据库的Django应用的第一步就是创建模型（主要是数据布局和元数据构成）。一个好的模型应该是唯一且精准的数据来源，其必须包含数据形式和操作行为。
 
 在我们的这个应用之中，我们会创建两个模型：问题和选择。问题模型包含问题和一个时间。而选择模型包含选择内容和一个单位，每个选择都和一个问题相关联。
 
 所以在polls/models.py中应该这样写模型：
-<pre class="lang:python decode:true" title="polls/models.py">from django.db import models
+```python
+from django.db import models
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
@@ -127,7 +143,9 @@ class Question(models.Model):
 class Choice(models.Model):
     question = models.ForeignKey(Question)
     choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)</pre>
+    votes = models.IntegerField(default=0)
+```
+
 
  每个模型都是由django.db.models.Model这个子类所代表，每个模型都有一系列的变量，其代表着模型中所对应的数据库的字段。
 
@@ -145,7 +163,8 @@ class Choice(models.Model):
 *   为应用创建一个Python的数据库应用接口来获取数据
 
 继续编辑setting.py文件夹，在INSTALLED_APP中加入polls，所以会变成这样：
-<pre class="lang:python decode:true" title="mysite/settings.py">INSTALLED_APPS = (
+```python
+INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,24 +172,33 @@ class Choice(models.Model):
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'polls',
-)</pre>
+)
+```
+
 
  这样Django就加入polls到应用之中了，所以在使用migrate命令的时候，Django就会为其创建对应的表了。
-<pre class="lang:sh decode:true">$ python manage.py makemigrations polls</pre>
+```sh
+$ python manage.py makemigrations polls
+```
+
 
  那么输出信息中就可以看到有关这次表新建的内容了。
-<pre class="lang:default decode:true">Migrations for 'polls':
+```default
+Migrations for 'polls':
   0001_initial.py:
     - Create model Question
     - Create model Choice
-    - Add field question to choice</pre>
+    - Add field question to choice
+```
+
 
  通过makemigrations就可以让Django检测模型的改变并且这些改变就能被作为一个migrate储存了。
 
-迁徙（migration）就是Django如何去变更你的模型的在硬盘上的文件。当你创建一个新的模型的时候，你可以随心所欲的观察迁徙，他们会被储存在比如<span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;">polls/migrations/0001_initial.py</span><span style="line-height: 1.42857;">这样的文件之中，但是我们也不必每次都花费时间去观察。</span>
+迁徙（migration）就是Django如何去变更你的模型的在硬盘上的文件。当你创建一个新的模型的时候，你可以随心所欲的观察迁徙，他们会被储存在比如polls/migrations/0001_initial.py这样的文件之中，但是我们也不必每次都花费时间去观察。
 
-当然了，migrate这个命令是更常见的被用于自动更新数据库的命令了，但是也许我们还是先看一下migrate的原理吧。使用<span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span><tt class="xref std std-djadmin docutils literal" style="color: #0c4b33; -webkit-tap-highlight-color: transparent; border-bottom-width: 1px; border-bottom-style: dotted; border-color: #971414; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 1em; line-height: 21px; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; font-weight: bold; background-color: #ffffff;"><span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">[sqlmigrate](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-sqlmigrate)</span></tt><span style="line-height: 1.42857;">命令就能执行迁徙这个操作并且返回执行的SQL语句。</span>
-<pre class="lang:plsql decode:true">BEGIN;
+当然了，migrate这个命令是更常见的被用于自动更新数据库的命令了，但是也许我们还是先看一下migrate的原理吧。使用 <tt class="xref std std-djadmin docutils literal" style="color: #0c4b33; -webkit-tap-highlight-color: transparent; border-bottom-width: 1px; border-bottom-style: dotted; border-color: #971414; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 1em; line-height: 21px; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; font-weight: bold; background-color: #ffffff;">[sqlmigrate](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-sqlmigrate)</tt>命令就能执行迁徙这个操作并且返回执行的SQL语句。
+```plsql
+BEGIN;
 CREATE TABLE "polls_choice" (
     "id" serial NOT NULL PRIMARY KEY,
     "choice_text" varchar(200) NOT NULL,
@@ -190,22 +218,25 @@ ALTER TABLE "polls_choice"
     REFERENCES "polls_question" ("id")
     DEFERRABLE INITIALLY DEFERRED;
 
-COMMIT;</pre>
+COMMIT;
+```
+
 
  但是我必须在这里说明一些事情：
 
 *   输出的格式由你所选择的数据库所决定，上面的就是PostgreSQL生成的
 *   表格的名字是由应用的名字和模型中类的名字的全小写采用下划线生成
 *   主键会被自动添加
-*   外围的键会精确地由<span class="pre" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">FOREIGN</span><span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;"> </span><span class="pre" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">KEY</span>约束所确立，而对于<span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span><tt class="docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;"><span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">DEFERRABLE</span></tt>，不必在意，其只是告诉PostgreSQL在事物之后才执行执行外围键这个操作
+*   外围的键会精确地由FOREIGN KEY约束所确立，而对于 <tt class="docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">DEFERRABLE</tt>，不必在意，其只是告诉PostgreSQL在事物之后才执行执行外围键这个操作
 *   通常为了简洁起见，Django会在外围键添加_id的后缀
-*   对于不同的数据库特殊类型我们应该为其量身定做类型，比如SQL中常见的自增<span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;">auto_increment</span>，PostgreSQL中的<span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;">serial</span>和SQLite之中的<span class="pre" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">integer</span><span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;"> </span><span class="pre" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">primary</span><span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;"> </span><span class="pre" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">key</span><span style="color: #0c4b33; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; line-height: 21px;"> </span><span class="pre" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 14px; font-weight: bold; line-height: 21px;">autoincrement</span>
-*   <span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span>[<tt class="xref std std-djadmin docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 1em; font-weight: bold;"><span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">sqlmigrate</span></tt>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-sqlmigrate)<span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span>并不会真正的去运行这个迁徙，他只是会把命令显示到屏幕之上去检查SQL语句
+*   对于不同的数据库特殊类型我们应该为其量身定做类型，比如SQL中常见的自增auto_increment，PostgreSQL中的serial和SQLite之中的integer primary key autoincrement
+*    [<tt class="xref std std-djadmin docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 1em; font-weight: bold;">sqlmigrate</tt>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-sqlmigrate) 并不会真正的去运行这个迁徙，他只是会把命令显示到屏幕之上去检查SQL语句
 
-使用 <span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span><tt class="xref std std-djadmin docutils literal" style="color: #1d915c; -webkit-tap-highlight-color: transparent; outline: 0px; border-bottom-width: 1px; border-bottom-style: dotted; border-color: #971414; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 1em; line-height: 21px; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; font-weight: bold; background-color: #f1fff7;">[<span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">python</span> <span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">manage.py</span> <span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">check</span>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-check)</tt><span style="line-height: 1.42857;"> 可以在不改变数据库结构的情况下检查工程中的SQL问题。</span>
+使用  <tt class="xref std std-djadmin docutils literal" style="color: #1d915c; -webkit-tap-highlight-color: transparent; outline: 0px; border-bottom-width: 1px; border-bottom-style: dotted; border-color: #971414; font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-size: 1em; line-height: 21px; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; font-weight: bold; background-color: #f1fff7;">[python manage.py check](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-check)</tt> 可以在不改变数据库结构的情况下检查工程中的SQL问题。
 
 接下来，运行migrate就可以创建模型表了。
-<pre class="lang:default decode:true">$ python manage.py migrate
+```default
+$ python manage.py migrate
 Operations to perform:
   Synchronize unmigrated apps: staticfiles, messages
   Apply all migrations: admin, contenttypes, polls, auth, sessions
@@ -215,69 +246,81 @@ Synchronizing apps without migrations:
   Installing custom SQL...
 Running migrations:
   Rendering model states... DONE
-  Applying &lt;migration name&gt;... OK</pre>
+  Applying <migration name>... OK
+```
+
 
  migrate命令会执行对未应用的模型所有的迁徙操作。migrate是一种非常强大的工具，它能够在升级模型数据库的情况下不丢失对应的数据，这里我们给出了修改模型的三步：
 
 1.  在models.py文件夹之中修改模型
-2.  运行 [<tt class="xref std std-djadmin docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #1d915c; font-size: 1em; font-weight: bold;"><span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">python</span> <span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">manage.py</span> <span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">makemigrations</span></tt>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-makemigrations)<span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span> 来执行改变的迁徙行为
-3.  运行 [<tt class="xref std std-djadmin docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #1d915c; font-size: 1em; font-weight: bold;"><span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">python</span> <span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">manage.py</span> <span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">migrate</span></tt>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-migrate)<span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px;"> </span> 来执行迁徙在数据库中的操作
+2.  运行 [<tt class="xref std std-djadmin docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #1d915c; font-size: 1em; font-weight: bold;">python manage.py makemigrations</tt>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-makemigrations)  来执行改变的迁徙行为
+3.  运行 [<tt class="xref std std-djadmin docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #1d915c; font-size: 1em; font-weight: bold;">python manage.py migrate</tt>](https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-migrate)  来执行迁徙在数据库中的操作
 
 在[这里](https://docs.djangoproject.com/en/1.8/ref/django-admin/)就能看到所有的manage.py能够做到的事情。
 
 # 7 使用API
 
 接着我们就开始使用Django提供的API来了，可以使用这个命令来激活Django的命令行：
-<pre class="lang:default decode:true ">$ python manage.py shell</pre>
+```default
+$ python manage.py shell
+```
+
 
 在这里我们并没有使用python，这是因为manage.py定义了DJANO_SETTING_MODULE环境变量，这样也能把mysite/setting.py引入自己的工程之中。
 
-如果你就是不想使用manage.py的话，你可以设置<span style="line-height: 22.8571px;">DJANO_SETTING_MODULE环境变量到</span><span style="line-height: 22.8571px;">mysite/setting.py，在mysite文件夹下启动Shell命令行，输入以下命令：</span>
-<pre class="lang:python decode:true ">&gt;&gt;&gt; import django
-&gt;&gt;&gt; django.setup()</pre>
+如果你就是不想使用manage.py的话，你可以设置DJANO_SETTING_MODULE环境变量到mysite/setting.py，在mysite文件夹下启动Shell命令行，输入以下命令：
+```python
+>>> import django
+>>> django.setup()
+```
 
-如果引发了一个<span style="color: #0c3c26; font-family: Roboto, Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif; font-size: 14px; line-height: 21px; background-color: #f1fff7;"> </span>[<tt class="xref py py-exc docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 1em; font-weight: bold;"><span class="pre" style="font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">AttributeError</span></tt>](https://docs.python.org/3/library/exceptions.html#AttributeError "(in Python v3.5)")的异常的话，那么就说明你安装的Django版本并非是1.8。
+
+如果引发了一个 [<tt class="xref py py-exc docutils literal" style="font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed; color: #0c4b33; font-size: 1em; font-weight: bold;">AttributeError</tt>](https://docs.python.org/3/library/exceptions.html#AttributeError "(in Python v3.5)")的异常的话，那么就说明你安装的Django版本并非是1.8。
 
 如果你想参考更多的函数的话，[这里](https://docs.djangoproject.com/en/1.8/topics/db/queries/)也有API的详情。
-<pre class="lang:python decode:true ">&gt;&gt;&gt; from polls.models import Question, Choice   # Import the model classes we just wrote.
+```python
+>>> from polls.models import Question, Choice   # Import the model classes we just wrote.
 
 # No questions are in the system yet.
-&gt;&gt;&gt; Question.objects.all()
+>>> Question.objects.all()
 []
 
 # Create a new Question.
 # Support for time zones is enabled in the default settings file, so
 # Django expects a datetime with tzinfo for pub_date. Use timezone.now()
 # instead of datetime.datetime.now() and it will do the right thing.
-&gt;&gt;&gt; from django.utils import timezone
-&gt;&gt;&gt; q = Question(question_text="What's new?", pub_date=timezone.now())
+>>> from django.utils import timezone
+>>> q = Question(question_text="What's new?", pub_date=timezone.now())
 
 # Save the object into the database. You have to call save() explicitly.
-&gt;&gt;&gt; q.save()
+>>> q.save()
 
 # Now it has an ID. Note that this might say "1L" instead of "1", depending
 # on which database you're using. That's no biggie; it just means your
 # database backend prefers to return integers as Python long integer
 # objects.
-&gt;&gt;&gt; q.id
+>>> q.id
 1
 
 # Access model field values via Python attributes.
-&gt;&gt;&gt; q.question_text
+>>> q.question_text
 "What's new?"
-&gt;&gt;&gt; q.pub_date
-datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=&lt;UTC&gt;)
+>>> q.pub_date
+datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
 
 # Change values by changing the attributes, then calling save().
-&gt;&gt;&gt; q.question_text = "What's up?"
-&gt;&gt;&gt; q.save()
+>>> q.question_text = "What's up?"
+>>> q.save()
 
 # objects.all() displays all the questions in the database.
-&gt;&gt;&gt; Question.objects.all()
-[&lt;Question: Question object&gt;]</pre>
+>>> Question.objects.all()
+[<Question: Question object>]
+```
 
- 需要指出的是&lt;Question: Question object&gt; 是一种在表达上非常没有意义的表示形式，你可以在models采用<span class="lang:python decode:true  crayon-inline "> __str__() </span> 这个函数来指明此时输出的格式
-<pre class="lang:python decode:true " title="polls/models.py">from django.db import models
+
+ 需要指出的是<Question: Question object> 是一种在表达上非常没有意义的表示形式，你可以在models采用 __str__()  这个函数来指明此时输出的格式
+```python
+from django.db import models
 
 class Question(models.Model):
     # ...
@@ -287,14 +330,17 @@ class Question(models.Model):
 class Choice(models.Model):
     # ...
     def __str__(self):              # __unicode__ on Python 2
-        return self.choice_text</pre>
+        return self.choice_text
+```
+
 
  增加这个函数是非常必要的，因为这不仅可以方便你以后检查代码，同时在Django的后台中得到很好的显示。
 
-_对于Python3，使用<span class="lang:python decode:true  crayon-inline ">__str__</span> 即可，在Python 2 之中，你必须定义<span class="lang:python decode:true  crayon-inline ">__unicode__</span> 来返回一个unicode的代码，Django的<span class="lang:python decode:true  crayon-inline ">__str__</span> 会自动去调用<span class="lang:python decode:true  crayon-inline ">__unicode__</span> 这个函数。也就是说<span class="lang:python decode:true  crayon-inline ">__unicode__</span> 会返回一个unicode的字符串，而<span class="lang:python decode:true  crayon-inline ">__str__</span> 则会返回一个由UTF-8编码而成的字节码,但是Python 2 中object中的<span class="lang:python decode:true  crayon-inline ">__unicode__</span> 会调用<span class="lang:python decode:true  crayon-inline ">__str__</span> 来返回一个ASCII码的字符串，如果你觉得这很蛋疼的话，用Python 3就好。_
+_对于Python3，使用__str__ 即可，在Python 2 之中，你必须定义__unicode__ 来返回一个unicode的代码，Django的__str__ 会自动去调用__unicode__ 这个函数。也就是说__unicode__ 会返回一个unicode的字符串，而__str__ 则会返回一个由UTF-8编码而成的字节码,但是Python 2 中object中的__unicode__ 会调用__str__ 来返回一个ASCII码的字符串，如果你觉得这很蛋疼的话，用Python 3就好。_
 
 当然这只是一种很平淡的用法，而有的时候我们需要自定义用法来满足我们的需求：
-<pre class="lang:python decode:true " title="polls/models.py">import datetime
+```python
+import datetime
 
 from django.db import models
 from django.utils import timezone
@@ -302,30 +348,33 @@ from django.utils import timezone
 class Question(models.Model):
     # ...
     def was_published_recently(self):
-        return self.pub_date &gt;= timezone.now() - datetime.timedelta(days=1)</pre>
+        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+```
+
 
  这里datetime的timezone和django.untils.timezone之间具有很大的差异，需要特别注意。[这里](https://docs.djangoproject.com/en/1.8/topics/i18n/timezones/)有相关的文档。
-<pre class="lang:default decode:true " title="shell">&gt;&gt;&gt; from polls.models import Question, Choice
+```default
+>>> from polls.models import Question, Choice
 
 # Make sure our __str__() addition worked.
-&gt;&gt;&gt; Question.objects.all()
-[&lt;Question: What's up?&gt;]
+>>> Question.objects.all()
+[<Question: What's up?>]
 
 # Django provides a rich database lookup API that's entirely driven by
 # keyword arguments.
-&gt;&gt;&gt; Question.objects.filter(id=1)
-[&lt;Question: What's up?&gt;]
-&gt;&gt;&gt; Question.objects.filter(question_text__startswith='What')
-[&lt;Question: What's up?&gt;]
+>>> Question.objects.filter(id=1)
+[<Question: What's up?>]
+>>> Question.objects.filter(question_text__startswith='What')
+[<Question: What's up?>]
 
 # Get the question that was published this year.
-&gt;&gt;&gt; from django.utils import timezone
-&gt;&gt;&gt; current_year = timezone.now().year
-&gt;&gt;&gt; Question.objects.get(pub_date__year=current_year)
-&lt;Question: What's up?&gt;
+>>> from django.utils import timezone
+>>> current_year = timezone.now().year
+>>> Question.objects.get(pub_date__year=current_year)
+<Question: What's up?>
 
 # Request an ID that doesn't exist, this will raise an exception.
-&gt;&gt;&gt; Question.objects.get(id=2)
+>>> Question.objects.get(id=2)
 Traceback (most recent call last):
     ...
 DoesNotExist: Question matching query does not exist.
@@ -333,12 +382,12 @@ DoesNotExist: Question matching query does not exist.
 # Lookup by a primary key is the most common case, so Django provides a
 # shortcut for primary-key exact lookups.
 # The following is identical to Question.objects.get(id=1).
-&gt;&gt;&gt; Question.objects.get(pk=1)
-&lt;Question: What's up?&gt;
+>>> Question.objects.get(pk=1)
+<Question: What's up?>
 
 # Make sure our custom method worked.
-&gt;&gt;&gt; q = Question.objects.get(pk=1)
-&gt;&gt;&gt; q.was_published_recently()
+>>> q = Question.objects.get(pk=1)
+>>> q.was_published_recently()
 True
 
 # Give the Question a couple of Choices. The create call constructs a new
@@ -346,27 +395,27 @@ True
 # of available choices and returns the new Choice object. Django creates
 # a set to hold the "other side" of a ForeignKey relation
 # (e.g. a question's choice) which can be accessed via the API.
-&gt;&gt;&gt; q = Question.objects.get(pk=1)
+>>> q = Question.objects.get(pk=1)
 
 # Display any choices from the related object set -- none so far.
-&gt;&gt;&gt; q.choice_set.all()
+>>> q.choice_set.all()
 []
 
 # Create three choices.
-&gt;&gt;&gt; q.choice_set.create(choice_text='Not much', votes=0)
-&lt;Choice: Not much&gt;
-&gt;&gt;&gt; q.choice_set.create(choice_text='The sky', votes=0)
-&lt;Choice: The sky&gt;
-&gt;&gt;&gt; c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+>>> q.choice_set.create(choice_text='Not much', votes=0)
+<Choice: Not much>
+>>> q.choice_set.create(choice_text='The sky', votes=0)
+<Choice: The sky>
+>>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
 
 # Choice objects have API access to their related Question objects.
-&gt;&gt;&gt; c.question
-&lt;Question: What's up?&gt;
+>>> c.question
+<Question: What's up?>
 
 # And vice versa: Question objects get access to Choice objects.
-&gt;&gt;&gt; q.choice_set.all()
-[&lt;Choice: Not much&gt;, &lt;Choice: The sky&gt;, &lt;Choice: Just hacking again&gt;]
-&gt;&gt;&gt; q.choice_set.count()
+>>> q.choice_set.all()
+[<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+>>> q.choice_set.count()
 3
 
 # The API automatically follows relationships as far as you need.
@@ -374,12 +423,14 @@ True
 # This works as many levels deep as you want; there's no limit.
 # Find all Choices for any question whose pub_date is in this year
 # (reusing the 'current_year' variable we created above).
-&gt;&gt;&gt; Choice.objects.filter(question__pub_date__year=current_year)
-[&lt;Choice: Not much&gt;, &lt;Choice: The sky&gt;, &lt;Choice: Just hacking again&gt;]
+>>> Choice.objects.filter(question__pub_date__year=current_year)
+[<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
 
 # Let's delete one of the choices. Use delete() for that.
-&gt;&gt;&gt; c = q.choice_set.filter(choice_text__startswith='Just hacking')
-&gt;&gt;&gt; c.delete()</pre>
+>>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+>>> c.delete()
+```
+
 
 #  8 后话
 

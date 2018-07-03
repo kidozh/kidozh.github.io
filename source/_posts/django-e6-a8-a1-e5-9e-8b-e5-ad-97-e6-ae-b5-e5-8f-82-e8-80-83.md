@@ -16,7 +16,7 @@ date: 2016-02-01 17:30:09
 
 如果内建的字段不能满足你的需要，你可以尝试对特定国家和文化有效的包含配套代码的 [django-localflavor](https://django-localflavor.readthedocs.org/)。当然，你也可以很容易的编写你自定义的字段。
 
-严格意义上来讲， model 是定义在`django.db.models.fields`里面，但为了使用方便，它们被导入到 `django.db.models`中；标准上，我们导入<span class="lang:python decode:true  crayon-inline ">from django.db import models</span> ，然后使用 `models.&lt;Foo&gt;Field`的形式使用字段。
+严格意义上来讲， model 是定义在`django.db.models.fields`里面，但为了使用方便，它们被导入到 `django.db.models`中；标准上，我们导入from django.db import models ，然后使用 `models.<Foo>Field`的形式使用字段。
 
 # 字段选项
 
@@ -50,18 +50,22 @@ date: 2016-02-01 17:30:09
 
 `Field.choices`
 
-它是一个可迭代的结构(比如，列表或是元组)，由可迭代的二元组组成(比如<span class="lang:python decode:true  crayon-inline ">[(A, B), (A, B) ...]</span> )，用来给这个字段提供选择项。如果设置了 `choices` ，默认表格样式就会显示选择框，而不是标准的文本框，而且这个选择框的选项就是 `choices` 中的元组。
+它是一个可迭代的结构(比如，列表或是元组)，由可迭代的二元组组成(比如[(A, B), (A, B) ...] )，用来给这个字段提供选择项。如果设置了 `choices` ，默认表格样式就会显示选择框，而不是标准的文本框，而且这个选择框的选项就是 `choices` 中的元组。
 
 每个元组中的第一个元素，是存储在数据库中的值；第二个元素是该选项更易理解的描述。 比如:
-<pre class="lang:python decode:true">YEAR_IN_SCHOOL_CHOICES = (
+```python
+YEAR_IN_SCHOOL_CHOICES = (
     ('FR', 'Freshman'),
     ('SO', 'Sophomore'),
     ('JR', 'Junior'),
     ('SR', 'Senior'),
-)</pre>
+)
+```
+
 
  一般来说，最好在模型类内部定义`choices`，然后再给每个值定义一个合适名字的常量。
-<pre class="lang:python decode:true">from django.db import models
+```python
+from django.db import models
 
 class Student(models.Model):
     FRESHMAN = 'FR'
@@ -79,12 +83,15 @@ class Student(models.Model):
                                       default=FRESHMAN)
 
     def is_upperclass(self):
-        return self.year_in_school in (self.JUNIOR, self.SENIOR)</pre>
+        return self.year_in_school in (self.JUNIOR, self.SENIOR)
+```
+
 
  尽管你可以在模型类的外部定义choices然后引用它，在模型类中定义choices和其每个`choice`的name可以保存所有的关于应用到此信息的类的信息， 也使得choices更容易被应用（例如， `Student.SOPHOMORE` 可以在任何引入Student 模型的位置生效)。
 
 你也可以归类可选的`choices`到已命名的组中用来达成组织整理的目的:
-<pre class="lang:python decode:true">MEDIA_CHOICES = (
+```python
+MEDIA_CHOICES = (
     ('Audio', (
             ('vinyl', 'Vinyl'),
             ('cd', 'CD'),
@@ -96,7 +103,9 @@ class Student(models.Model):
         )
     ),
     ('unknown', 'Unknown'),
-)</pre>
+)
+```
+
 
  每个元组的第一个元素是组的名字。第二个元素是一组可迭代的二元元组，每一个二元元组包含一个值和一个给人看的名字构成一个选项。分组的选项可能会和未分组的选项合在同一个`list`中。 （就像例中的`unknown`选项）。
 
@@ -133,10 +142,13 @@ class Student(models.Model):
 该字段的默认值. 它可以是一个值或者一个可调用对象. 如果是一个可调用对象，那么在每一次创建新对象的时候，它将会调用一次.
 
 这个默认值不可以是一个可变对象（如字典，列表，等等）,因为对于所有模型的一个新的实例来说，它们指向同一个引用。或者，把他们包装为一个可调用的对象。例如，你有一个自定义的`JSONField`，并且想指定一个特定的字典值，可以如下使用：
-<pre class="lang:python decode:true">def contact_default():
+```python
+def contact_default():
     return {"email": "to1@example.com"}
 
-contact_info = JSONField("ContactInfo", default=contact_default)</pre>
+contact_info = JSONField("ContactInfo", default=contact_default)
+```
+
 
  请注意`lambdas` 函数不可作为如 `default` 这类可选参数的值.因为它们无法被 `migrations`命令序列化. 请参见文档其他部分。
 
@@ -171,7 +183,10 @@ contact_info = JSONField("ContactInfo", default=contact_default)</pre>
 额外的 ‘`help`' 文本被显示在表单控件中  `form`。如果你没有字表单字段中使用，它对文档事件很有帮助。
 
 注意这 不 会自动添加 `HTML` 标签。需要你在 `help_text` 包含自己需要的格式。例如:
-<pre class="lang:python decode:true">help_text="Please use the following format: &lt;em&gt;YYYY-MM-DD&lt;/em&gt;."</pre>
+```python
+help_text="Please use the following format: <em>YYYY-MM-DD</em>."
+```
+
 
 另外, 你可以使用简单文本和`django.utils.html.escape()`以避免任何HTML特定的字符。为了防止CSRF攻击，需要保证来自不可信用户的所有的帮助文本能够被编码。
 
@@ -340,10 +355,16 @@ contact_info = JSONField("ContactInfo", default=contact_default)</pre>
 小数点后的数字数量。
 
 举个例子，为了存储一个最大到999且含有两位数字的数字，你可以这样使用：
-<pre class="lang:python decode:true">models.DecimalField(..., max_digits=5, decimal_places=2)</pre>
+```python
+models.DecimalField(..., max_digits=5, decimal_places=2)
+```
+
 
  你要是想存储一个十亿的具有10位小数的数字，你可以使用这个：
-<pre class="lang:python decode:true">models.DecimalField(..., max_digits=19, decimal_places=10)</pre>
+```python
+models.DecimalField(..., max_digits=19, decimal_places=10)
+```
+
 
 这个字段默认表单中的控件是`TextInput`。
 
@@ -396,7 +417,7 @@ Changed in Django 1.7:
 这个路径可能会包含一个 `strftime()` 格式串,并且会在文件上传时被替换为 实际的`date/time`作为文件路径 (这样上传的文件就不会塞满你指定的文件夹了).
 
 这也可以是一个可调用对象，如函数。可以调用它来获取上传路径，包括文件名。它必须接受两个参数，并且返回一个Unix-style的路径(带有/)给存储系统。这被传递的两个参数为:
-<table style="width: 805px; box-sizing: border-box; height: 220px;" border="0" width="439" cellspacing="0" cellpadding="0"><colgroup> <col style="mso-width-source: userset; mso-width-alt: 4096; width: 96pt; box-sizing: border-box;" width="128" /> <col style="mso-width-source: userset; mso-width-alt: 9952; width: 233pt; box-sizing: border-box;" width="311" /> </colgroup><tbody><tr style="height: 15.0pt; box-sizing: border-box;"><td class="xl63" style="height: 15.0pt; width: 96pt;" width="128" height="20">Argument</td><td class="xl63" style="width: 233pt;" width="311">Description</td></tr><tr style="height: 85.5pt; box-sizing: border-box;"><td class="xl67" style="height: 85.5pt; border-top: none; width: 96pt; box-sizing: border-box;" width="128" height="114"><span style="box-sizing: border-box; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">instance</span></td><td class="xl64" style="width: 233pt; box-sizing: border-box;" width="311"><span style="box-sizing: border-box; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">FileField<span class="font5" style="box-sizing: border-box;"> </span><span class="font7" style="box-sizing: border-box;">被定义时的一个实例</span><span class="font5">. </span><span class="font7">更准确地说，这是一个包含当前文件的特殊实例。在大多数情况下</span><span class="font5">, this object will not have been saved to the database yet, so if it uses the default</span><span class="font7"> </span><span class="font5">AutoField,</span><span class="font7"> </span><span class="font5">it might not yet have a value for its primary key field.</span></span></td></tr><tr style="height: 43.5pt; box-sizing: border-box;"><td class="xl66" style="height: 43.5pt; width: 96pt; box-sizing: border-box;" width="128" height="58"><span style="box-sizing: border-box; font-variant-ligatures: no-common-ligatures; text-rendering: optimizeSpeed;">filename</span></td><td class="xl65" style="width: 233pt; box-sizing: border-box;" width="311">The filename that was originally given to the file. This may or may not be taken into account when determining the final destination path.</td></tr></tbody></table>
+<table style="width: 805px; box-sizing: border-box; height: 220px;" border="0" width="439" cellspacing="0" cellpadding="0"><colgroup> <col style="mso-width-source: userset; mso-width-alt: 4096; width: 96pt; box-sizing: border-box;" width="128" /> <col style="mso-width-source: userset; mso-width-alt: 9952; width: 233pt; box-sizing: border-box;" width="311" /> </colgroup><tbody><tr style="height: 15.0pt; box-sizing: border-box;"><td class="xl63" style="height: 15.0pt; width: 96pt;" width="128" height="20">Argument</td><td class="xl63" style="width: 233pt;" width="311">Description</td></tr><tr style="height: 85.5pt; box-sizing: border-box;"><td class="xl67" style="height: 85.5pt; border-top: none; width: 96pt; box-sizing: border-box;" width="128" height="114">instance</td><td class="xl64" style="width: 233pt; box-sizing: border-box;" width="311">FileField 被定义时的一个实例. 更准确地说，这是一个包含当前文件的特殊实例。在大多数情况下, this object will not have been saved to the database yet, so if it uses the default AutoField, it might not yet have a value for its primary key field.</td></tr><tr style="height: 43.5pt; box-sizing: border-box;"><td class="xl66" style="height: 43.5pt; width: 96pt; box-sizing: border-box;" width="128" height="58">filename</td><td class="xl65" style="width: 233pt; box-sizing: border-box;" width="311">The filename that was originally given to the file. This may or may not be taken into account when determining the final destination path.</td></tr></tbody></table>
 
 ## FileField.storage
 
@@ -451,14 +472,20 @@ Note
 其会使用两个必选参数：文件名称和一个包含文件内容的对象。可选参数就是一个控制在关联字段的文件发生变更的时候模型实例是否会被保存。默认是`True`。
 
 需要注意的是，内容参数应该是`django.core.files.File`的一个实例而不是Python的内建对象，你能够这样从一个现有的Python文件对象之中构建这个文件：
-<pre class="lang:python decode:true">from django.core.files import File
+```python
+from django.core.files import File
 # Open an existing file using Python's built-in open()
 f = open('/tmp/hello.world')
-myfile = File(f)</pre>
+myfile = File(f)
+```
+
 
 或者你可以这样构造Python的字符串：
-<pre class="lang:python decode:true">from django.core.files.base import ContentFile
-myfile = ContentFile("hello world")</pre>
+```python
+from django.core.files.base import ContentFile
+myfile = ContentFile("hello world")
+```
+
 
 更多的信息，你可以查看[Managing files](http://python.usyiyi.cn/django_182/topics/files.html).
 
@@ -503,7 +530,10 @@ myfile = ContentFile("hello world")</pre>
 当然，这些参数能够一起使用
 
 有一点需要提醒的是 match只匹配基本文件名（base filename）, 而不是整个文件路径（full path）. So, this example:
-<pre class="lang:python decode:true">FilePathField(path="/home/images", match="foo.*", recursive=True)</pre>
+```python
+FilePathField(path="/home/images", match="foo.*", recursive=True)
+```
+
 
  会匹配`/home/images/foo.png`但是并不会匹配`/home/images/bar.png`，因为这个前者的匹配会应用于`foo.png`和`bar.png`。
 
@@ -646,12 +676,15 @@ MySQL users
 一个为了存储[通用唯一识别码](http://baike.baidu.com/link?url=hwOmlIib6lr_lkrd-Ea3-DW8NaJtN7aV6ZQ_aUTesW_nLcbtAaV49zx7ByqY52NDF4sWvLC6a7QV-6ARGI0vKa "UUID")的字段，使用Python的`UUID`这个类，当使用PostgreSQL的时候，其会以`uuid`的数据类型储存而不是`char(32)`的格式。
 
 [通用唯一识别码](http://baike.baidu.com/link?url=hwOmlIib6lr_lkrd-Ea3-DW8NaJtN7aV6ZQ_aUTesW_nLcbtAaV49zx7ByqY52NDF4sWvLC6a7QV-6ARGI0vKa "UUID")是一个能够替代`primary_key`的一个`AutoField`，数据库并不会自动生成`UUID`，所以使用默认类型还是比较好的。
-<pre class="lang:python decode:true ">import uuid
+```python
+import uuid
 from django.db import models
 
 class MyUUIDModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # other fields</pre>
+    # other fields
+```
+
 
  需要注意的是一个`callable`会被传递给`default`，而不是[UUID](http://baike.baidu.com/link?url=hwOmlIib6lr_lkrd-Ea3-DW8NaJtN7aV6ZQ_aUTesW_nLcbtAaV49zx7ByqY52NDF4sWvLC6a7QV-6ARGI0vKa)的实例。
 
@@ -668,7 +701,8 @@ Django 同样定义了一系列的字段来描述数据库之间的关联。
 若要创建一个递归的关联 —— 对象与自己具有多对一的关系 —— 请使用`models.ForeignKey('self')`。
 
 如果你需要关联到一个还没有定义的模型，你可以使用模型的名字而不用模型对象本身：
-<pre class="lang:python decode:true ">from django.db import models
+```python
+from django.db import models
 
 class Car(models.Model):
     manufacturer = models.ForeignKey('Manufacturer')
@@ -676,11 +710,16 @@ class Car(models.Model):
 
 class Manufacturer(models.Model):
     # ...
-    pass</pre>
+    pass
+```
+
 
  若要引用在其它应用中定义的模型，你可以用带有完整标签名的模型来显式指定。例如，如果上面提到的Manufacturer 模型是在一个名为production 的应用中定义的，你应该这样使用它：
-<pre class="lang:python decode:true ">class Car(models.Model):
-    manufacturer = models.ForeignKey('production.Manufacturer')</pre>
+```python
+class Car(models.Model):
+    manufacturer = models.ForeignKey('production.Manufacturer')
+```
+
 
  在解析两个应用之间具有相互依赖的导入时，这种引用将会很有帮助。
 
@@ -703,15 +742,21 @@ class Manufacturer(models.Model):
 当这个字段使用模型表单或者`Admin` 渲染时（默认情况下，查询集中的所有对象都可以使用），为这个字段设置一个可用的选项。它可以是一个字典、一个Q 对象或者一个返回字典或Q对象的可调用对象。
 
 例如：
-<pre class="lang:python decode:true ">staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})</pre>
+```python
+staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})
+```
+
 
  将使得模型表单 中对应的字段只列出`is_staff=True` 的`Users`。 这在Django 的`Admin` 中也可能有用处。
 
 可调用对象的形式同样非常有用，比如与Python 的`datetime`模块一起使用来限制选择的时间范围。例如：
-<pre class="lang:python decode:true ">def limit_pub_date_choices():
+```python
+def limit_pub_date_choices():
     return {'pub_date__lte': datetime.date.utcnow()}
 
-limit_choices_to = limit_pub_date_choices</pre>
+limit_choices_to = limit_pub_date_choices
+```
+
 
  如果`limit_choices_to` 自己本身是或者返回一个用于复杂查询的Q 对象，当字段没有在模型的`ModelAdmin`中的`raw_id_fields` 列出时，它将只会影响`Admin`中的可用的选项。
 
@@ -728,18 +773,24 @@ _注_
 这个名称用于让关联的对象反查到源对象。它还是`related_query_name` 的默认值（关联的模型进行反向过滤时使用的名称）。完整的解释和示例参见关联对象的文档。注意，当你为抽象模型定义关联关系的时，必须设置这个参数的值；而且当你这么做的时候需要用到一些特殊语法。
 
 如果你不想让Django 创建一个反向关联，请设置`related_name` 为 '+' 或者以'+' 结尾。 例如，下面这行将确定User 模型将不会有到这个模型的返回关联：
-<pre class="lang:python decode:true ">user = models.ForeignKey(User, related_name='+')</pre>
+```python
+user = models.ForeignKey(User, related_name='+')
+```
+
 
 #### ForeignKey.related_query_name
 
 这个名称用于目标模型的反向过滤。如果设置了`related_name`，则默认为它的值，否则默认值为模型的名称：
-<pre class="lang:python decode:true "># Declare the ForeignKey with related_query_name
+```python
+# Declare the ForeignKey with related_query_name
 class Tag(models.Model):
     article = models.ForeignKey(Article, related_name="tags", related_query_name="tag")
     name = models.CharField(max_length=255)
 
 # That's now the name of the reverse filter
-Article.objects.filter(tag__name="important")</pre>
+Article.objects.filter(tag__name="important")
+```
+
 
 #### ForeignKey.to_field
 
@@ -757,7 +808,10 @@ Article.objects.filter(tag__name="important")</pre>
 #### ForeignKey.on_delete
 
 当一个`ForeignKey` 引用的对象被删除时，Django 默认模拟`SQL` 的`ON DELETE CASCADE` 的约束行为，并且删除包含该`ForeignKey`的对象。这种行为可以通过设置`on_delete` 参数来改变。例如，如果你有一个可以为空的`ForeignKey`，在其引用的对象被删除的时你想把这个`ForeignKey` 设置为空：
-<pre class="lang:python decode:true ">user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)</pre>
+```python
+user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+```
+
 
  `on_delete` 在`django.db.models`中可以找到的值有：
 
@@ -780,7 +834,8 @@ Article.objects.filter(tag__name="important")</pre>
 #### SET()
 
 设置`ForeignKey` 为传递给`SET()` 的值，如果传递的是一个可调用对象，则为调用后的结果。在大部分情形下，传递一个可调用对象用于避免`models.py` 在导入时执行查询：
-<pre class="lang:python decode:true ">from django.conf import settings
+```python
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -789,7 +844,9 @@ def get_sentinel_user():
 
 class MyModel(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.SET(get_sentinel_user))</pre>
+                             on_delete=models.SET(get_sentinel_user))
+```
+
 
 #### DO_NOTHING
 
@@ -816,12 +873,15 @@ class MyModel(models.Model):
 Django 阻止未保存的模型实例被分配给一个`ForeignKey` 字段以防止意味的数据丢失（当保存一个模型实例时，未保存的外键将默默忽略）。
 
 如果你需要允许赋值未保存的实例且不关心数据的丢失（例如你不会保存对象到数据库），你可以通过创建这个字段的子类并设置其`allow_unsaved_instance_assignment` 属性为`True` 来关闭这个检查。例如：
-<pre class="lang:python decode:true ">class UnsavedForeignKey(models.ForeignKey):
+```python
+class UnsavedForeignKey(models.ForeignKey):
     # A ForeignKey which can point to an unsaved object
     allow_unsaved_instance_assignment = True
 
 class Book(models.Model):
-    author = UnsavedForeignKey(Author)</pre>
+    author = UnsavedForeignKey(Author)
+```
+
 
 ## ManyToManyField
 
@@ -860,10 +920,13 @@ class Book(models.Model):
 #### ManyToManyField.symmetrical
 
 只用于与自身进行关联的`ManyToManyField`。例如下面的模型：
-<pre class="lang:python decode:true ">from django.db import models
+```python
+from django.db import models
 
 class Person(models.Model):
-    friends = models.ManyToManyField("self")</pre>
+    friends = models.ManyToManyField("self")
+```
+
 
  当Django 处理这个模型的时候，它定义该模型具有一个与自身具有多对多关联的`ManyToManyField`，因此它不会向Person 类添加`person_set` 属性。Django 将假定这个`ManyToManyField` 字段是对称的 —— 如果我是你的朋友，那么你也是我的朋友。
 
@@ -880,14 +943,14 @@ Django 会自动创建一个表来管理多对多关系。不过，如果你希�
 如果源模型和目标不同，则生成以下字段：
 
 *   `id`：关系的主键。
-*   `&lt;containing_model&gt;_id`：声明`ManyToManyField` 字段的模型的`id`。
-*   `&lt;other_model&gt;_id`：`ManyToManyField` 字段指向的模型的`id`。
+*   `<containing_model>_id`：声明`ManyToManyField` 字段的模型的`id`。
+*   `<other_model>_id`：`ManyToManyField` 字段指向的模型的`id`。
 
 如果ManyToManyField 的源模型和目标模型相同，则生成以下字段：
 
 *   id：关系的主键。
-*   `from_&lt;model&gt;_id`：源模型实例的`id`<!--more--><!--more-->。
-*   `to_&lt;model&gt;_id`：目标模型实例的`id`。
+*   `from_<model>_id`：源模型实例的`id`<!--more--><!--more-->。
+*   `to_<model>_id`：目标模型实例的`id`。
 
 这个类可以让一个给定的模型像普通的模型那样查询与之相关联的记录。
 
@@ -896,7 +959,8 @@ Django 会自动创建一个表来管理多对多关系。不过，如果你希�
 **New in Django 1.7.**
 
 只能在指定了自定义中间模型的时候使用。 Django 一般情况会自动决定使用中间模型的哪些字段来建立多对多关联。但是，考虑如下模型：
-<pre class="lang:python decode:true ">from django.db import models
+```python
+from django.db import models
 
 class Person(models.Model):
     name = models.CharField(max_length=50)
@@ -909,7 +973,9 @@ class Membership(models.Model):
     group = models.ForeignKey(Group)
     person = models.ForeignKey(Person)
     inviter = models.ForeignKey(Person, related_name="membership_invites")
-    invite_reason = models.CharField(max_length=64)</pre>
+    invite_reason = models.CharField(max_length=64)
+```
+
 
  Membership 有两个 外键指向Person （person 和inviter），这使得关联关系含混不清并让Django 不知道使用哪一个。在这种情况下，你必须使用`through_fields` 明确指定Django 应该使用哪些外键，就像上面例子一样。
 
@@ -965,25 +1031,34 @@ New in Django 1.8.
 如果你没有指定`OneToOneField` 的`related_name` 参数，Django 将使用当前模型的小写的名称作为默认值。
 
 例如下面的例子：
-<pre class="lang:python decode:true ">from django.conf import settings
+```python
+from django.conf import settings
 from django.db import models
 
 class MySpecialUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    supervisor = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='supervisor_of')</pre>
+    supervisor = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='supervisor_of')
+```
+
 
  你将使得User 模型具有以下属性：
-<pre class="lang:default decode:true ">&gt;&gt;&gt; user = User.objects.get(pk=1)
-&gt;&gt;&gt; hasattr(user, 'myspecialuser')
+```default
+>>> user = User.objects.get(pk=1)
+>>> hasattr(user, 'myspecialuser')
 True
-&gt;&gt;&gt; hasattr(user, 'supervisor_of')
-True</pre>
+>>> hasattr(user, 'supervisor_of')
+True
+```
+
 
  当反向访问关联关系时，如果关联的对象不存在对应的实例，则抛出`DoesNotExist` 异常。例如，如果一个User 没有`MySpecialUser` 指定的`supervisor`：
-<pre class="lang:default decode:true ">&gt;&gt;&gt; user.supervisor_of
+```default
+>>> user.supervisor_of
 Traceback (most recent call last):
     ...
-DoesNotExist: User matching query does not exist.</pre>
+DoesNotExist: User matching query does not exist.
+```
+
 
  另外，`OneToOneField` 除了接收`ForeignKey` 接收的所有额外的参数之外，还有另外一个参数：
 

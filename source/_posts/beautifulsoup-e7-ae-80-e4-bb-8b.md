@@ -13,20 +13,21 @@ date: 2015-03-31 13:22:16
 [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/) 是用Python写的一个HTML/XML的解析器，它可以很好的处理不规范标记并生成剖析树(parse tree)。 它提供简单又常用的导航（navigating），搜索以及修改剖析树的操作。它可以大大节省你的编程时间。
 
 直接看例子：
-<pre class="lang:default decode:true ">#!/usr/bin/python
+```default
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 html_doc = """
-&lt;html&gt;&lt;head&gt;&lt;title&gt;The Dormouse's story&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-&lt;p class="title"&gt;&lt;b&gt;The Dormouse's story&lt;/b&gt;&lt;/p&gt;
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="title"><b>The Dormouse's story</b></p>
 
-&lt;p class="story"&gt;Once upon a time there were three little sisters; and their names were
-&lt;a href="http://example.com/elsie" class="sister" id="link1"&gt;Elsie&lt;/a&gt;,
-&lt;a href="http://example.com/lacie" class="sister" id="link2"&gt;Lacie&lt;/a&gt; and
-&lt;a href="http://example.com/tillie" class="sister" id="link3"&gt;Tillie&lt;/a&gt;;
-and they lived at the bottom of a well.&lt;/p&gt;
-&lt;p class="story"&gt;...&lt;/p&gt;
+<p class="story">Once upon a time there were three little sisters; and their names were
+<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+and they lived at the bottom of a well.</p>
+<p class="story">...</p>
 """
 
 soup = BeautifulSoup(html_doc)
@@ -37,9 +38,11 @@ print soup.p
 print soup.a
 print soup.find_all('a')
 print soup.find(id='link3')
-print soup.get_text()</pre>
+print soup.get_text()
+```
 
-<div>结果是：<span class="lang:default highlight:0 decode:true  crayon-inline ">title The Dormouse's story The Dormouse's story Elsie [Elsie, Lacie, Tillie] Tillie The Dormouse's story The Dormouse's story Once upon a time there were three little sisters; and their names were Elsie, Lacie and Tillie; and they lived at the bottom of a well.</span> </div><div>
+
+结果是：title The Dormouse's story The Dormouse's story Elsie [Elsie, Lacie, Tillie] Tillie The Dormouse's story The Dormouse's story Once upon a time there were three little sisters; and their names were Elsie, Lacie and Tillie; and they lived at the bottom of a well. 
 
 可以看出：soup 就是BeautifulSoup处理格式化后的字符串，soup.title 得到的是title标签，soup.p 得到的是文档中的第一个p标签，要想得到所有标签，得用find_all函数。find_all 函数返回的是一个序列，可以对它进行循环，依次得到想到的东西.
 
@@ -72,15 +75,18 @@ get_text() 是返回文本,这个对每一个BeautifulSoup处理后的对象得�
 find_all(name, attrs, recursive, text, limit, **kwargs)
 
 举例说明：
-<pre class="lang:default decode:true ">print soup.find_all('title')
+```default
+print soup.find_all('title')
 print soup.find_all('p','title')
 print soup.find_all('a')
 print soup.find_all(id="link2")
-print soup.find_all(id=True)</pre>
+print soup.find_all(id=True)
+```
+
 
 返回值为：
 
-<span class="lang:default highlight:0 decode:true  crayon-inline ">[] [ The Dormouse's story ] [Elsie, Lacie, Tillie] [Lacie] [Elsie, Lacie, Tillie]</span> 
+[] [ The Dormouse's story ] [Elsie, Lacie, Tillie] [Lacie] [Elsie, Lacie, Tillie] 
 
 通过css查找,直接上例子把：
 
@@ -111,4 +117,3 @@ print soup.find_all("a", class_="sister")
  [[Elsie](http://example.com/elsie), [Lacie](http://example.com/lacie)]
 
 总之，通过这些函数可以查找到想要的东西。
-</div>

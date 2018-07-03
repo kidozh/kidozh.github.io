@@ -16,12 +16,12 @@ date: 2015-12-21 16:42:23
 采用$$\LaTeX\$$制作幻灯片主要有以下好处：
 
 *   其使用的是PDF格式，可以不受操作系统和应用软件的限制，在任何计算机上都能使用
-*   <span style="line-height: 1.42857; font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif;">$$\LaTeX\$$优秀的数学排版功能，可以把论文中各种复杂的数学式直接搬到幻灯片之中</span>
+*   $$\LaTeX\$$优秀的数学排版功能，可以把论文中各种复杂的数学式直接搬到幻灯片之中
 
 其中较为常见的就是beamer幻灯文类了，其具有以下特点：
 
-1.  幻灯片的源文件可以使用PDFLaTeX、XeLaTeX或者LuaLaTeX编译直接生成PDF格式，也可以使用LaTeX-&gt;dvi2ps-&gt;ps2pdf的编译方法，任何计算机上都有阅读PDF的阅读器（实在不行还有浏览器），所以放映问题基本是不愁的。
-2.  绝大部分的$$\LaTeX\$$命令仍然具有效力，例如章节目录还是可以用<span class="lang:tex decode:true  crayon-inline ">\tableofcontents</span> 生成，itemize环境创建常规列表，<span class="lang:tex decode:true  crayon-inline ">\section</span> 和<span class="lang:default decode:true  crayon-inline ">\subsection</span> 的层次结构
+1.  幻灯片的源文件可以使用PDFLaTeX、XeLaTeX或者LuaLaTeX编译直接生成PDF格式，也可以使用LaTeX->dvi2ps->ps2pdf的编译方法，任何计算机上都有阅读PDF的阅读器（实在不行还有浏览器），所以放映问题基本是不愁的。
+2.  绝大部分的$$\LaTeX\$$命令仍然具有效力，例如章节目录还是可以用\tableofcontents 生成，itemize环境创建常规列表，\section 和\subsection 的层次结构
 3.  提供了大量的多种类型的主题样式，可以方便的更改幻灯片的整体风格，或者对某一局部的样式、字体和颜色等细节进行修改
 4.  具有多种动画功能，易于调整和使用，可以形象生动的掩饰各种过程的分解动作，有利于加深理解
 
@@ -29,10 +29,11 @@ date: 2015-12-21 16:42:23
 
 其源文件分为导言和正文两个部分，大部分的$$\LaTeX\$$命令和环境都可以照搬到beamer中，由于幻灯片的特殊性，beamer也提供了大量的专有命令和环境，便于对幻灯片中的各种细节进行修饰。
 
-使用文档命令<span class="lang:tex decode:true  crayon-inline ">\documentclass</span> 调用beamer.cls幻灯片文件的时候，amsfont、amsmath、amssymb、amsthm、enumerate、geometry、graphics、graphicx、hyperref、ifpdf、keyval、xcolor、xxcolor和url等多个相关用途的宏包也被自动加载，所以在制作幻灯片的时候不必重复调用这些包，以免发生冲突。
+使用文档命令\documentclass 调用beamer.cls幻灯片文件的时候，amsfont、amsmath、amssymb、amsthm、enumerate、geometry、graphics、graphicx、hyperref、ifpdf、keyval、xcolor、xxcolor和url等多个相关用途的宏包也被自动加载，所以在制作幻灯片的时候不必重复调用这些包，以免发生冲突。
 
 例如下面这个beamer示例。
-<pre class="lang:tex decode:true">\documentclass[14pt,hyperref={CJKbookmarks=true}]{beamer}
+```tex
+\documentclass[14pt,hyperref={CJKbookmarks=true}]{beamer}
 \usepackage[space,noindent]{ctex}
 \usetheme{AnnArbor}
 \setbeamercolor{normal text}{bg=black!10}
@@ -67,7 +68,9 @@ date: 2015-12-21 16:42:23
 ...
 \end{frame}
 \end{document}
-</pre>
+
+```
+
 
  [PDF文件](/wp-content/uploads/2015/12/13-1.pdf)
 
@@ -76,13 +79,16 @@ date: 2015-12-21 16:42:23
 1.  由于$$\LaTeX\$$的自动排版，其生成了5帧幻灯片，每篇幻灯片右下角显示的是帧码，例如1/5指的就是当前显示的是第1帧，本幻灯片一共有5帧
 2.  每一帧幻灯片顶部都有一个导航条，除了第一篇题名外，每幅定边导航条都显示节标题和小节标题
 3.  同样的，在底部也有一个导航条，分别显示的是作者姓名，院系简称、题名简称、回忆简称和编码
-4.  右上方的徽标可以用<span class="lang:tex decode:true  crayon-inline ">\logo</span> 命令引入插图
-5.  幻灯文类分别给题名信息命令<span class="lang:tex decode:true  crayon-inline ">\author</span> 、<span class="lang:tex decode:true  crayon-inline ">\date</span> 、<span class="lang:tex decode:true  crayon-inline ">\title</span> 添加了一个可选参数
+4.  右上方的徽标可以用\logo 命令引入插图
+5.  幻灯文类分别给题名信息命令\author 、\date 、\title 添加了一个可选参数
 
 ## 2.1 选项
 
 幻灯文类的第一条命令就是文档类型命令：
-<pre class="lang:tex decode:true">\documentclass[args1,args2,...]{beamer}</pre>
+```tex
+\documentclass[args1,args2,...]{beamer}
+```
+
 
  这些参数主要有以下几类：
 
@@ -105,25 +111,28 @@ date: 2015-12-21 16:42:23
 2.  draft 各种导航条使用灰色长方条取代，插图使用方框替代，符号条也被取消，这样主要用于调试
 3.  handout 取消符号条和叠层动画效果，以便于全文打印
 4.  trans 用于制作透明幻灯片
-5.  hyperref 增加或者取消某项设置，例如节或者小节标题含有中文之时就必须增加设置<span class="lang:tex decode:true  crayon-inline ">\hyperref={CJKbookmarks=true}</span> 
+5.  hyperref 增加或者取消某项设置，例如节或者小节标题含有中文之时就必须增加设置\hyperref={CJKbookmarks=true} 
 6.  compress 尽可能压缩导航条中的内容
-7.  table 在编排彩色表格时候使用行颜色命令<span class="lang:tex decode:true  crayon-inline ">\rowcolors</span>
+7.  table 在编排彩色表格时候使用行颜色命令\rowcolors
 
 beamer可选参数有CJK中文选项，但是他和中文字体宏包ctex的有关设置**冲突**，所以无法使用。
 
 ## 2.2 帧环境
 
 幻灯片的源文件主要由一些列的帧环境frame组成的，出了题名命令、节和小节以及其他设置命令，幻灯片中节和小节的内容必须置于帧环境之中。帧环境的命令结构为：
-<pre class="lang:tex decode:true">\begin{frame}
+```tex
+\begin{frame}
 \frametitle{帧标题}
 \framesubtitle{帧副题}
 基本理论的要点 1、2、3...
-\end{frame}</pre>
+\end{frame}
+```
+
 
  其中就可选参数如下：
 
 *   allowdisplaybreaks 允许多行公式的中间换幅，这个命令必须与allowframebreaks一起使用
-*   <span style="line-height: 22.8571px;">allowframebreaks 允许帧环境的自动换幅，可以根据内容多出来的情况自动增加若干个帧环境</span>
+*   allowframebreaks 允许帧环境的自动换幅，可以根据内容多出来的情况自动增加若干个帧环境
 *   b 底对齐
 *   c 默认值，垂直居中，帧环境的t、c优先于beamer中的t、c
 *   t 顶对齐

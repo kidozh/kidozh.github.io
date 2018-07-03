@@ -16,12 +16,15 @@ date: 2017-04-05 19:28:27
 
 # 创建仓库
 
-&nbsp;
+ 
 
-<pre class="lang:sh decode:true ">cd /var
-mkdir git &amp;&amp; cd git
-mkdir your_site.git &amp;&amp; cd your_site.git
-git init --bare</pre>
+```sh
+cd /var
+mkdir git && cd git
+mkdir your_site.git && cd your_site.git
+git init --bare
+```
+
 
 `--bare`的意思是，该文件夹是我们的代码仓库，它将不会放源代码而只是做版本控制。
 
@@ -29,46 +32,73 @@ git init --bare</pre>
 
 我们将会使用`post-receive`钩子
 
-<pre class="lang:sh decode:true ">ls</pre>
+```sh
+ls
+```
+
 
 你可以看到有hooks文件夹已经为我们创建好了,而且里面也有各种钩子的样例
 
-<pre class="lang:sh decode:true ">cd hooks</pre>
+```sh
+cd hooks
+```
+
 
 创建我们自己的`post-receive`
 
-<pre class="lang:sh decode:true ">vim post-receive</pre>
+```sh
+vim post-receive
+```
+
 
 输入下面的命令到这个文件之中：
 
-<pre class="lang:sh decode:true ">#!/bin/sh
-git --work-tree=生产环境网站文件夹位置 --git-dir=/var/git/your_site.git checkout -f</pre>
+```sh
+#!/bin/sh
+git --work-tree=生产环境网站文件夹位置 --git-dir=/var/git/your_site.git checkout -f
+```
+
 
 `git-dir`指的是仓库的地址， `work-tree`则是存放代码的位置，也就是我们的网站的源代码的位置。 接下来则是要保证它可以运行：
 
-<pre class="lang:sh decode:true ">chmod +x post-receive</pre>
+```sh
+chmod +x post-receive
+```
+
 
 ## 本地
 
 一般情况是你已经有了自己的git项目了，那么只需要添加vps的仓库地址就行了
 
-    git remote add myVPS-sitename ssh://user@mydomain.com/var/git/your_site.git`</pre>
+    git remote add myVPS-sitename ssh://user@mydomain.com/var/git/your_site.git`
+```
+
 
     'myVPS-sitename'只是这个远程连接的名称，你可以同时有多个远程连接，每次push的时候指定名称即可将代码上传到不同的仓库。
 
     如果你本地还没有项目代码：
 
-    <pre>`cd 项目地址
-    git init`</pre>
+    
+```
+`cd 项目地址
+    git init`
+```
+
 
     添加一个README.ME文件后
 
-    <pre>`git add .
-    git commit -m "项目初始"`</pre>
+    
+```
+`git add .
+    git commit -m "项目初始"`
+```
+
 
     接下来我们便可以将代码push到vps了：
 
-    <pre>`git push myVPS-sitename master
+    
+```
+`git push myVPS-sitename master
 
 `master`指定的是master分支，如果你有其他分支也可以push其他分支。.
 

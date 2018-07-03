@@ -24,7 +24,6 @@ license里面server后面的hostname和物理地址一定要与电脑本身的�
 
 ## 端口冲突
 
-FLEXlm not running，很有可能就是端口冲突，这个以前发现过，有的软件就会互相冲突。解决办法：在dos界面下输入
-<pre class="lang:sh decode:true">netstat -a -o</pre>
+FLEXlm not running，很有可能就是端口冲突，这个以前发现过，有的软件就会互相冲突。解决办法：在dos界面下输入`netstat -a -o`
 
 找到**1055**端口对应pid值，然后启动任务管理器，打开“查看-选项列”，勾选pid选项，找到pid值对应的映像名称，结束进程；打开打开Server ANSLIC_ADMIN Utility ， 点击stop the ANSYS,lnc.License Manager,再点击start the ANSYS,lnc.License Manager，看看FLEXlm是不是变成running了点击start the ANSYS,lnc.License Manager，看看FLEXlm是不是变成running了。这里由于UG的证书文件往往和这货端口号一致，所以经常鬼畜。。。

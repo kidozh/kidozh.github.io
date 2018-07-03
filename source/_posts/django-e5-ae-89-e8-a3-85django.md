@@ -24,7 +24,7 @@ date: 2016-01-13 01:44:46
 
 而对于windows操作系统，需要下载MSI installer for windows，完成之后按照窗口导引就能完成安装了。
 
-在安装完成之后，需要检查Python是否存在在环境变量Path之中。首先打开命令行，通过`python --version`检查环境变量是否被正确的设定了，如果没有，需要保证python的python可执行文件和script文件夹被正确的包含在内。例如，python 2.7安装路径位于C:\python27\，那么C:\python27\和<span style="line-height: 22.8571px;">C:\python27\Script\都需要包含在环境变量里</span>
+在安装完成之后，需要检查Python是否存在在环境变量Path之中。首先打开命令行，通过`python --version`检查环境变量是否被正确的设定了，如果没有，需要保证python的python可执行文件和script文件夹被正确的包含在内。例如，python 2.7安装路径位于C:\python27\，那么C:\python27\和C:\python27\Script\都需要包含在环境变量里
 
 ## 2 安装Apache和mod_wsgi
 
@@ -44,18 +44,18 @@ mod_wsgi主要分为两个模式：嵌入式和守护式。在嵌入式之中，
 
 对于官方版本，需要确保与数据库的链接被正确安装了：
 
-*   <span style="font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif; line-height: 22.8571px;">PostgreSQL需要使用</span><span style="font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif;"><span style="line-height: 22.8571px;"> [psycopg2](http://initd.org/psycopg/) 包，在[PostgreSQL notes ](https://docs.djangoproject.com/en/1.8/ref/databases/#postgresql-notes)</span></span><span style="font-family: 'Microsoft YaHei', 微软雅黑, Raleway, sans-serif;"><span style="line-height: 22.8571px;">之中也能得到详尽的帮助</span></span>
+*   PostgreSQL需要使用 [psycopg2](http://initd.org/psycopg/) 包，在[PostgreSQL notes ](https://docs.djangoproject.com/en/1.8/ref/databases/#postgresql-notes)之中也能得到详尽的帮助
 *   MySQL需要一个数据库API驱动器，比如mysqlclient，在[notes for MySQL backend](https://docs.djangoproject.com/en/1.8/ref/databases/#mysql-notes)里可以获得详细信息
 *   SQLite可以在[SQLite backend notes](https://docs.djangoproject.com/en/1.8/ref/databases/#sqlite-notes)里得到帮助
 *   Oracle需要一份cx_Oracle的备份，但是还是需要在[notes for the Oracle backend ](https://docs.djangoproject.com/en/1.8/ref/databases/#oracle-notes)获得对cx_Oracle和Oracle支持版本的信息
 
 而对于官方并不支持的数据库，第三方应用也是可以使用的，比如：
 
-*   <span style="line-height: 1.42857;">SAP SQL Anywhere</span>
-*   <span style="line-height: 1.42857;">IBM DB2</span>
-*   <span style="line-height: 1.42857;">Microsoft SQL Server</span>
-*   <span style="line-height: 1.42857;">Firebird</span>
-*   <span style="line-height: 1.42857;">ODBC</span>
+*   SAP SQL Anywhere
+*   IBM DB2
+*   Microsoft SQL Server
+*   Firebird
+*   ODBC
 
 这些数据库django版本和ORM特征差异较大，对于这些非官方的后台的具体功能以及任何支持查询，应直接使用第三方项目提供支持的渠道获得帮助。
 
@@ -68,7 +68,10 @@ Django的命令`manage.py migrate`可以自动创建数据库之中的表格，�
 如果你具有easy_install或者pip的话，更新Django的时候会自动执行卸载的过程的。
 
 如果是没有以上两种工具，那么就需要手工在site-packages中删除django库的，可以通过以下命令在**Shell**命令行来取得其地址：
-<pre class="lang:ps decode:true ">$ python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"</pre>
+```ps
+$ python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
+```
+
 
 # 5 安装Django代码
 
@@ -76,7 +79,7 @@ Django的命令`manage.py migrate`可以自动创建数据库之中的表格，�
 
 ### pip安装官方发行版：
 
-1.  <span style="line-height: 1.1;">安装pip。最简单的办法就是安装[独立的pip安装器 ](http://www.pip-installer.org/en/latest/installing.html#install-pip)，如果你已经安装了pip，需要确保其还能跟得上时代的潮流</span>
+1.  安装pip。最简单的办法就是安装[独立的pip安装器 ](http://www.pip-installer.org/en/latest/installing.html#install-pip)，如果你已经安装了pip，需要确保其还能跟得上时代的潮流
 2.  [virtualenv](http://www.virtualenv.org/)和[virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)提供了一个隔离的Python环境，这样也使得不比在系统层面上安装那么多库文件，其也支持在没有管理员权限的情况下安装Django，[这里](https://docs.djangoproject.com/en/1.8/intro/contributing/)就有如何在Python3上安装Django的方法。
 3.  当完成了环境的创建和激活之后，就可以使用`pip install Django`来在Shell命令行之中安装Django了
 
@@ -91,14 +94,16 @@ Django的命令`manage.py migrate`可以自动创建数据库之中的表格，�
 如果你想得到最新的Django代码以求最新的BUG修正和代码优化，需要执行以下几步：
 
 1.  确保Git安装完成，并且能够在Shell命令行中调用`git help`
-2.  检出Django的一个主要版本，例如使用这个命令：<span class="trim-code-tag:false mixed:false lang:default decode:true  crayon-inline ">$ git clone git://github.com/django/django.git</span> ，然后再本地目录里就会出现Django文件夹
-3.  确保Python能够正确的加载代码，最为稳妥的办法就是使用[virtualenv](http://www.virtualenv.org/)<span style="line-height: 22.8571px;">、</span>[virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)和[pip](http://www.pip-installer.org/)
-4.  当安装并且激活[virtualenv](http://www.virtualenv.org/)之后需要运行命令：<span style="color: #c7254e; font-family: Monaco, Menlo, Consolas, 'Courier New', monospace; font-size: 14.4px; line-height: 20.5714px; white-space: nowrap; background-color: #f9f2f4;">pip install -e Django</span>，这样也会使得django-admin被正确执行
+2.  检出Django的一个主要版本，例如使用这个命令：$ git clone git://github.com/django/django.git ，然后再本地目录里就会出现Django文件夹
+3.  确保Python能够正确的加载代码，最为稳妥的办法就是使用[virtualenv](http://www.virtualenv.org/)、[virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)和[pip](http://www.pip-installer.org/)
+4.  当安装并且激活[virtualenv](http://www.virtualenv.org/)之后需要运行命令：pip install -e Django，这样也会使得django-admin被正确执行
 
-当需要获取最新的Django的时候，运行命令<span style="color: #c7254e; font-family: Monaco, Menlo, Consolas, 'Courier New', monospace; font-size: 14.4px; line-height: 20.5714px; white-space: nowrap; background-color: #f9f2f4;">git pull</span><span style="line-height: 1.42857;"> 即可，git会自动完成各种更新的。</span>
+当需要获取最新的Django的时候，运行命令git pull 即可，git会自动完成各种更新的。
 
 # windows环境下的BUG
 
 *   如果django-admin只显示帮助文本而不接受参数的话，这样很有可能是文件和Windows的关联出了问题，检查是否有多个script在环境变量之中，这往往是多个版本的Python安装所导致的
-*   在使用代理采用pip或者easy_install安装的时候，需要在命令行之中配置代理，例如：<pre class="lang:ps decode:true">set http_proxy=http://username:password@proxyserver:proxyport
-set https_proxy=https://username:password@proxyserver:proxyport</pre>
+*   在使用代理采用pip或者easy_install安装的时候，需要在命令行之中配置代理，例如：```ps
+set http_proxy=http://username:password@proxyserver:proxyport
+set https_proxy=https://username:password@proxyserver:proxyport
+```

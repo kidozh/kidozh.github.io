@@ -76,11 +76,11 @@ date: 2016-01-21 23:58:03
 ![](/wp-content/uploads/2016/01/012116_1557_MineCraftMi7.png)
 > GNU Screen是一款由GNU计划开发的用于命令行终端切换的自由软件。用户可以通过该软件同时连接多个本地或远程的命令行会话，并在其间自由切换。> 常用Screen 命令：
 > 
-> *   <span style="line-height: 1.25;">· screen -S mc //新建一个叫mc的Screen</span>
-> *   <span style="line-height: 1.25;">· screen -r mc //返回名为mc的Screen</span>
-> *   <span style="line-height: 1.25;">· 键盘按Ctrl + A //退出刚创建的Screen</span>
-> *   <span style="line-height: 1.25;">· screen -ls //显示所有的Screen</span>
-> *   <span style="line-height: 1.25;">· exit //在Screen中使用可以关闭当前Screen会话</span>
+> *   · screen -S mc //新建一个叫mc的Screen
+> *   · screen -r mc //返回名为mc的Screen
+> *   · 键盘按Ctrl + A //退出刚创建的Screen
+> *   · screen -ls //显示所有的Screen
+> *   · exit //在Screen中使用可以关闭当前Screen会话
 
 更多资料参考：[linux screen 命令详解](http://www.cnblogs.com/mchina/archive/2013/01/30/2880680.html) By David Camp
 
@@ -112,13 +112,13 @@ date: 2016-01-21 23:58:03
 
 接下来依次执行下列命令（一次一行）：
 
-`echo 'export JAVA_HOME=/usr/java/jre1.8.0_71' &gt;&gt; /etc/profile`
+`echo 'export JAVA_HOME=/usr/java/jre1.8.0_71' >> /etc/profile`
 
 这句中的jre1.8.0_1即为刚才的名字。
 
-`echo 'export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar'&gt;&gt; /etc/profile`
+`echo 'export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar'>> /etc/profile`
 
-`echo 'export PATH=$PATH:$JAVA_HOME/bin' &gt;&gt; /etc/profile`
+`echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile`
 
 OK，至此Java环境已配置完毕。
 
@@ -151,9 +151,13 @@ OK，至此Java环境已配置完毕。
 `vim start.sh `
 
 新建start.sh文件，弹出编辑器窗口，粘贴内容如下：
-<pre>#!/bin/sh 
+
+```
+#!/bin/sh 
 java -Xmx768M -Xms512M -jar /home/mcserver/minecraft_server.1.7.10.jar
-</pre>
+
+```
+
 
 ![](/wp-content/uploads/2016/01/012116_1557_MineCraftMi12.png)
 

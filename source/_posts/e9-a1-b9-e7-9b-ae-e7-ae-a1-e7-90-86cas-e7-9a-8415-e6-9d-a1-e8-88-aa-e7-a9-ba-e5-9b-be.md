@@ -7,221 +7,220 @@ date: 2015-04-04 17:48:16
 tags:
 ---
 
-<span style="font-family: 微软雅黑;">采用Google Earth Pro来观测的指标。
-</span>
-<div>
+采用Google Earth Pro来观测的指标。
+
+
 <table style="border-collapse: collapse;" border="0"><colgroup> <col style="width: 72px;" /> <col style="width: 112px;" /> <col style="width: 135px;" /> <col style="width: 123px;" /> <col style="width: 111px;" /> <col style="width: 111px;" /> <col style="width: 128px;" /></colgroup>
 <tbody valign="top">
 <tr style="height: 22px;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">ID</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">departure</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">出发地</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">destination</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">终点</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">距离（公里）</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">国家/地区</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">ID</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">departure</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">出发地</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">destination</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">终点</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">距离（公里）</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">国家/地区</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">1</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Edinburgh</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">爱丁堡</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">1</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Edinburgh</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">爱丁堡</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">934.49</span>
+934.49
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">英国-苏格兰</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">英国-苏格兰</td>
 </tr>
 <tr style="height: 22px; background: #bdd7ee;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">2</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Copenhagen</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">哥本哈根</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">2</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Copenhagen</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">哥本哈根</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="font-family: 微软雅黑;">466.87</span>
+466.87
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">丹麦</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">丹麦</td>
 </tr>
 <tr style="height: 22px; background: #2f75b5;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">3</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">St Petersburg</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">圣彼得堡</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">3</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">St Petersburg</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">圣彼得堡</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">1093.49</span>
+1093.49
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">俄罗斯</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">俄罗斯</td>
 </tr>
 <tr style="height: 22px; background: #bdd7ee;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">4</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Stockholm</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">斯德哥摩尔</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">4</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Stockholm</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">斯德哥摩尔</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="font-family: 微软雅黑;">413.08</span>
+413.08
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">瑞典</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">瑞典</td>
 </tr>
 <tr style="height: 22px; background: #bdd7ee;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">5</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Trondheim</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">特隆赫姆</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">5</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Trondheim</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">特隆赫姆</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="font-family: 微软雅黑;">402.9</span>
+402.9
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">挪威第三大城市</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">挪威第三大城市</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">6</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Kiruna</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">基律纳</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">6</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Kiruna</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">基律纳</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">981.11</span>
+981.11
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">瑞典</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">瑞典</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">7</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Hamburger</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">汉堡</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">7</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Hamburger</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">汉堡</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">709.94</span>
+709.94
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">德国</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">德国</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">8</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Aberdeen</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">阿伯丁</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">8</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Aberdeen</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">阿伯丁</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">803.13</span>
+803.13
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">英国-苏格兰</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">英国-苏格兰</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">9</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Narvik</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">纳尔维克</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">9</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Narvik</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">纳尔维克</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">988.29</span>
+988.29
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">挪威</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">挪威</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">10</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Helsinki</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">赫尔辛基</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">10</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Helsinki</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">赫尔辛基</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">786.47</span>
+786.47
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">挪威</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">挪威</td>
 </tr>
 <tr style="height: 22px; background: #9bc2e6;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">11</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Berlin</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">柏林</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">11</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Berlin</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">柏林</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">841.52</span>
+841.52
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">德国</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">德国</td>
 </tr>
 <tr style="height: 22px; background: #bdd7ee;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">12</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">Stavanger</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">斯塔万格</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">12</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Stavanger</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">斯塔万格</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="font-family: 微软雅黑;">302.7</span>
+302.7
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="font-family: 微软雅黑;">挪威</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">挪威</td>
 </tr>
 <tr style="height: 22px; background: #ddebf7;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">13</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Goteborg</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">哥德堡</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">13</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Goteborg</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">哥德堡</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">273.18</span>
+273.18
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">瑞典</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">瑞典</td>
 </tr>
 <tr style="height: 22px; background: #2f75b5;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">14</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Rovaniemi</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">罗瓦涅米</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">14</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Rovaniemi</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">罗瓦涅米</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">1038.81</span>
+1038.81
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">芬兰</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">芬兰</td>
 </tr>
 <tr style="height: 22px; background: #2f75b5;">
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">15</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Oslo</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">奥斯陆</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">Amsterdam</span></td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">阿姆斯特丹</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">15</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Oslo</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">奥斯陆</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">Amsterdam</td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">阿姆斯特丹</td>
 <td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">
 
-<span style="color: black; font-family: 微软雅黑;">1021.48</span>
+1021.48
 
 </td>
-<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle"><span style="color: black; font-family: 微软雅黑;">荷兰</span></td>
+<td style="padding-left: 7px; padding-right: 7px; border: none;" valign="middle">荷兰</td>
 </tr>
 </tbody>
 </table>
-</div>
-<span style="font-family: 微软雅黑;">然后有这张图，使用极清来合成的</span>
 
-<span style="font-family: 微软雅黑;">[![](/wp-content/uploads/2015/04/CAS-AIR-150x150.jpg "CAS AIR")](/wp-content/uploads/2015/04/CAS-AIR.jpg)</span>
+然后有这张图，使用极清来合成的
 
-<span style="font-family: 微软雅黑;">
-</span>
+[![](/wp-content/uploads/2015/04/CAS-AIR-150x150.jpg "CAS AIR")](/wp-content/uploads/2015/04/CAS-AIR.jpg)
+
+

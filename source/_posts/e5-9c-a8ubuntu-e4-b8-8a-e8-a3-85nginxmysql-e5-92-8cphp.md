@@ -22,8 +22,11 @@ date: 2016-10-16 21:34:04
 
 因为我们这是第一次使用apt来安装，所以我们需要先更新源。
 
-<pre class="lang:sh decode:true ">sudo apt-get update
-sudo apt-get install nginx</pre>
+```sh
+sudo apt-get update
+sudo apt-get install nginx
+```
+
 
 在Ubuntu 14.04这个版本里，Nginx会根据安装时候的配置来决定启动方式。
 
@@ -31,24 +34,39 @@ sudo apt-get install nginx</pre>
 
 如果你不知道的话，很简单，运行下面的命令就可以知道自己服务器公共的IP地址了。
 
-<pre class="lang:sh decode:true">ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'</pre>
-<pre class="lang:default decode:true">111.111.111.111
-fe80::601:17ff:fe61:9801</pre>
+```sh
+ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'
+```
+
+```default
+111.111.111.111
+fe80::601:17ff:fe61:9801
+```
+
 
 或者你觉得麻烦，这样也可以：
 
-<pre class="lang:sh decode:true ">curl http://icanhazip.com</pre>
-<pre class="lang:default decode:true">111.111.111.111</pre>
+```sh
+curl http://icanhazip.com
+```
+
+```default
+111.111.111.111
+```
+
 
 这样就知道了地址。这里由于我在的RWTH-Aachen屏蔽了这个网站，所以就查不到，具体情况你可以联系网管。
 
 直接输入IP或者域名。
 
-<pre class="lang:default highlight:0 decode:true ">http://server_domain_name_or_IP</pre>
+```default
+http://server_domain_name_or_IP
+```
 
-&nbsp;
 
-![nginx_default](http://kidozh.com/wp-content/uploads/2016/10/nginx_default.png)
+ 
+
+![nginx_default](/wp-content/uploads/2016/10/nginx_default.png)
 
 如果你看到了Nginx的欢迎页面，那么恭喜您，Ngnix就装好了。
 
@@ -58,7 +76,10 @@ fe80::601:17ff:fe61:9801</pre>
 
 最简单的就是输入下面的命令：
 
-<pre class="lang:sh decode:true ">sudo apt-get install mysql-server</pre>
+```sh
+sudo apt-get install mysql-server
+```
+
 
 在此期间，你会被要求输入一个MySQL管理员的密码。
 
@@ -66,11 +87,17 @@ fe80::601:17ff:fe61:9801</pre>
 
 首先，我们需要让MySQL生成一个可以存储信息和数据结构的目录，我们只需要键入下面的命令：
 
-<pre class="lang:sh decode:true ">sudo mysql_install_db</pre>
+```sh
+sudo mysql_install_db
+```
+
 
 接下来，你可以运行一个安全脚本来引导你做一些安全的配置，你需要输入命令：
 
-<pre class="lang:sh decode:true ">sudo mysql_secure_installation</pre>
+```sh
+sudo mysql_secure_installation
+```
+
 
 在这个过程中，你需要在安装过程中提供您MySQL管理员的密码。
 
@@ -86,7 +113,10 @@ fe80::601:17ff:fe61:9801</pre>
 
 我们可以安装这个模块并且还需要一个安装一个能够让PHP和我们后台数据库交互的包。这次安装会放入所有必要的PHP核心文件。你需要键入：
 
-<pre class="lang:sh decode:true ">sudo apt-get install php5-fpm php5-mysql</pre>
+```sh
+sudo apt-get install php5-fpm php5-mysql
+```
+
 
 ## 配置PHP处理模块
 
@@ -94,7 +124,10 @@ fe80::601:17ff:fe61:9801</pre>
 
 使用root权限来打开`php5-fpm`的配置文件：
 
-<pre class="lang:sh decode:true">sudo vim /etc/php5/fpm/php.ini</pre>
+```sh
+sudo vim /etc/php5/fpm/php.ini
+```
+
 
 在这个文件中，我们找到第一个参数`cgi.fix_pathinfo`，这个被一个`;`所注释掉，并且默认设置为1。
 
@@ -102,13 +135,19 @@ fe80::601:17ff:fe61:9801</pre>
 
 我们就需要关闭这个设定：
 
-<pre class="lang:sh decode:true ">cgi.fix_pathinfo=0</pre>
+```sh
+cgi.fix_pathinfo=0
+```
+
 
 保存这个文件，并且完成设定。
 
 现在，我们就需要重启我们的PHP处理器：
 
-<pre class="lang:sh decode:true ">sudo service php5-fpm restart</pre>
+```sh
+sudo service php5-fpm restart
+```
+
 
 这样我们的设定就会应用了。
 
@@ -118,11 +157,15 @@ fe80::601:17ff:fe61:9801</pre>
 
 我们需要在服务器层次上配置。如果我们想要Nginx默认的话，只需要这样：
 
-<pre class="lang:sh decode:true ">sudo vim /etc/nginx/sites-available/default</pre>
+```sh
+sudo vim /etc/nginx/sites-available/default
+```
+
 
 移除掉注释之后，整个文件就会像这样：
 
-<pre class="lang:default decode:true ">server {
+```default
+server {
     listen 80 default_server;
     listen [::]:80 default_server ipv6only=on;
 
@@ -134,7 +177,9 @@ fe80::601:17ff:fe61:9801</pre>
     location / {
         try_files $uri $uri/ =404;
     }
-}</pre>
+}
+```
+
 
 当然，我们需要为我们的网站做一些细微的调整：
 
@@ -145,7 +190,8 @@ fe80::601:17ff:fe61:9801</pre>
 
 所以说，现在我们要变成这样（注意高亮）
 
-<pre class="lang:default mark:6,8,14-28 decode:true ">server {
+```default
+server {
     listen 80 default_server;
     listen [::]:80 default_server ipv6only=on;
 
@@ -172,13 +218,18 @@ fe80::601:17ff:fe61:9801</pre>
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include fastcgi_params;
     }
-}</pre>
+}
+```
+
 
 当修改好了之后，你就可以保存文件了。
 
 然后重启Nginx服务器：
 
-<pre class="lang:sh decode:true ">sudo service nginx restart</pre>
+```sh
+sudo service nginx restart
+```
+
 
 # 创建一个PHP文件来测试配置
 
@@ -186,28 +237,40 @@ fe80::601:17ff:fe61:9801</pre>
 
 就上面所述，我们可以直接在文件夹中创建一个PHP文件。打开一个名为info.php的新文件。
 
-<pre class="lang:sh decode:true ">sudo vim /usr/share/nginx/html/info.php</pre>
+```sh
+sudo vim /usr/share/nginx/html/info.php
+```
+
 
 我们可以把下面的内容键入到文件之中，这个有效的PHP代码就能够反映我们服务器的一些情况。
 
-<pre class="lang:php decode:true ">&lt;?php
+```php
+<?php
 phpinfo();
-?&gt;</pre>
+?>
+```
+
 
 保存并且关闭文件。
 
 现在你可以在浏览器中访问这个界面：
 
-<pre class="lang:default decode:true ">http://server_domain_name_or_IP/info.php</pre>
+```default
+http://server_domain_name_or_IP/info.php
+```
+
 
 这样你就可以看见一个被PHP创建的反映你情况的界面。
 
-![php_info](http://kidozh.com/wp-content/uploads/2016/10/php_info.png)
+![php_info](/wp-content/uploads/2016/10/php_info.png)
 
 如果你看见了一个像这样的页面，那么你的Nginx的PHP环境就配置完毕了。
 
 接着，为了防止我们信息的泄露，删除这个文件就可以了。
 
-<pre class="lang:sh decode:true ">sudo rm /usr/share/nginx/html/info.php</pre>
+```sh
+sudo rm /usr/share/nginx/html/info.php
+```
 
-&nbsp;
+
+ 

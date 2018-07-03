@@ -768,7 +768,7 @@ array([[ 2, 5],
 ---------------------------------------------------------------------------
 IndexError Traceback (most recent call last)
 in () 1 a[s]
-IndexError: index (3) out **of** range (0&lt;=index&lt;2) **in** dimension 0
+IndexError: index (3) out **of** range (0<=index<2) **in** dimension 0
 
 >>>
 >>> a[tuple(s)] # same **as** a[i,j]
@@ -793,7 +793,7 @@ array([[ 0\. , 0.84147098, 0.90929743, 0.14112001],
 >>> ind
 array([2, 0, 3, 1])
 >>> time_max = time[ ind] _# times corresponding to the maxima_
->>> data_max = data[ind, xrange(data.shape[1])] _# =&gt; data[ind[0],0], data[ind[1],1]..._
+>>> data_max = data[ind, xrange(data.shape[1])] _# => data[ind[0],0], data[ind[1],1]..._
 >>> time_max
 array([ 82.5 , 20\. , 113.75, 51.25])
 >>> data_max
@@ -841,7 +841,7 @@ array([1, 1, 3, 3, 4])
 
 [code lang="python" light="0" toolbar="1"]
 >>> a = arange(12).reshape(3,4)
->>> b = a &gt; 4
+>>> b = a > 4
 >>> b # b is a boolean with a's shape
 array([[False, False, False, False],
 [False, True, True, True],
@@ -1146,9 +1146,9 @@ array([[ 5, 7],
 现在让我们做些更复杂的。比如说我们想要保留第一行大于1的列。一种方法是创建布尔索引：
 
 [code lang="python" light="0" toolbar="1"]
->>> A[0,:]&gt;1
+>>> A[0,:]>1
 array[False, False, True, True], dtype=bool)
->>> A[:,A[0,:]&gt;1]
+>>> A[:,A[0,:]>1]
 array([[ 2, 3],
 [ 6, 7],
 [10, 11]])
@@ -1157,9 +1157,9 @@ array([[ 2, 3],
 就是我们想要的！但是索引矩阵没这么方便。
 
 [code lang="python" light="0" toolbar="1"]
->>> M[0,:]&gt;1
+>>> M[0,:]>1
 matrix([[False, False, True, True]], dtype=bool)
->>> M[:,M[0,:]&gt;1]
+>>> M[:,M[0,:]>1]
 matrix([[2, 3]])
 [/code]
 
@@ -1175,7 +1175,7 @@ matrix([[ 2, 3],
 如果我们想要在矩阵两个方向有条件地切片，我们必须稍微调整策略，代之以：
 
 [code lang="python" light="0" toolbar="1"]
->>> A[A[:,0]&gt;2,A[0,:]&gt;1]
+>>> A[A[:,0]>2,A[0,:]>1]
 array([ 6, 11])
 >>> M[M.A[:,0]>2,M.A[0,:]>1]
 matrix([[ 6, 11]])
@@ -1187,7 +1187,7 @@ matrix([[ 6, 11]])
 >>> A[ix_(A[:,0]>2,A[0,:]>1)]
 array([[ 6, 7],
 [10, 11]])
->>> M[ix_(M.A[:,0]&gt;2,M**.A**[0,:]&gt;1)]
+>>> M[ix_(M.A[:,0]>2,M**.A**[0,:]>1)]
 matrix([[ 6, 7],
 [10, 11]])
 [/code]

@@ -38,7 +38,7 @@ date: 2015-12-09 02:49:06
 
 轧辊的角速度$$ \omega $$为6.28 Rad/s
 
-$$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 0.2
+$$ F_{s} $$ = 0.35 , $$ F_{d} $$= 0.2
 
 对于轧件：
 
@@ -50,17 +50,17 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 对于轧辊
 
-*   密度<span style="line-height: 22.8571px;">$$ \rho = 7850 kg/m^{3} $$</span>
+*   密度$$ \rho = 7850 kg/m^{3} $$
 *   $$ E = 2.1*10^{11} $$
-*   <span style="line-height: 22.8571px;">$$ \nu = 0.3 $$</span><span style="line-height: 22.8571px;"> </span>
+*   $$ \nu = 0.3 $$ 
 
 由于轧件在轧制过程中是对称分布，则我取了模型的**1/4**进行求解，同时将模型的密度放大**100**倍进行分析，缩短计算时间。
 
-# <span style="font-family: Consolas;">ANSYS</span>分析
+# ANSYS分析
 
 1.  ### 启动ANSYS
 
-1.1 以GUI模式进入ANSYS，同时在licensel栏中选择<span style="color: #00b050;">**LS-DYNA**</span>。（由于我的计算机并不支持CUDA并行计算，所以并没有开启GPU加速，有Nvidia显卡的同学可以选择开启此项功能）
+1.1 以GUI模式进入ANSYS，同时在licensel栏中选择**LS-DYNA**。（由于我的计算机并不支持CUDA并行计算，所以并没有开启GPU加速，有Nvidia显卡的同学可以选择开启此项功能）
 
 1.2 选择File Management对话框，在总路径下面为新工程建立一个子路径：ansysProduct/myHomework,工作名取为myHomework。
 
@@ -68,15 +68,15 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ### 2.设定标题
 
-选择菜单Utility Menu &gt; File &gt; Change Jobname 弹出对话框，输入myHomework，在New log and error files中选择Yes，单击OK按钮确认并且关闭对话框。
+选择菜单Utility Menu > File > Change Jobname 弹出对话框，输入myHomework，在New log and error files中选择Yes，单击OK按钮确认并且关闭对话框。
 
 ### 3.定义单元类型
 
-3.1 选择菜单 Main Menu &gt; Preprocessor &gt; Element Types &gt; Add/Edit/Delete ，弹出Element Types 对话框。
+3.1 选择菜单 Main Menu > Preprocessor > Element Types > Add/Edit/Delete ，弹出Element Types 对话框。
 
-3.2 单击Add… 按钮，弹出Library of Element Types 对话框，在 <span style="color: #00b050;">**LS-DYNA**</span>
- <span style="color: #00b050;">** Explicit**</span>下选择 <span style="text-decoration: underline;">3D Solid 164
- </span>
+3.2 单击Add… 按钮，弹出Library of Element Types 对话框，在 **LS-DYNA**
+ ** Explicit**下选择 3D Solid 164
+ 
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS2.png)
 
@@ -84,11 +84,11 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS3.png)
 
-3.4 （定义材料的模型）选择菜单Main Menu&gt;Preprocessor&gt;Material Props &gt;Material Models，弹出Define Material Model Behavior出现了Material Model Number 1，在对话框右边选择LS-DYNA &gt;Nonlinear &gt; Inelastic &gt;Isotropic Harding &gt; Bilinear Isotropic，在DENS（密度）输入785000，EX输入1.17E+011，NUXY输入0.36，Yield Stress 输入5.8E+077，Tangent Modulus 输入9E+006，如下图所示。
+3.4 （定义材料的模型）选择菜单Main Menu>Preprocessor>Material Props >Material Models，弹出Define Material Model Behavior出现了Material Model Number 1，在对话框右边选择LS-DYNA >Nonlinear > Inelastic >Isotropic Harding > Bilinear Isotropic，在DENS（密度）输入785000，EX输入1.17E+011，NUXY输入0.36，Yield Stress 输入5.8E+077，Tangent Modulus 输入9E+006，如下图所示。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS4.png)
 
-3.5（定义第二个材料模型）同样的，选择菜单栏中的Material &gt; New Model，弹出的Define Material ID对话框，输入2。在右边窗口中选择LS-DYNA &gt;Rigid Properties，定义轧辊材料。这个时候在DENS输入785000，EX输入2.1E+11，NUXY输入0.3，Translation Constraint Parameter（平移约束参数）处选择All disps, Rotational Constraint Parameter（旋转约束参数）出选择Y and Z rotate。单击OK后关闭对话框后，在Material 菜单下单击QUIT，退出对话框。
+3.5（定义第二个材料模型）同样的，选择菜单栏中的Material > New Model，弹出的Define Material ID对话框，输入2。在右边窗口中选择LS-DYNA >Rigid Properties，定义轧辊材料。这个时候在DENS输入785000，EX输入2.1E+11，NUXY输入0.3，Translation Constraint Parameter（平移约束参数）处选择All disps, Rotational Constraint Parameter（旋转约束参数）出选择Y and Z rotate。单击OK后关闭对话框后，在Material 菜单下单击QUIT，退出对话框。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS5.png)
 
@@ -98,7 +98,7 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ### 4.建立几何模型
 
-4.1 选择Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt; Keypoint &gt; In Active CS ，选择Crete Keypoints in Active Coordinate System 对话框，在X,Y,Z处依次填入 -0.001 , 0.0016,单击Apply
+4.1 选择Main Menu > Preprocessor > Modeling > Create > Keypoint > In Active CS ，选择Crete Keypoints in Active Coordinate System 对话框，在X,Y,Z处依次填入 -0.001 , 0.0016,单击Apply
 
 4.2 在 X,Y,Z依次填入-0.001,0.506,0,单击Apply
 
@@ -108,79 +108,79 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS8.png)
 
-4.5（画直线）选择 Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt;Lines&gt;Lines &gt; Straight Lines ， 依次点击 1 和2，2和3，3和4，4和1，在前三步点击Apply，在最后一项上点击OK完成直线的绘制。
+4.5（画直线）选择 Main Menu > Preprocessor > Modeling > Create >Lines>Lines > Straight Lines ， 依次点击 1 和2，2和3，3和4，4和1，在前三步点击Apply，在最后一项上点击OK完成直线的绘制。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS9.png)
 
-4.6（显示线框的编号）在Utility Menu &gt; Plot Ctrls &gt;Numbering，弹出Plot Numbering Controls，将Lines numbers 设置为On，单击OK，然后在 Utility Menu &gt; Plot &gt; Lines 使得图形窗口中显示线。这里我们可以看到：
+4.6（显示线框的编号）在Utility Menu > Plot Ctrls >Numbering，弹出Plot Numbering Controls，将Lines numbers 设置为On，单击OK，然后在 Utility Menu > Plot > Lines 使得图形窗口中显示线。这里我们可以看到：
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS10.png)
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS11.png)
 
-4.7（画出轧棍）在 Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt; Areas &gt; Arbitrary &gt; By Lines,按照顺序单击L1,L2,L3,L4，完成截面的建立，选择Main Menu &gt; Preprocessor &gt; Operate &gt; Extrude &gt; Areas &gt; About Axis ,弹出Sweep Areas about 对话框，在图形窗口中选择我们刚刚绘制出的A1(Area 1)，单击OK，在接下来弹出来的Sweep Areas about Axis对话框中，在ARC栏中输入360，单击OK完成轧辊的几何模型，同时退出Sweep Areas about Axis
+4.7（画出轧棍）在 Main Menu > Preprocessor > Modeling > Create > Areas > Arbitrary > By Lines,按照顺序单击L1,L2,L3,L4，完成截面的建立，选择Main Menu > Preprocessor > Operate > Extrude > Areas > About Axis ,弹出Sweep Areas about 对话框，在图形窗口中选择我们刚刚绘制出的A1(Area 1)，单击OK，在接下来弹出来的Sweep Areas about Axis对话框中，在ARC栏中输入360，单击OK完成轧辊的几何模型，同时退出Sweep Areas about Axis
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS12.png)
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS13.png)
 
-4.8（画出轧件）在 Main Menu &gt; Preprocessor &gt; Modeling &gt; Create &gt; Volumes &gt; Block &gt; ByDimensions弹出的对话框在X-coordinates中输入0，0.5，在Y-coordinates中输入0，0.02，在Z-coordinates中输入-0.15，-0.65.单击OK完成轧辊的几何模型，同时也可以显示出轧辊的几何模型。
+4.8（画出轧件）在 Main Menu > Preprocessor > Modeling > Create > Volumes > Block > ByDimensions弹出的对话框在X-coordinates中输入0，0.5，在Y-coordinates中输入0，0.02，在Z-coordinates中输入-0.15，-0.65.单击OK完成轧辊的几何模型，同时也可以显示出轧辊的几何模型。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS14.png)
 
 ### 5.划分网格
 
-5.1 （体的标号）选择 Utility Menu &gt; Plot Ctrls &gt; Numbering 所弹出的对话框中设置Volume numbers 为on，单击OK退出Plot Numbering Controls，并且在Utility Menu&gt; Plot &gt;Volumes中显示体。
+5.1 （体的标号）选择 Utility Menu > Plot Ctrls > Numbering 所弹出的对话框中设置Volume numbers 为on，单击OK退出Plot Numbering Controls，并且在Utility Menu> Plot >Volumes中显示体。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS15.png)
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS16.png)
 
-5.2（选择轧件）在Utility Menu &gt; Select &gt; Entities所弹出的Select Enti…对话框中选择Volume,By Num/Pick,选择V5（轧件），单击OK。
+5.2（选择轧件）在Utility Menu > Select > Entities所弹出的Select Enti…对话框中选择Volume,By Num/Pick,选择V5（轧件），单击OK。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS17.png)
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS18.png)
 
-5.3（只选择轧件）在Utility Menu&gt; Select&gt;Everything Below&gt;Selected Volumes ,在选择的体下编辑。同时在Utility Menu&gt;Plot&gt;Lines中显示轧辊的所有的线。
+5.3（只选择轧件）在Utility Menu> Select>Everything Below>Selected Volumes ,在选择的体下编辑。同时在Utility Menu>Plot>Lines中显示轧辊的所有的线。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS19.png)
 
-5.4（设定划分曲线的形式）选择Main Menu &gt; Preprocessor &gt; Meshing &gt;Mesh Attributes &gt; Default Attribs弹出Meshing Attributes 在[MAT]中选择1（板坯轧件），单击OK退出
+5.4（设定划分曲线的形式）选择Main Menu > Preprocessor > Meshing >Mesh Attributes > Default Attribs弹出Meshing Attributes 在[MAT]中选择1（板坯轧件），单击OK退出
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS20.png)
 
-5.5（划分网格的尺寸控制）选择Main Menu&gt;Preprocessor &gt;Meshing &gt;Size Cntrl &gt;ManualSize &gt;Lines &gt;Picked Lines，弹出Element Size On…对话框。
+5.5（划分网格的尺寸控制）选择Main Menu>Preprocessor >Meshing >Size Cntrl >ManualSize >Lines >Picked Lines，弹出Element Size On…对话框。
 
-5.6（长的网格分段）在图形窗口中选择L30，31，32，33，在Element Size On对话框中单击Apply，弹出<span style="color: #00b0f0;">**Element Size On Picked Lines**</span>对话框，在NDIV No. of element divisions中输入51。单击Apply。
+5.6（长的网格分段）在图形窗口中选择L30，31，32，33，在Element Size On对话框中单击Apply，弹出**Element Size On Picked Lines**对话框，在NDIV No. of element divisions中输入51。单击Apply。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS21.png)
 
-5.6（宽的网格分段）在图形窗口中选择L23，25，26，28，在Element Size On对话框中单击Apply，弹出Element Size On Picked Lines对话框，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入21。单击Apply。
+5.6（宽的网格分段）在图形窗口中选择L23，25，26，28，在Element Size On对话框中单击Apply，弹出Element Size On Picked Lines对话框，在**NDIV No. of element divisions**中输入21。单击Apply。
 
-5.6（高的网格分段）在图形窗口中选择L23，25，26，28，在Element Size On对话框中单击Apply，弹出Element Size On Picked Lines对话框，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入11。单击Apply。
+5.6（高的网格分段）在图形窗口中选择L23，25，26，28，在Element Size On对话框中单击Apply，弹出Element Size On Picked Lines对话框，在**NDIV No. of element divisions**中输入11。单击Apply。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS22.png)
 
-5.7（完成板坯V5的网格划分）选择Main Menu &gt; Preprocessor &gt;Meshing &gt;Mesh &gt;Volumes &gt;Mapped &gt;4 or 6 sided，弹出Mesh &gt; Volumes对话框，这里单击板坯V5，单击OK，完成板坯的网格划分。
+5.7（完成板坯V5的网格划分）选择Main Menu > Preprocessor >Meshing >Mesh >Volumes >Mapped >4 or 6 sided，弹出Mesh > Volumes对话框，这里单击板坯V5，单击OK，完成板坯的网格划分。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS23.png)
 
-5.8（选择轧辊的步骤）选择Utility Menu &gt; Select &gt; Everything，然后选择Utility Menu &gt; Plot &gt; Volume显示体，然后Utility Menu &gt;Select&gt;Entities…弹出的对话框中选择Volume、By Num/Pick，单击轧辊（根据ANSYS的格式，应该是V1，2，3，4），单击OK。
+5.8（选择轧辊的步骤）选择Utility Menu > Select > Everything，然后选择Utility Menu > Plot > Volume显示体，然后Utility Menu >Select>Entities…弹出的对话框中选择Volume、By Num/Pick，单击轧辊（根据ANSYS的格式，应该是V1，2，3，4），单击OK。
 
-5.9（显示轧辊）选择Utility Menu &gt;Select &gt;Everything Below &gt;Selected Volume选定好了轧辊，选择Utility Menu &gt; Plot &gt;Line，显示所有的线。
+5.9（显示轧辊）选择Utility Menu >Select >Everything Below >Selected Volume选定好了轧辊，选择Utility Menu > Plot >Line，显示所有的线。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS24.png)
 
-5.10（选择轧辊的性质）同上面的理在Main Menu &gt; Preprocessor &gt;Meshing &gt;Mesh Attributes &gt;Default Attribs，弹出Meshing Attributes对话框中，在[MAT]中选择2（Rigid轧辊），单击OK
+5.10（选择轧辊的性质）同上面的理在Main Menu > Preprocessor >Meshing >Mesh Attributes >Default Attribs，弹出Meshing Attributes对话框中，在[MAT]中选择2（Rigid轧辊），单击OK
 
-5.11（划分轧辊的对话框）选择Main Menu &gt; Preprocessor &gt;Meshing &gt; Size Cntrl&gt;Lines &gt;Picked Lines，在弹出的对话框中选择轧辊中的所有线段（Pick all![](/wp-content/uploads/2015/12/120815_1846_ANSYS25.png)），弹出Element Sizes On Picked Lines对话框，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入31，单击Apply在之后，在图形窗口中选择L2,4,12,7,17(也就是轴中框)，单击OK，在<span style="color: #00b0f0;">**NDIV No. of element divisions**</span>中输入11.
+5.11（划分轧辊的对话框）选择Main Menu > Preprocessor >Meshing > Size Cntrl>Lines >Picked Lines，在弹出的对话框中选择轧辊中的所有线段（Pick all![](/wp-content/uploads/2015/12/120815_1846_ANSYS25.png)），弹出Element Sizes On Picked Lines对话框，在**NDIV No. of element divisions**中输入31，单击Apply在之后，在图形窗口中选择L2,4,12,7,17(也就是轴中框)，单击OK，在**NDIV No. of element divisions**中输入11.
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS26.png)
 
-5.12 选择Main Menu &gt; Preprocessor &gt;Meshing &gt; Meshing &gt;MeshTool，弹出对话框，启动<span style="color: #7030a0;">**SmartSize**</span>，选择MeshTool的<span style="color: #7030a0;">Hex</span>和<span style="color: #7030a0;">Sweep</span>，单击<span style="color: #7030a0;">Sweep</span>，在弹出的对话框中，在图形窗口中选择轧辊（V<span style="color: #c00000; font-size: 14pt;">1,2,3,4</span>）。单击<span style="color: #c00000;">OK</span>之后完成对轧辊的划分。
+5.12 选择Main Menu > Preprocessor >Meshing > Meshing >MeshTool，弹出对话框，启动**SmartSize**，选择MeshTool的Hex和Sweep，单击Sweep，在弹出的对话框中，在图形窗口中选择轧辊（V1,2,3,4）。单击OK之后完成对轧辊的划分。
 
-5.13 选择Utility Menu&gt;Select &gt;Everything以保证PART的正常进行。
+5.13 选择Utility Menu>Select >Everything以保证PART的正常进行。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS27.png)
 
@@ -188,7 +188,7 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ### 6.生成PART
 
-6.1 选择Main Menu &gt; Preprocessor&gt; LS-DYNA Options&gt;Parts Option，弹出Parts Date Written for LS-DYNA，选择Create all parts，单击OK后，从对话框中选择File &gt; Close，关闭EDPART Command对话框
+6.1 选择Main Menu > Preprocessor> LS-DYNA Options>Parts Option，弹出Parts Date Written for LS-DYNA，选择Create all parts，单击OK后，从对话框中选择File > Close，关闭EDPART Command对话框
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS29.png)
 
@@ -198,7 +198,7 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ### 7.定义接触
 
-7.1选择Main Menu &gt; Preprocessor &gt; LS-DYNA Options &gt; Contact &gt; Define Contact，弹出Contact Parameter Definitions（接触参数定义）对话框。选择Surface To Surf &gt; Automatic(ASTS)，在Static Friction Coefficient(动摩擦系数)中输入0.35，在Dynamic Friction Coefficient（动态摩擦系数）栏中输入0.2。单击OK。
+7.1选择Main Menu > Preprocessor > LS-DYNA Options > Contact > Define Contact，弹出Contact Parameter Definitions（接触参数定义）对话框。选择Surface To Surf > Automatic(ASTS)，在Static Friction Coefficient(动摩擦系数)中输入0.35，在Dynamic Friction Coefficient（动态摩擦系数）栏中输入0.2。单击OK。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS31.png)
 
@@ -208,45 +208,45 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ### 8.创建组件，施加约束
 
-8.1选择Utility Menu &gt;Select &gt;Entities…，弹出Select Enti…对话框，依次选择Volume、By Num/Pick，单击OK，选择板坯轧件（V5）。
+8.1选择Utility Menu >Select >Entities…，弹出Select Enti…对话框，依次选择Volume、By Num/Pick，单击OK，选择板坯轧件（V5）。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS33.png)
 
-8.2选择Utility Menu &gt;Select&gt;Entities，依次选择Nodes、Attached to、Volumes、all、From Full，单击OK。
+8.2选择Utility Menu >Select>Entities，依次选择Nodes、Attached to、Volumes、all、From Full，单击OK。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS34.png)
 
-8.3选择Utility Menu&gt;Select &gt;Comp/Assembly &gt;Create Component…，在弹出的对话框中，Cname中输入slab，在Entity中选取Nodes，完成Component的设置。
+8.3选择Utility Menu>Select >Comp/Assembly >Create Component…，在弹出的对话框中，Cname中输入slab，在Entity中选取Nodes，完成Component的设置。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS35.png)
 
-8.4选择Utility Menu &gt; Select &gt;Entities…，依次选取Nodes、ByLocation、Y coordinates、0、Reselect，单击OK（沿Y轴的节点）
+8.4选择Utility Menu > Select >Entities…，依次选取Nodes、ByLocation、Y coordinates、0、Reselect，单击OK（沿Y轴的节点）
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS36.png)
 
-8.5（完成轧件底部的约束）选择Main Menu &gt; Preprocessor &gt;LS-DYNA Option &gt;Constraints &gt;Apply &gt;On Nodes，弹出的对话框中继续Pick All，单击OK完成对于<span style="color: #4472c4;">轧件底部的约束</span>
+8.5（完成轧件底部的约束）选择Main Menu > Preprocessor >LS-DYNA Option >Constraints >Apply >On Nodes，弹出的对话框中继续Pick All，单击OK完成对于轧件底部的约束
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS37.png)
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS38.png)
 
-8.6选择Utility Menu &gt;Select &gt; Everything Below&gt; Selected Volumes。
+8.6选择Utility Menu >Select > Everything Below> Selected Volumes。
 
-8.7选择Utility Menu&gt; Select &gt; Entities…,弹出Select Enti…对话框中依次选取Nodes、ByLocation、X coordinates、0、Reselect，单击OK
+8.7选择Utility Menu> Select > Entities…,弹出Select Enti…对话框中依次选取Nodes、ByLocation、X coordinates、0、Reselect，单击OK
 
-8.8选择Main Menu &gt;Preprocessor &gt;LS-DYNA Option &gt; Constraints Apply &gt;On Nodes，在弹出的对话框中Select All，在Lab2栏中选择UX，在Value栏中输入0
+8.8选择Main Menu >Preprocessor >LS-DYNA Option > Constraints Apply >On Nodes，在弹出的对话框中Select All，在Lab2栏中选择UX，在Value栏中输入0
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS39.png)
 
-8.9选择Utility Menu &gt;Select &gt;Everything
+8.9选择Utility Menu >Select >Everything
 
-8.10（设置初始速度）选择Main Menu &gt; Preprocessor &gt;LS-DYNA Option &gt; Initial Velocity &gt; On Nodes &gt; w/Nodal Rotate，弹出Input Velocity 对话框中，在Input Velocity on component栏中选择SLAB，在VZ栏中输入2.88，单击OK
+8.10（设置初始速度）选择Main Menu > Preprocessor >LS-DYNA Option > Initial Velocity > On Nodes > w/Nodal Rotate，弹出Input Velocity 对话框中，在Input Velocity on component栏中选择SLAB，在VZ栏中输入2.88，单击OK
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS40.png)
 
 ### 9.施加载荷
 
-9.1选择Utility Menu &gt; Parameters &gt; Array Parameters &gt; Define/Edit，在弹出来的对话框中单击Add。
+9.1选择Utility Menu > Parameters > Array Parameters > Define/Edit，在弹出来的对话框中单击Add。
 
 9.2在弹出来的对话框中，在Par处输入time，在I，J，K处分别输入2，1，1，单击Apply
 
@@ -256,40 +256,41 @@ $$ F_{s} $$ = 0.35 , <span style="line-height: 22.8571px;">$$ F_{d} $$</span>= 
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS42.png)
 
-9.4选择time，单击<span style="color: #00b050;">Edit</span>…，弹出Array Parameter Time 对话框，在第一栏中输入0，在第二栏中输入0.08，选择<span style="color: #00b0f0;">File&gt;Apply/Quit</span>。保存数据并退出。
+9.4选择time，单击Edit…，弹出Array Parameter Time 对话框，在第一栏中输入0，在第二栏中输入0.08，选择File>Apply/Quit。保存数据并退出。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS43.png)
 
-9.5选择velocity，单击<span style="color: #00b050;">Edit</span>…，弹出Array Parameter Time 对话框，在第一栏中输入0，在第二栏中输入-2.62，选择<span style="color: #00b0f0;">File&gt;Apply/Quit</span>。保存数据并退出。
+9.5选择velocity，单击Edit…，弹出Array Parameter Time 对话框，在第一栏中输入0，在第二栏中输入-2.62，选择File>Apply/Quit。保存数据并退出。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS44.png)
 
-9.6选择Main Menu &gt; Preprocessor &gt; LS-DYNA Option &gt; Loading Option&gt; Specify Loads，弹出对话框中，在LoadLabels栏中选择RBRX，在Component name or PART number 栏中选择2（轧辊），在Parameter name for time values中选择TIME，在Parameter name for date value中选择VELOCITY，单击OK，完成轧辊的加载。
+9.6选择Main Menu > Preprocessor > LS-DYNA Option > Loading Option> Specify Loads，弹出对话框中，在LoadLabels栏中选择RBRX，在Component name or PART number 栏中选择2（轧辊），在Parameter name for time values中选择TIME，在Parameter name for date value中选择VELOCITY，单击OK，完成轧辊的加载。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS45.png)
 
 ### 10.求解（输出文件格式、时间、时间步）
 
-10.1选择Main Menu &gt;Solution &gt;Analysis Options &gt;Energy Options，弹出对话框，单击OK后退出。
+10.1选择Main Menu >Solution >Analysis Options >Energy Options，弹出对话框，单击OK后退出。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS46.png)
 
-10.2选择Main Menu&gt; Solution &gt;Time Controls &gt;Solution Time，弹出对话框，输入0.15.
+10.2选择Main Menu> Solution >Time Controls >Solution Time，弹出对话框，输入0.15.
 
-10.3选择Main Menu&gt;Solution &gt; Output Controls &gt; Output File Type，弹出的对话框中，选择ANSYS and LS-DYNA，单击OK。
+10.3选择Main Menu>Solution > Output Controls > Output File Type，弹出的对话框中，选择ANSYS and LS-DYNA，单击OK。
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS47.png)
 
-10.4选择Main Menu&gt;Solution &gt; Output Controls &gt;File Output Freq &gt; Number of Steps，在弹出的对话框在，在[EDRST]栏中输入50，[EDHTIME]栏中输入1000，[EDDUMP]栏中输入1，单击OK
+10.4选择Main Menu>Solution > Output Controls >File Output Freq > Number of Steps，在弹出的对话框在，在[EDRST]栏中输入50，[EDHTIME]栏中输入1000，[EDDUMP]栏中输入1，单击OK
 
 ![](/wp-content/uploads/2015/12/120815_1846_ANSYS48.png)
 
-10.5选择Main Menu &gt; Solution &gt; Solve，弹出Solve Current Load Step，单击OK求解。
+10.5选择Main Menu > Solution > Solve，弹出Solve Current Load Step，单击OK求解。
 
 注：这个过程进行时间比较长，在我的电脑（联想G500，Intel i7 Ivb）下大概运行了1小时6分钟。那么我的BLOG也到这里，我会在下一篇阐述结果和查看结果的方法。
 
 下面是ANSYS命令流的代码：
-<pre class="wrap:true minimize:true lang:default decode:true"> ANSYS Mechanical/LS-DYNA
+```default
+ ANSYS Mechanical/LS-DYNA
  Point Releases and Patches installed:
 
  ANSYS, Inc. Products 15.0
@@ -1206,4 +1207,5 @@ Rotation    : Ox =   0.0000     Oy =   0.0000     Oz =   0.0000
  RAYLIGH ENERGY dissipation is to be computed and included in the energy balance.
 
  CONTROL TERMINATION time set to  0.1500     seconds
-</pre>
+
+```

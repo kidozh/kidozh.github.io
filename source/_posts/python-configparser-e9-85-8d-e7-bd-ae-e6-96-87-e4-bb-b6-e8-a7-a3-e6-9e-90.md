@@ -14,9 +14,12 @@ ConfigParser该模块定义了ConfigParser类，该类实现了基本的配置�
 
 例如：
 
-<pre class="lang:ini decode:true">[My Section] 
+```ini
+[My Section] 
 foodir: %(dir)s/whatever 
-dir=frob</pre>
+dir=frob
+```
+
 
 将会解析“`%(dir)s`”为“`dir`”的值（这里是“`frob`”）。该模块包含所以需要的扩展。
 
@@ -108,19 +111,22 @@ read(filenames)
 
 尝试解析文件列表，如果解析成功返回文件列表。如果filenames是string或Unicode string，将会按单个文件来解析。如果在filenames中的文件不能打开，该文件将被忽略。这样设计的目的是，让你能指定本地有可能是配置文件的列表（例如，当前文件夹，用户的根目录，及一些全系统目录），所以在列表中存在的配置文件都会被读取。如果文件都不存在，那么ConfigParser实例会包含空数据集。一个需要从配置文件读取初始化数据的应用程序，应该使用readfp()方法来加载所需要的文件，之后可以使用read()方法来获取任何可能的文件：
 
-<pre class="lang:python decode:true ">import ConfigParser, os
+```python
+import ConfigParser, os
 
 config = ConfigParser.ConfigParser() 
 config.readfp(open('defaults.cfg')) 
-config.read(['site.cfg', os.path.expanduser('~/.myapp.cfg')]) </pre>
+config.read(['site.cfg', os.path.expanduser('~/.myapp.cfg')]) 
+```
 
-&nbsp;
+
+ 
 
 2.4版本之后，返回成功解析的文件列表。
 
 readfp(fp[, filename]) 
 
-从文件或fp（值使用该对象的readline()方法）中的似文件类读取并解析配置数据，如果filename被省略，fp有一个name属性，该属性用于获取filename；默认是“&lt;???&gt;”。
+从文件或fp（值使用该对象的readline()方法）中的似文件类读取并解析配置数据，如果filename被省略，fp有一个name属性，该属性用于获取filename；默认是“<???>”。
 
 get(section, option) 
 

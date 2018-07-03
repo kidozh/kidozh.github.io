@@ -48,7 +48,8 @@ date: 2016-11-03 07:29:30
 
 我将会使用Shape作为主题名称，但是你想用啥名字都无所谓。同时，你需要填入author（作者），URLs（地址栏）和你的主题的说明信息。
 
-<pre class="lang:css decode:true ">/*
+```css
+/*
 Theme Name: Shape
 Theme URI: https://themeshaper.com/
 Author: ThemeShaper
@@ -60,12 +61,14 @@ License URI: license.txt
 Tags: light, white, one-column, two-columns, left-sidebar, right-sidebar, flexible-width, custom-backgroud, custom-header, custom-menu, featured-images, flexible-header, microformats, post-formats, rtl-language-support, threaded-comments, translation-ready
 This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
-*/</pre>
+*/
+```
+
 
 让我们挨个看这些元素，这样你就会知道他们在说什么了。
 
 *   Theme Name - 你的主题名称
-*   Theme URL - 你主题主页在网络中的地址。这可以是你网站的某一部分。举个例子，许多的主题作者都可能使用类似于这样的地址：[http://yourgroovydomain.com/your-theme/&amp;#8221](http://yourgroovydomain.com/your-theme/&amp;#8221)
+*   Theme URL - 你主题主页在网络中的地址。这可以是你网站的某一部分。举个例子，许多的主题作者都可能使用类似于这样的地址：[http://yourgroovydomain.com/your-theme/&#8221](http://yourgroovydomain.com/your-theme/&#8221)
 *   Author - 自我说明，当然也就是你的名字咯
 *   Author URL - 连接到你的网站
 *   Description - 提供一个你主题的简短而清晰的说明，你可以用几句话总结你创建主题的目的以及主题的特性。当用户搜索主题的时候，这个说明将会出现在用户的仪表盘（Dashboard）之中，当然也有可能出现在WordPress.org免费主题库之中
@@ -90,52 +93,70 @@ WordPress真的只需要一个模板文件，`index.php`。我们能够并且将
 
 ## Header.php和Footer.php
 
-在我们之前的创建的HTML结构查看并且把所有的代码粘贴到这里并且在`header.php`之中应该包含`&lt;div id="main"&gt;`。它看起来应该像这样：
+在我们之前的创建的HTML结构查看并且把所有的代码粘贴到这里并且在`header.php`之中应该包含`<div id="main">`。它看起来应该像这样：
 
-<pre class="lang:xhtml decode:true ">&lt;div id="page" class="hfeed site"&gt;
-     &lt;header id="masthead" class="site-header" role="banner"&gt;
-         &lt;hgroup&gt;&lt;/hgroup&gt;
-         &lt;nav role="navigation" class="site-navigation main-navigation"&gt;&lt;/nav&gt;&lt;!-- .site-navigation .main-navigation --&gt;
-     &lt;/header&gt;&lt;!-- #masthead .site-header --&gt;
-&lt;div id="main" class="site-main"&gt;</pre>
+```xhtml
+<div id="page" class="hfeed site">
+     <header id="masthead" class="site-header" role="banner">
+         <hgroup></hgroup>
+         <nav role="navigation" class="site-navigation main-navigation"></nav><!-- .site-navigation .main-navigation -->
+     </header><!-- #masthead .site-header -->
+<div id="main" class="site-main">
+```
 
-现在在后面复制所有事情，包含<span class="lang:xhtml decode:true crayon-inline">&lt;/div&gt;&lt;!– #main –&gt;</span>在`footer.php`之中，它看起来可能是这样：
 
-<pre class="lang:xhtml decode:true ">&lt;/div&gt;&lt;!-- #main .site-main --&gt;
-     &lt;footer id="colophon" class="site-footer" role="contentinfo"&gt;
-          &lt;div class="site-info"&gt;&lt;/div&gt;&lt;!-- .site-info --&gt;
-     &lt;/footer&gt;&lt;!-- #colophon .site-footer --&gt;
-&lt;/div&gt;&lt;!-- #page .hfeed .site --&gt;</pre>
+现在在后面复制所有事情，包含</div><!– #main –>在`footer.php`之中，它看起来可能是这样：
+
+```xhtml
+</div><!-- #main .site-main -->
+     <footer id="colophon" class="site-footer" role="contentinfo">
+          <div class="site-info"></div><!-- .site-info -->
+     </footer><!-- #colophon .site-footer -->
+</div><!-- #page .hfeed .site -->
+```
+
 
 ## sidebar.php
 
 把下面的代码复制到`sidebar.php`之中：
 
-<pre class="lang:xhtml decode:true ">&lt;div id="secondary" class="widget-area"&gt;
-&lt;/div&gt;&lt;!-- #secondary .widget-area --&gt;
+```xhtml
+<div id="secondary" class="widget-area">
+</div><!-- #secondary .widget-area -->
 
-&lt;div id="tertiary" class="widget-area"&gt;
-&lt;/div&gt;&lt;!-- #tertiary .widget-area --&gt;</pre>
+<div id="tertiary" class="widget-area">
+</div><!-- #tertiary .widget-area -->
+```
+
 
 ## index.php
 
 我猜你们已经知道我们要做什么了。把下面的代码复制到#main div 之中而在#primary 闭合之前，那么差不多看成这样：
 
-<pre class="lang:xhtml decode:true ">&lt;div id="primary" class="content-area"&gt;
-    &lt;div id="content" class="site-content" role="main"&gt;
-    &lt;/div&gt;&lt;!-- #content .site-content --&gt;
-&lt;/div&gt;&lt;!-- #primary .content-area --&gt;</pre>
+```xhtml
+<div id="primary" class="content-area">
+    <div id="content" class="site-content" role="main">
+    </div><!-- #content .site-content -->
+</div><!-- #primary .content-area -->
+```
+
 
 只需要两个很小几部，我们就会有一个完美的WordPress主题。我们需要在`header`，`sidebar`和`footer`之中调用这些函数。
 
 在`index.php`的页首，我们需要添加模板标签：
 
-<pre class="lang:php decode:true ">&lt;?php get_header(); ?&gt;</pre>
+```php
+<?php get_header(); ?>
+```
+
 
 很好！那么在页尾，我们需要添加
 
-<pre class="lang:php decode:true ">&lt;?php get_sidebar(); ?&gt;
-&lt;?php get_footer(); ?&gt;</pre>
+```php
+<?php get_sidebar(); ?>
+<?php get_footer(); ?>
+```
+
 
 是的，现在我们就能够看到WordPress的主要文件index.php了。其有在页首调用了开始页，而在页尾也会调用函数。
 

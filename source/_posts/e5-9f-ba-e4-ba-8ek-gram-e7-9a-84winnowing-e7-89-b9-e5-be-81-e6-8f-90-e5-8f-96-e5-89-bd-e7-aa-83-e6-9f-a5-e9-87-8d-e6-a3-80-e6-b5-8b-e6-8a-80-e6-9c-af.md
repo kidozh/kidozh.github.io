@@ -27,7 +27,7 @@ k-gram 就是将一个连续的文本进行切割，每一个部分的长度都�
 
 这个时候我们在A这个文档上取一个大小为3的滑动窗口，就得到了一个3-gram 的集合：
 
-![](http://kidozh.com/wp-content/uploads/2017/01/k-grams.png)
+![](/wp-content/uploads/2017/01/k-grams.png)
 
 A : yab abb bba dad ada dab abb bba bad ado doo
 
@@ -147,31 +147,31 @@ OK，这个想法却是减小了我们的特征值，但是有效么？
 
 好的我们现在再来解答一下这个问题： 我们的特征值如下：
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_sample-512x43.png)
+![](/wp-content/uploads/2017/01/Winnowing_sample-512x43.png)
 
 我们假设我们选取的窗口的大小为4：
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows.png)
 
 在第一个窗口中我们的最小值是A3:8，以此类推
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows_step_1-512x70.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows_step_1-512x70.png)
 
 在第二个窗口中我们的最小值依然是A3:8
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows_step_2-512x60.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows_step_2-512x60.png)
 
 在第三个窗口中我们的最小值依然是A3:8
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows_step_3-512x64.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows_step_3-512x64.png)
 
 在第四个窗口中我们的最小值依然是A3:8
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows_step_4-512x67.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows_step_4-512x67.png)
 
 直到第五个窗口的时候我们才能加入新的特征值
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows_step_5-512x60.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows_step_5-512x60.png)
 
 我们可以看到最差的情况就是上面我们说的这情况，其实就是W-1
 
@@ -179,14 +179,14 @@ OK，这个想法却是减小了我们的特征值，但是有效么？
 
 假设我们的hash值的集合是下面这个样子
 
-![](http://kidozh.com/wp-content/uploads/2017/01/hash_set.png)
+![](/wp-content/uploads/2017/01/hash_set.png)
 
 我们设置窗口的大小为4：
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Winnowing_windows_matrix.png)
+![](/wp-content/uploads/2017/01/Winnowing_windows_matrix.png)
 
 我们得到最终的特征值就是下面这个样子：
 
-![](http://kidozh.com/wp-content/uploads/2017/01/Fingerprint.png)
+![](/wp-content/uploads/2017/01/Fingerprint.png)
 
 前面的是特征值，后面的是特征值对应的下标。

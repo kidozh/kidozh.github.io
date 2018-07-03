@@ -20,7 +20,7 @@ date: 2016-10-19 21:54:23
 
 在这个入门之中，你能够随心所欲的开发WordPress了。
 
-![theme-shaper-cloud1](http://kidozh.com/wp-content/uploads/2016/10/theme-shaper-cloud1.png)
+![theme-shaper-cloud1](/wp-content/uploads/2016/10/theme-shaper-cloud1.png)
 
 # 下划线(_s)的开始主题的入门
 
@@ -50,6 +50,6 @@ date: 2016-10-19 21:54:23
 
 我认为对任何WordPress主题这也是重要的。
 
-&nbsp;
+ 
 
-&nbsp;
+ 

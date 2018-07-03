@@ -68,7 +68,8 @@ sigmoid函数输入记为z，可以通过这个公式得出：
 ## 训练算法
 
 我们可以找到包含两个数值型特征：X1和X2。在此数据集上，我们通过梯度上升算法找到最佳的回归系数，也就是拟合出Logistic回归模型的最佳参数。
-<pre class="lang:python decode:true">from numpy import *
+```python
+from numpy import *
 
 def loadDataSet():
     dataMat = []; labelMat = []
@@ -93,7 +94,9 @@ def gradAscent(dataMatIn, classLabels):
         h = sigmoid(dataMatrix*weights)     #matrix mult
         error = (labelMat - h)              #vector subtraction
         weights = weights + alpha * dataMatrix.transpose()* error #matrix mult
-    return weights</pre>
+    return weights
+```
+
 
  第一个函数就是打开`testSet.txt`并且逐行读取。每行的前两个值分别是X1和X2，第三个值是数据对应的类别标签。此外为了方便计算，该函数还将X0的值设定为1.0，接下来的这个函数就是`sigmoid`函数了。
 
@@ -104,7 +107,8 @@ def gradAscent(dataMatIn, classLabels):
 ## 分析数据：给出决策边界
 
 上面已经给出了一组回归系数，其确定了不同类别数据之间的分割线：
-<pre class="lang:python decode:true">def plotBestFit(weights):
+```python
+def plotBestFit(weights):
     import matplotlib.pyplot as plt
     dataMat,labelMat=loadDataSet()
     dataArr = array(dataMat)
@@ -124,9 +128,11 @@ def gradAscent(dataMatIn, classLabels):
     y = (-weights[0]-weights[1]*x)/weights[2]
     ax.plot(x, y)
     plt.xlabel('X1'); plt.ylabel('X2');
-    plt.show()</pre>
+    plt.show()
+```
 
- 程序之中的代码是直接用Matplotlib画出来的，我们需要指出的是在18行 我们指定了`sigmoid`函数为0，而0正是类别1和0的分界处。因此我们设定$$0=w_{0}x_{0}+w_{1}x_{1}+w_{2}x_{2}$$<span style="line-height: 1.42857; background-color: transparent;">，然后解出X2和X1的关系式（分割线的方程有，注意X0=1）</span>
+
+ 程序之中的代码是直接用Matplotlib画出来的，我们需要指出的是在18行 我们指定了`sigmoid`函数为0，而0正是类别1和0的分界处。因此我们设定$$0=w_{0}x_{0}+w_{1}x_{1}+w_{2}x_{2}$$，然后解出X2和X1的关系式（分割线的方程有，注意X0=1）
 
 [![Logistic](/wp-content/uploads/2016/05/Logistic.png)](/wp-content/uploads/2016/05/Logistic.png)
 
@@ -135,7 +141,8 @@ def gradAscent(dataMatIn, classLabels):
 ## 训练算法：随机梯度上升
 
 梯度上升算法在每次更新回归系数的时候都需要遍历整个数据集，这个方法在处理大数据的时候，其计算复杂度就太高了，改进方法就是一次只用一个样本点来更新回归数据，这个方法就被成为随机梯度上升算法。由于可以在新样本到来的时候对分类器进行增量式更新，因而随机梯度上升算法是一个**在线学习算法**。
-<pre class="lang:python decode:true">def stocGradAscent0(dataMatrix, classLabels):
+```python
+def stocGradAscent0(dataMatrix, classLabels):
     m,n = shape(dataMatrix)
     alpha = 0.01
     weights = ones(n)   #initialize to all ones
@@ -143,7 +150,9 @@ def gradAscent(dataMatIn, classLabels):
         h = sigmoid(sum(dataMatrix[i]*weights))
         error = classLabels[i] - h
         weights = weights + alpha * error * dataMatrix[i]
-    return weights</pre>
+    return weights
+```
+
 
  可以看到，这个算法和梯度上升算法很相似，但是仍有一些区别，首先，h和error都是向量，而前者前部都是数值，第二，前者没有矩阵转换过程，所有的数据类型都是NumPy数组。这样我们验证结果可以发现，随机梯度上升算法并不是最佳分类线。而且迭代出现明显的收敛的特征：
 
@@ -156,7 +165,8 @@ def gradAscent(dataMatIn, classLabels):
 上图就展示了随机梯度上升算法在多次迭代过程中的回归系数变化情况，首先可以发现X3快速就进入了收敛，而1和2则需要更多次的迭代。并且在大的波动停止之后，还有一些小的周期性波动。
 
 所以我们需要改进我们的随机梯度算法：
-<pre class="lang:default decode:true">def stocGradAscent1(dataMatrix, classLabels, numIter=500):
+```default
+def stocGradAscent1(dataMatrix, classLabels, numIter=500):
     m,n = shape(dataMatrix)
     weights = ones(n)   #initialize to all ones
 
@@ -172,9 +182,11 @@ def gradAscent(dataMatIn, classLabels):
             del(dataIndex[randIndex])
 
     return weights
-</pre>
 
- 这里我们只来介绍我们改进的地方，首先，在`alpha`每次迭代的时候都会调整，这样能够环节数据波动以及高频波动，虽然`alpha`会随着迭代次数不断减小，但是不会减小到0，如果需要处理的问题是动态变化的，那么可以适当加大上述常数项以确保新的值获得更大的回归系数。另外，在降低`alpha`的函数中，alpha每次减小1/(j+i)，其中j为迭代次数，i是样本点的下标，这样当`j&lt;&lt;max(i)`的时候，`alpha`就不是严格下降的。避免参数的严格下降也常见于模拟退火算法之中。
+```
+
+
+ 这里我们只来介绍我们改进的地方，首先，在`alpha`每次迭代的时候都会调整，这样能够环节数据波动以及高频波动，虽然`alpha`会随着迭代次数不断减小，但是不会减小到0，如果需要处理的问题是动态变化的，那么可以适当加大上述常数项以确保新的值获得更大的回归系数。另外，在降低`alpha`的函数中，alpha每次减小1/(j+i)，其中j为迭代次数，i是样本点的下标，这样当`j<<max(i)`的时候，`alpha`就不是严格下降的。避免参数的严格下降也常见于模拟退火算法之中。
 
 程序的第二点改变在随机选取样本来更新回归系数，这种方法将会减小周期性波动，这种方法每次随机从队列中选取一个值，并且删除这个值之后在进行下一次的迭代。
 
@@ -206,12 +218,18 @@ def gradAscent(dataMatIn, classLabels):
 
 现在，我们对下一届要用的数据集进行预处理，使其可用顺利的使用分类算法。在预处理阶段需要做两件事情：
 
-1 . 所有的缺失值都必须使用一个实数值替代，因为NumPy数据类型不允许包含缺失值。这里选择0来替换所有的缺失值，恰好能够适用于Logistic回归。这样做的直觉在于，我们需要一个在更新的时候不会影响系数的值。<span style="line-height: 1.42857; background-color: transparent;">
-</span>
-<pre class="lang:python decode:true">weights = weights + alpha * error * dataMatrix[randIndex]</pre>
+1 . 所有的缺失值都必须使用一个实数值替代，因为NumPy数据类型不允许包含缺失值。这里选择0来替换所有的缺失值，恰好能够适用于Logistic回归。这样做的直觉在于，我们需要一个在更新的时候不会影响系数的值。
+
+```python
+weights = weights + alpha * error * dataMatrix[randIndex]
+```
+
 
  如果dataMatrix的某种特征对应值为0，那么这个特征的系数就不会做更新，即：
-<pre class="lang:python decode:true">weights = weights</pre>
+```python
+weights = weights
+```
+
 
  另外由于sigmoid(0)=0.5，也就是他对结果的预测不具有任何倾向性。给予这个原因，缺失值用0替代既能够保留现有的数据，不需要对优化算法进行修改。此外该数据集中的特征值一般不为0，因此其也在某种程度上满足“特殊性”这个要求。
 
@@ -222,9 +240,10 @@ def gradAscent(dataMatIn, classLabels):
 使用logistic回归方法进行分类并不需要做很多工作，所需做的只是把测试集上每个特征向量乘以最优化方法得来的回归系数，然后将每个乘积求和，最终输入到`sigmoid`函数即可。
 
 那么我们来看看实际运行效果吧：
-<pre class="lang:python decode:true">def classifyVector(inX, weights):
+```python
+def classifyVector(inX, weights):
     prob = sigmoid(sum(inX*weights))
-    if prob &gt; 0.5: return 1.0
+    if prob > 0.5: return 1.0
     else: return 0.0
 
 def colicTest():
@@ -256,14 +275,17 @@ def multiTest():
     for k in range(numTests):
         errorSum += colicTest()
     print "after %d iterations the average error rate is: %f" % (numTests, errorSum/float(numTests))
-</pre>
+
+```
+
 
  第一个函数`classifyVector`，他以回归系数和特征向量来作为输入来计算对应的`sigmoid`值。
 
 接下来的函数`colicTest`，用于打开测试和训练集，并对数据进行格式化处理的标签。该函数首先导入训练及，数据最初有三个标签，分别代表马的三中情况：“仍存活”、“已经死亡”和“已经安乐死”。为了方便，我们对后两者合并为“未能存活”这个标签。数据导入之后使用函数`stocGradAscent`来计算回归系数向量，这里能够自由设定迭代次数。在系数计算完成之后，导入测试集并且计算分类错误率。总体看来`coliTest`具有完全独立的功能。
 
 最后一个`multiTest`，其功能是调用`coliTest`10次并且求结果的平均值。
-<pre class="lang:default decode:true">the error rate of this test is: 0.313433
+```default
+the error rate of this test is: 0.313433
 the error rate of this test is: 0.253731
 the error rate of this test is: 0.253731
 the error rate of this test is: 0.358209
@@ -273,7 +295,9 @@ the error rate of this test is: 0.388060
 the error rate of this test is: 0.358209
 the error rate of this test is: 0.328358
 the error rate of this test is: 0.358209
-after 10 iterations the average error rate is: 0.340299</pre>
+after 10 iterations the average error rate is: 0.340299
+```
+
 
 # 小结
 

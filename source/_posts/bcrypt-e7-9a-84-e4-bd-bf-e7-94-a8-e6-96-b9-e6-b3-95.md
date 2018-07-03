@@ -20,13 +20,17 @@ bcrypt作为一种非常有力的加密手法。它的口令必须是8至56个�
 
 最简单的还是使用pip了：
 
-<pre class="lang:default decode:true ">$ pip install bcrypt</pre>
+```default
+$ pip install bcrypt
+```
+
 
 # 用法
 
 哈希然后检查这个值是否正确很简单：
 
-<pre class="lang:python decode:true ">import bcrypt
+```python
+import bcrypt
 password = b"super secret password"
 # Hash a password for the first time, with a randomly-generated salt
 hashed = bcrypt.hashpw(password, bcrypt.gensalt())
@@ -35,13 +39,16 @@ hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 if bcrypt.hashpw(password, hashed) == hashed:
      print("It Matches!")
 else:
-     print("It Does not Match :(")</pre>
+     print("It Does not Match :(")
+```
+
 
 # 可调节的工作轮次
 
 bcrypt的特性之一是可调的工作轮次。调节这个轮次，你只需要传入round的参数就可以了。`bcrypt.gensalt(rounds=12)` 默认的就是12
 
-<pre class="lang:python decode:true ">import bcrypt
+```python
+import bcrypt
 password = b"super secret password"
 # Hash a password for the first time, with a certain number of rounds
 hashed = bcrypt.hashpw(password, bcrypt.gensalt(14))
@@ -50,13 +57,18 @@ hashed = bcrypt.hashpw(password, bcrypt.gensalt(14))
 if bcrypt.hashpw(password, hashed) == hashed:
     print("It Matches!")
 else:
-    print("It Does not Match :(")</pre>
+    print("It Does not Match :(")
+```
+
 
 # 可调节的前缀
 
 你也可以调整bcrypt的前缀来决定其会兼容谁，你可以传递2a或者2b（默认值）来决定。
 
-<pre class="lang:python decode:true ">bcrypt.gensalt(prefix=b"2b") </pre>
+```python
+bcrypt.gensalt(prefix=b"2b") 
+```
+
 
 # 兼容的版本
 

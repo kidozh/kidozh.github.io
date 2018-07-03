@@ -9,13 +9,13 @@ date: 2015-03-27 17:01:53
 ---
 
 我的博客中使用了WordPress的插件 [SyntaxHighlighter](http://alexgorbatchev.com/SyntaxHighlighter/) 这是一个代码高亮、模式化的工具，能让你的代码在网页上以类似IDE编辑器里的样子高亮关键字。功能挺强的，支持的语言很多，我列在下面了。在文章的最后，我将SyntaxHighlighter自带帮助文档列了出来，并稍微翻译了一下。
-<div>具体用法：</div>
-<div>
+具体用法：
 
-1.  在代码前根据代码语言的不同加上不同的[%Lang]在代码后加上[/%Lang]，%Lang = 你用的语言对应的Brush aliases（具体对应罗列于下）。例如**[@cpp]#include &lt;stdio.h&gt;[/cpp]**（@去掉）。
+
+1.  在代码前根据代码语言的不同加上不同的[%Lang]在代码后加上[/%Lang]，%Lang = 你用的语言对应的Brush aliases（具体对应罗列于下）。例如**[@cpp]#include <stdio.h>[/cpp]**（@去掉）。
 2.  或者只用一次%Lang，[@code lang=%Lang]你的代码[/code]或者[@source lang=%Lang]你的代码[@source lang=%Lang]，其中lang都可以换成language。
-</div>
-<div>
+
+
 <table width="90%">
 <thead>
 <tr>
@@ -142,8 +142,8 @@ date: 2015-03-27 17:01:53
 </tr>
 </tbody>
 </table>
-</div>
-<div>
+
+
 
 简码参数
 
@@ -167,5 +167,4 @@ wraplines (v2 only) — Toggle line wrapping.（自动换行）
 [php]这里写你的代码[/php]
 [css autolinks="false" classname="myclass" collapse="false" firstline="1" gutter="true" highlight="1-3,6,9" htmlscript="false" light="false" padlinenumbers="false" smarttabs="true" tabsize="4" toolbar="true" title="example-filename.php"]这里写你的代码[/css]
 
-</div>
-<div></div>
+

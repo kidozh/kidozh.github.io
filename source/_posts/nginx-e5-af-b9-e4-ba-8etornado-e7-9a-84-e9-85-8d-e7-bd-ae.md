@@ -31,16 +31,20 @@ date: 2016-11-27 23:38:23
 
 首先，我的思路是，需要对原来的HTTP访问全部转发到HTTPS上，所以，我们可以在Nginx中配置这一项。
 
-<pre class="lang:default decode:true " title="转发到安全的连接服务">server {
+```default
+server {
     listen 80;
     server_name example.com;
 
     rewrite /(.*) https://$http_host/$1 redirect;
-}</pre>
+}
+```
+
 
 然后就要对HTTPS进行配置
 
-<pre class="lang:default decode:true ">server {
+```default
+server {
     listen 443;
     ssl on;
     ssl_certificate /path/to/cert.pem;
@@ -67,13 +71,16 @@ date: 2016-11-27 23:38:23
         proxy_set_header X-Scheme $scheme;
         proxy_pass http://tornadoes;
     }
-}</pre>
+}
+```
+
 
 但是这样明显不够，因为我的tornado中使用了Websocket技术，这里就不能使用`ws://`协议而应该是`wss://`了，所以我们需要告诉Nginx开启Websocket服务。
 
 所以最终的代码应该是
 
-<pre class="lang:default decode:true ">upstream tornados{
+```default
+upstream tornados{
     server 127.0.0.1:8003;
     server 127.0.0.1:8001;
     server 127.0.0.1:8002;
@@ -117,18 +124,23 @@ server{
     }
 }
 
-</pre>
+
+```
+
 
 自然，如果你并不想配置ngnix的话，你可以直接在本地开启HTTPS服务。
 
-<pre class="lang:python decode:true ">    http_server = tornado.httpserver.HTTPServer(app
+```python
+    http_server = tornado.httpserver.HTTPServer(app
         ssl_options={
         "certfile": os.path.join(os.path.abspath("SSL"), "public_key.crt"),
         "keyfile": os.path.join(os.path.abspath("SSL"), "private_key.key"),
     }
     )
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()</pre>
+    tornado.ioloop.IOLoop.instance().start()
+```
+
 
 这样本地调试的时候，你就可以直接输入HTTPS调试了，同样的Websocket也可以直接使用`wss://`协议了。
 

@@ -19,14 +19,20 @@ psutil(Python system and process utilities)是一个跨平台的进程管理和�
 
 首先确定下当前系统有没有psutil模块
 
-<pre class="lang:python decode:true">import psutil</pre>
+```python
+import psutil
+```
+
 
 如果有的话，就直接导入模块成功，如果没有，就会提示错误然后到官网上下载psutil-2.0.0.tar.gz源码包
 
-<pre class="lang:sh decode:true ">tar -zxf psutil-2.0.0.tar.gz &amp; cd psutil-2.0.0
-python setup.py install</pre>
+```sh
+tar -zxf psutil-2.0.0.tar.gz & cd psutil-2.0.0
+python setup.py install
+```
 
-也可以直接使用<span class="lang:sh decode:true  crayon-inline ">pip install psutil</span> 来安装
+
+也可以直接使用pip install psutil 来安装
 
 # 系统相关功能
 
@@ -34,29 +40,44 @@ python setup.py install</pre>
 
 ### cpu_times
 
-<pre class="lang:python decode:true">psutil.cpu_times(precpu=False) </pre>
+```python
+psutil.cpu_times(precpu=False) 
+```
+
 
 返回系统CPU运行时间的元组，时间为秒。
 
 ### cpu_percent
 
-<pre class="lang:python decode:true ">psutil.cpu_percent(interval=None, percpu=False)</pre>
+```python
+psutil.cpu_percent(interval=None, percpu=False)
+```
+
 
 返回一个浮点数，代表当前cpu的利用率的百分比，包括sy+user. 当`interval`为0或者None时，表示的是interval时间内的sys的利用率。 当`percpu`为True返回是每一个cpu的利用率。
 
 ### cpu_count
 
-<pre class="lang:python decode:true ">psutil.cpu_count()</pre>
+```python
+psutil.cpu_count()
+```
+
 
 返回CPU的逻辑个数
 
-<pre class="lang:python decode:true ">psutil.cpu_count(logical=True)</pre>
+```python
+psutil.cpu_count(logical=True)
+```
+
 
 返回CPU的物理个数
 
 ## 内存
 
-<pre class="lang:python decode:true ">psutil.virtual_memory()</pre>
+```python
+psutil.virtual_memory()
+```
+
 
 返回一个内存信息的元组，大小为字节
 
@@ -77,7 +98,10 @@ Platform-specific fields:
 
 内存总大小不等于Used+available,在windows系统可用内存和空闲内存是用一个。
 
-<pre class="lang:default decode:true">psutil.swap_memory()</pre>
+```default
+psutil.swap_memory()
+```
+
 
 返回系统的swap信息
 
@@ -91,24 +115,39 @@ Platform-specific fields:
 
 ## 分区
 
-<pre class="lang:python decode:true">psutil.disk_partitions(all=False)</pre>
+```python
+psutil.disk_partitions(all=False)
+```
+
 
 返回所有挂载的分区的信息的列表，列表中的每一项类似于df命令的格式输出，包括分区，挂载点，文件系统格式，挂载参数等，会忽略掉`/dev/shm`,`/proc/filesystem`等，windows上分区格式 "`removable`", "`fixed`", "`remote`", "`cdrom`", "`unmounted`" or "`ramdisk`"。
 
-<pre class="lang:default decode:true ">&gt;&gt;&gt; import psutil
-&gt;&gt;&gt; psutil.disk_partitions()
+```default
+>>> import psutil
+>>> psutil.disk_partitions()
 [sdiskpart(device='/dev/sda3', mountpoint='/', fstype='ext4', opts='rw,errors=remount-ro'),
- sdiskpart(device='/dev/sda7', mountpoint='/home', fstype='ext4', opts='rw')]</pre>
-<pre class="lang:python decode:true">psutil.disk_usage(path) </pre>
+ sdiskpart(device='/dev/sda7', mountpoint='/home', fstype='ext4', opts='rw')]
+```
+
+```python
+psutil.disk_usage(path) 
+```
+
 
 返回硬盘，分区或者目录的使用情况，单位字节
 
 如果不存在会报“`OSError`”错误。
 
-<pre class="lang:default decode:true ">&gt;&gt;&gt; import psutil
-&gt;&gt;&gt; psutil.disk_usage('/')
-sdiskusage(total=21378641920, used=4809781248, free=15482871808, percent=22.5)</pre>
-<pre class="lang:python decode:true ">psutil.disk_io_counters(perdisk=False)</pre>
+```default
+>>> import psutil
+>>> psutil.disk_usage('/')
+sdiskusage(total=21378641920, used=4809781248, free=15482871808, percent=22.5)
+```
+
+```python
+psutil.disk_io_counters(perdisk=False)
+```
+
 
 返回当前磁盘的io情况
 
@@ -123,7 +162,10 @@ sdiskusage(total=21378641920, used=4809781248, free=15482871808, percent=22.5)</
 
 返回整个系统的网络信息
 
-<pre class="lang:python decode:true">psutil.net_io_counters(pernic=False)</pre>
+```python
+psutil.net_io_counters(pernic=False)
+```
+
 
 *   bytes_sent: 发送的字节数
 *   bytes_recv: 接收的字节数
@@ -136,18 +178,24 @@ sdiskusage(total=21378641920, used=4809781248, free=15482871808, percent=22.5)</
 
 如果 `pernic`值为True，会显示具体各个网卡的信息。
 
-<pre class="lang:default decode:true ">&gt;&gt;&gt; import psutil
-&gt;&gt;&gt; psutil.net_io_counters()
+```default
+>>> import psutil
+>>> psutil.net_io_counters()
 snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_recv=94888, errin=0, errout=0, dropin=0, dropout=0)
-&gt;&gt;&gt;
-&gt;&gt;&gt; psutil.net_io_counters(pernic=True)
+>>>
+>>> psutil.net_io_counters(pernic=True)
 {'lo': snetio(bytes_sent=547971, bytes_recv=547971, packets_sent=5075, packets_recv=5075, errin=0, errout=0, dropin=0, dropout=0),
-'wlan0': snetio(bytes_sent=13921765, bytes_recv=62162574, packets_sent=79097, packets_recv=89648, errin=0, errout=0, dropin=0, dropout=0)}</pre>
-<pre class="lang:python decode:true">psutil.net_connections(kind='inet') </pre>
+'wlan0': snetio(bytes_sent=13921765, bytes_recv=62162574, packets_sent=79097, packets_recv=89648, errin=0, errout=0, dropin=0, dropout=0)}
+```
+
+```python
+psutil.net_connections(kind='inet') 
+```
+
 
 返回系统的整个socket连接的信息，可以选择查看哪些类型的连接信息，类似于netstat命令
 
-&nbsp;
+ 
 
 **fd**:
 
@@ -185,14 +233,16 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
  “all” the sum of all the possible families and protocols
 
-    &gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; psutil.net_connections()
+    >>>
+    >>> import psutil
+    >>> psutil.net_connections()
     [pconn(fd=115, family=2, type=1, laddr=('10.0.0.1', 48776), raddr=('93.186.135.91', 80), status='ESTABLISHED', pid=1254),
      pconn(fd=117, family=2, type=1, laddr=('10.0.0.1', 43761), raddr=('72.14.234.100', 80), status='CLOSING', pid=2987),
      pconn(fd=-1, family=2, type=1, laddr=('10.0.0.1', 60759), raddr=('72.14.234.104', 80), status='ESTABLISHED', pid=None),
      pconn(fd=-1, family=2, type=1, laddr=('10.0.0.1', 51314), raddr=('72.14.234.83', 443), status='SYN_SENT', pid=None)
-     ...]`</pre>
+     ...]`
+```
+
 
     ## Other system info
 
@@ -208,22 +258,30 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      **started**: 登录了多长时间
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; psutil.users()
+    
+```
+`>>>
+    >>> import psutil
+    >>> psutil.users()
     [suser(name='giampaolo', terminal='pts/2', host='localhost', started=1340737536.0),
-     suser(name='giampaolo', terminal='pts/3', host='localhost', started=1340737792.0)]`</pre>
+     suser(name='giampaolo', terminal='pts/3', host='localhost', started=1340737792.0)]`
+```
+
 
     `psutil.boot_time()`
 
      返回当前的时间
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil, datetime
-    &gt;&gt;&gt; psutil.boot_time()
+    
+```
+`>>>
+    >>> import psutil, datetime
+    >>> psutil.boot_time()
     1389563460.0
-    &gt;&gt;&gt; datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
-    '2014-01-12 22:51:00'`</pre>
+    >>> datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
+    '2014-01-12 22:51:00'`
+```
+
 
     * * *
 
@@ -243,7 +301,9 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      返回一个包含Process对象的迭代器。每一个对象只创建一次，创建后缓存起来。当一个进程更新时，会更新缓存。遍历所有进程首选psutil.pids().迭代器排序是根据pid。
 
-    <pre>`import psutil
+    
+```
+`import psutil
 
     for proc in psutil.process_iter():
         try:
@@ -251,7 +311,9 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
         except psutil.NoSuchProcess:
             pass
         else:
-            print(pinfo)`</pre>
+            print(pinfo)`
+```
+
 
     `psutil.wait_procs(procs, timeout=None, callback=None)`
 
@@ -265,7 +327,9 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
     Example:
 
-    <pre>`import psutil
+    
+```
+`import psutil
 
     def on_terminate(proc):
         print("process {} terminated".format(proc))
@@ -275,7 +339,9 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
         p.terminate()
     gone, alive = wait_procs(procs, timeout=3, callback=on_terminate)
     for p in alive:
-        p.kill()`</pre>
+        p.kill()`
+```
+
 
     ### Exceptions
 
@@ -339,23 +405,31 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      进程创建时间
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil, datetime
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.create_time()
+    
+```
+`>>>
+    >>> import psutil, datetime
+    >>> p = psutil.Process()
+    >>> p.create_time()
     1307289803.47
-    &gt;&gt;&gt; datetime.datetime.fromtimestamp(p.create_time()).strftime("%Y-%m-%d %H:%M:%S")
-    '2011-03-05 18:03:52'`</pre>
+    >>> datetime.datetime.fromtimestamp(p.create_time()).strftime("%Y-%m-%d %H:%M:%S")
+    '2011-03-05 18:03:52'`
+```
+
 
     `as_dict(attrs=None, ad_value=None)`
 
      返回进程信息的哈希字典的实用方法，`attrs`指定的值必须是Process的属性值，例如（['cpu_times','name']）
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.as_dict(attrs=['pid', 'name', 'username'])
-    {'username': 'giampaolo', 'pid': 12366, 'name': 'python'}`</pre>
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> p.as_dict(attrs=['pid', 'name', 'username'])
+    {'username': 'giampaolo', 'pid': 12366, 'name': 'python'}`
+```
+
 
     `parent()`
 
@@ -393,46 +467,62 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      获取或者设置进程的nice值，
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.nice(10)  # set
-    &gt;&gt;&gt; p.nice()  # get
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> p.nice(10)  # set
+    >>> p.nice()  # get
     10
-    &gt;&gt;&gt;`</pre>
+    >>>`
+```
+
 
     在windows系统上，只能通过`GetProrityClass`和`SetPriorityClass`的`psutil.*_PRIORITY_CLASS`包含的值来设定
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; p.nice(psutil.HIGH_PRIORITY_CLASS)`</pre>
+    
+```
+`>>>
+    >>> p.nice(psutil.HIGH_PRIORITY_CLASS)`
+```
+
 
     `ionice(ioclass=None, value=None)`
 
      获取或者设置进程I/O的优先级。Linux上的`ioclass`的值`psutil.IOPRO_CLASS_*`值在0-7，windows 2 为正常，1为优先级低，0为非常低。
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.ionice(psutil.IOPRIO_CLASS_IDLE)  # set
-    &gt;&gt;&gt; p.ionice()  # get
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> p.ionice(psutil.IOPRIO_CLASS_IDLE)  # set
+    >>> p.ionice()  # get
     pionice(ioclass=3, value=0)
-    &gt;&gt;&gt;`</pre>
+    >>>`
+```
+
 
     `rlimit(resource, limits=None)`
 
      Get or set process resource limits (see man prlimit). resource is one of the psutil.RLIMIT_* constants. limits is a (soft, hard) tuple. This is the same as resource.getrlimit() and resource.setrlimit() but can be used for every process PID and only on Linux. Example:
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; # process may open no more than 128 file descriptors
-    &gt;&gt;&gt; p.rlimit(psutil.RLIMIT_NOFILE, (128, 128))
-    &gt;&gt;&gt; # process may create files no bigger than 1024 bytes
-    &gt;&gt;&gt; p.rlimit(psutil.RLIMIT_FSIZE, (1024, 1024))
-    &gt;&gt;&gt; # get
-    &gt;&gt;&gt; p.rlimit(psutil.RLIMIT_FSIZE)
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> # process may open no more than 128 file descriptors
+    >>> p.rlimit(psutil.RLIMIT_NOFILE, (128, 128))
+    >>> # process may create files no bigger than 1024 bytes
+    >>> p.rlimit(psutil.RLIMIT_FSIZE, (1024, 1024))
+    >>> # get
+    >>> p.rlimit(psutil.RLIMIT_FSIZE)
     (1024, 1024)
-    &gt;&gt;&gt;`</pre>
+    >>>`
+```
+
 
     **Availability**: Linux
 
@@ -440,11 +530,15 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      返回这个进程的IO情况
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.io_counters()
-    pio(read_count=454556, write_count=3456, read_bytes=110592, write_bytes=0)`</pre>
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> p.io_counters()
+    pio(read_count=454556, write_count=3456, read_bytes=110592, write_bytes=0)`
+```
+
 
     **Availability**: all platforms except OSX
 
@@ -478,21 +572,25 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
     `cpu_percent(interval=None)`
 
-     Return a float representing the process CPU utilization as a percentage. When interval is &gt; 0.0 compares process times to system CPU times elapsed before and after the interval (blocking). When interval is 0.0 or None compares process times to system CPU times elapsed since last call, returning immediately. That means the first time this is called it will return a meaningless 0.0 value which you are supposed to ignore. In this case is recommended for accuracy that this function be called a second time with at least 0.1 seconds between calls. Example:
+     Return a float representing the process CPU utilization as a percentage. When interval is > 0.0 compares process times to system CPU times elapsed before and after the interval (blocking). When interval is 0.0 or None compares process times to system CPU times elapsed since last call, returning immediately. That means the first time this is called it will return a meaningless 0.0 value which you are supposed to ignore. In this case is recommended for accuracy that this function be called a second time with at least 0.1 seconds between calls. Example:
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt;
-    &gt;&gt;&gt; # blocking
-    &gt;&gt;&gt; p.cpu_percent(interval=1)
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>>
+    >>> # blocking
+    >>> p.cpu_percent(interval=1)
     2.0
-    &gt;&gt;&gt; # non-blocking (percentage since last call)
-    &gt;&gt;&gt; p.cpu_percent(interval=None)
+    >>> # non-blocking (percentage since last call)
+    >>> p.cpu_percent(interval=None)
     2.9
-    &gt;&gt;&gt;`</pre>
+    >>>`
+```
 
-    Note a percentage &gt; 100 is legitimate as it can result from a process with multiple threads running on different CPU cores.
+
+    Note a percentage > 100 is legitimate as it can result from a process with multiple threads running on different CPU cores.
 
      Warning the first time this method is called with interval = 0.0 or None it will return a meaningless 0.0 value which you are supposed to ignore.
 
@@ -500,21 +598,25 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      Get or set process current CPU affinity. CPU affinity consists in telling the OS to run a certain process on a limited set of CPUs only. The number of eligible CPUs can be obtained with list(range(psutil.cpu_count())).
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; psutil.cpu_count()
+    
+```
+`>>>
+    >>> import psutil
+    >>> psutil.cpu_count()
     4
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.cpu_affinity()  # get
+    >>> p = psutil.Process()
+    >>> p.cpu_affinity()  # get
     [0, 1, 2, 3]
-    &gt;&gt;&gt; p.cpu_affinity([0])  # set; from now on, process will run on CPU #0 only
-    &gt;&gt;&gt; p.cpu_affinity()
+    >>> p.cpu_affinity([0])  # set; from now on, process will run on CPU #0 only
+    >>> p.cpu_affinity()
     [0]
-    &gt;&gt;&gt;
-    &gt;&gt;&gt; # reset affinity against all CPUs
-    &gt;&gt;&gt; all_cpus = list(range(psutil.cpu_count()))
-    &gt;&gt;&gt; p.cpu_affinity(all_cpus)
-    &gt;&gt;&gt;`</pre>
+    >>>
+    >>> # reset affinity against all CPUs
+    >>> all_cpus = list(range(psutil.cpu_count()))
+    >>> p.cpu_affinity(all_cpus)
+    >>>`
+```
+
 
     **Availability**: Linux, Windows, BSD
 
@@ -557,56 +659,56 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
     <td>shared</td>
     <td>pfaults</td>
     <td>text</td>
-    <td>&nbsp;</td>
+    <td> </td>
     <td>wset</td>
     </tr>
     <tr>
     <td>text</td>
     <td>pageins</td>
     <td>data</td>
-    <td>&nbsp;</td>
+    <td> </td>
     <td>peak_paged_pool</td>
     </tr>
     <tr>
     <td>lib</td>
-    <td>&nbsp;</td>
+    <td> </td>
     <td>stack</td>
-    <td>&nbsp;</td>
+    <td> </td>
     <td>paged_pool</td>
     </tr>
     <tr>
     <td>data</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
     <td>peak_nonpaged_pool</td>
     </tr>
     <tr>
     <td>dirty</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
     <td>nonpaged_pool</td>
     </tr>
     <tr>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
     <td>pagefile</td>
     </tr>
     <tr>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
     <td>peak_pagefile</td>
     </tr>
     <tr>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
     <td>private</td>
     </tr>
     </tbody>
@@ -614,11 +716,15 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
     Windows metrics are extracted from PROCESS_MEMORY_COUNTERS_EX structure. Example on Linux:
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.memory_info_ex()
-    pextmem(rss=15491072, vms=84025344, shared=5206016, text=2555904, lib=0, data=9891840, dirty=0)`</pre>
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> p.memory_info_ex()
+    pextmem(rss=15491072, vms=84025344, shared=5206016, text=2555904, lib=0, data=9891840, dirty=0)`
+```
+
 
     `memory_percent()`
 
@@ -628,17 +734,21 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      Return process’s mapped memory regions as a list of nameduples whose fields are variable depending on the platform. As such, portable applications should rely on namedtuple’s path and rss fields only. This method is useful to obtain a detailed representation of process memory usage as explained here. If grouped is True the mapped regions with the same path are grouped together and the different memory fields are summed. If grouped is False every mapped region is shown as a single entity and the namedtuple will also include the mapped region’s address space (addr) and permission set (perms). See examples/pmap.py for an example application.
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.memory_maps()
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process()
+    >>> p.memory_maps()
     [pmmap_grouped(path='/lib/x8664-linux-gnu/libutil-2.15.so', rss=16384, anonymous=8192, swap=0),
      pmmap_grouped(path='/lib/x8664-linux-gnu/libc-2.15.so', rss=6384, anonymous=15, swap=0),
      pmmap_grouped(path='/lib/x8664-linux-gnu/libcrypto.so.0.1', rss=34124, anonymous=1245, swap=0),
      pmmap_grouped(path='[heap]', rss=54653, anonymous=8192, swap=0),
      pmmap_grouped(path='[stack]', rss=1542, anonymous=166, swap=0),
      ...]
-    &gt;&gt;&gt;`</pre>
+    >>>`
+```
+
 
     `children(recursive=False)`
 
@@ -658,10 +768,14 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      └─ D (child)
 
-    <pre>`&gt;&gt;&gt; p.children()
+    
+```
+`>>> p.children()
     B, C, D
-    &gt;&gt;&gt; p.children(recursive=True)
-    B, X, Y, C, D`</pre>
+    >>> p.children(recursive=True)
+    B, X, Y, C, D`
+```
+
 
     Note that in the example above if process X disappears process Y won’t be returned either as the reference to process A is lost.
 
@@ -669,12 +783,16 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
      Return regular files opened by process as a list of namedtuples including the absolute file name and the file descriptor number (on Windows this is always -1). Example:
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; f = open('file.ext', 'w')
-    &gt;&gt;&gt; p = psutil.Process()
-    &gt;&gt;&gt; p.open_files()
-    [popenfile(path='/home/giampaolo/svn/psutil/file.ext', fd=3)]`</pre>
+    
+```
+`>>>
+    >>> import psutil
+    >>> f = open('file.ext', 'w')
+    >>> p = psutil.Process()
+    >>> p.open_files()
+    [popenfile(path='/home/giampaolo/svn/psutil/file.ext', fd=3)]`
+```
+
 
     `connections(kind="inet")`
 
@@ -751,16 +869,20 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
     Example:
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; p = psutil.Process(1694)
-    &gt;&gt;&gt; p.name()
+    
+```
+`>>>
+    >>> import psutil
+    >>> p = psutil.Process(1694)
+    >>> p.name()
     'firefox'
-    &gt;&gt;&gt; p.connections()
+    >>> p.connections()
     [pconn(fd=115, family=2, type=1, laddr=('10.0.0.1', 48776), raddr=('93.186.135.91', 80), status='ESTABLISHED'),
      pconn(fd=117, family=2, type=1, laddr=('10.0.0.1', 43761), raddr=('72.14.234.100', 80), status='CLOSING'),
      pconn(fd=119, family=2, type=1, laddr=('10.0.0.1', 60759), raddr=('72.14.234.104', 80), status='ESTABLISHED'),
-     pconn(fd=123, family=2, type=1, laddr=('10.0.0.1', 51314), raddr=('72.14.234.83', 443), status='SYN_SENT')]`</pre>
+     pconn(fd=123, family=2, type=1, laddr=('10.0.0.1', 51314), raddr=('72.14.234.83', 443), status='SYN_SENT')]`
+```
+
 
     `is_running()`
 
@@ -804,20 +926,22 @@ snetio(bytes_sent=14508483, bytes_recv=62749361, packets_sent=84311, packets_rec
 
     Note Unlike subprocess.Popen this class pre-emptively checks wheter PID has been reused on send_signal(), terminate() and kill() so that you don’t accidentally terminate another process, fixing [http://bugs.python.org/issue6973](http://bugs.python.org/issue6973).
 
-    <pre>`&gt;&gt;&gt;
-    &gt;&gt;&gt; import psutil
-    &gt;&gt;&gt; from subprocess import PIPE
-    &gt;&gt;&gt;
-    &gt;&gt;&gt; p = psutil.Popen(["/usr/bin/python", "-c", "print('hello')"], stdout=PIPE)
-    &gt;&gt;&gt; p.name()
+    
+```
+`>>>
+    >>> import psutil
+    >>> from subprocess import PIPE
+    >>>
+    >>> p = psutil.Popen(["/usr/bin/python", "-c", "print('hello')"], stdout=PIPE)
+    >>> p.name()
     'python'
-    &gt;&gt;&gt; p.username()
+    >>> p.username()
     'giampaolo'
-    &gt;&gt;&gt; p.communicate()
+    >>> p.communicate()
     ('hello\n', None)
-    &gt;&gt;&gt; p.wait(timeout=2)
+    >>> p.wait(timeout=2)
     0
-    &gt;&gt;&gt;
+    >>>
 
 ### Constants
 

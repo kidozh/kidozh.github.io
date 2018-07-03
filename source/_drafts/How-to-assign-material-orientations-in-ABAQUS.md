@@ -13,5 +13,3 @@ Sometimes we need to deal with anisotropic materials and that naturally requires
 To assign the material orientation other than default, we need to first specify a coordinate system(CSYS) based on the default one.
 
 We can create a CSYS In Property module using this tool
-
-&nbsp;

@@ -18,7 +18,9 @@ date: 2016-07-30 00:36:12
 # 获得验证
 
 众所周知，Vjudge获取比赛源代码需要登陆拉题人的账号密码，所以我使用了`Request`这个库来处理含有cookie的请求。所以首先需要模拟登陆这个过程：
-<pre class="lang:python decode:true ">def login(self,username=None,password=None):
+
+```python
+def login(self,username=None,password=None):
 
         #username = raw_input('Your username : ')
         #password = raw_input('Your password : ')
@@ -51,14 +53,18 @@ date: 2016-07-30 00:36:12
         if res == '"success"':
             return True
         else:
-            return False</pre>
+            return False
+```
+
 
 # 获得流
 
 下一步是爬虫中常见的，使用`opener.open`来访问这个URL并且获得结果，需要注意的是，这个过程需要带一个合适的`header`。
 
 接着我从浏览器中发现其`Content-Type`为`application/octet-stream`，而`request`返回的数据中`fp`正是`CStringIO`类型，所以我们需要通过这个数据结构来获得我们需要的文件。
-<pre class="lang:default decode:true ">def getExportedSourceCode(self,cid='121125'):
+
+```python
+def getExportedSourceCode(self,cid='121125'):
         VJheaders = {
             'Host':'acm.hust.edu.cn',
             'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0',
@@ -82,6 +88,8 @@ date: 2016-07-30 00:36:12
         #print '#',res.fp,res.code
         with open(tarName,'wb') as tarFile:
             tarFile.write(f.read())
-        print 'TAR File has been Downloaded..'</pre>
+        print 'TAR File has been Downloaded..'
+```
+
 
 这样就能够正确的把导出的zip文件存储到本地磁盘之中了。

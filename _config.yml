@@ -7,12 +7,12 @@ title: kidozh
 subtitle: 某不科学的kidozh
 description: kidozh的一些想法和随手笔记
 author: kido zhang
-language: zh-cn
+language: zh-Hans
 timezone: Asia/Shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://kidozh.com
+url: https://kidozh.github.io
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -34,7 +34,7 @@ titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
@@ -63,7 +63,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: apollo
+theme: yilia
 
 archive_generator:
     per_page: 0
@@ -75,7 +75,36 @@ archive_generator:
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:github
-  repo:https://github.com/kidozh/kidozh.github.io.git
-  branch:master
+  type: git
+#  repo: https://github.com/kidozh/kidozh.github.io.git
+  repo: git@github.com:kidozh/kidozh.github.io.git
+  branch: master
 
+math:
+  engine: 'mathjax'
+  enable: true
+  per_page: true
+  cdn: //cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML
+
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true
+
+# server
+server:
+  compress: true
