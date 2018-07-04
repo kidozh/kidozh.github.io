@@ -184,7 +184,29 @@
 <p>举例而言，对于下面的对象：</p>
 <img src="/2018/07/03/拓扑学针对神经网络建模/example1.png" alt="example1.png" title="">
 <p>如果使用代数表达式来表示上述的对象，其通常需要很高维度的方程。因为现在由很多不同的微分系数都能在模型压缩数据之中变化，这也就意味着压缩数据的程度也很低。这说明了，为了包含尽可能多的信息，代数模型通常需要具有较低的阶，比如线性或者二次型。但是可以肯定的是，我们也可以使用除多项式之外的函数族进行回归，但是我们需要很好的找出这个函数族，但是通常来说，我们很难知道哪个函数是合适的。</p>
-<h1 id="聚类分析"><a href="#聚类分析" class="headerlink" title="聚类分析"></a>聚类分析</h1><p>聚类分析的结果通常都是对于数据进行分组和分类。在这种情况下，模型的压缩特性可以通过提供聚类来提供，通常来说数据可以被压缩到很小的范围内。这种压缩特性也能够允许人们能够理解这种模型的范式。</p>
+<h1 id="聚类分析"><a href="#聚类分析" class="headerlink" title="聚类分析"></a>聚类分析</h1><p>聚类分析的结果通常都是对于数据进行分组和分类。在这种情况下，模型的压缩特性可以通过提供聚类来提供，通常来说数据可以被压缩到很小的范围内。这种压缩特性也能够允许人们能够理解这种模型的范式。举例而言，对于糖尿病患者，将其分为1型2型患者。将选民分为保守党、自由党或者中立选民。这种方法在大量数据集中经常出现，通过构造新的数据点针对改点所属的集群进行猜测，并且将该点附加到模型之中。在许多情况下，这种行为也能被很好解释。例如，如果一个数据集包含了多个实例或者条目的向量，则我们可以找到一个单独参数，从而能够很好的区分聚类，或者从整个基于多个数据特征维度来区分聚类。</p>
+<h2 id="分层聚类"><a href="#分层聚类" class="headerlink" title="分层聚类"></a>分层聚类</h2><p>分层聚类是一种非常有趣的方法。由于其可以输出一个树状图，它并不是一个代数方程以及划分而是一个非常惊喜的对象。创建此建模方法是为了解决许多聚类算法需要选择阈值的事实，并且通常很难确定正确的阈值（如果有的话）。在这种情况下，我们可以针对数据集进行多次压缩，因为人们通常研究高层结构下的树状图，其含有少量的簇。在这种高维结构的树状图中，因为它可以在每个级别都有对应的集群，同时其也能确定较低级别的给定集群。例如，我们通常使用下面的图片描述动物的分类：</p>
+<img src="/2018/07/03/拓扑学针对神经网络建模/animalCluster.png" alt="animalCluster.png" title="">
+<p>这显然是对于聚类方法的一个体现，因为其编码了食肉目、鲸类和翼手目都属于高度抽象类下的哺乳动物群。</p>
+<h1 id="拓扑学模型"><a href="#拓扑学模型" class="headerlink" title="拓扑学模型"></a>拓扑学模型</h1><p>这是Ayasdi开发的方法。 它产生拓扑网络作为输出，而不是代数方程，分区或树形图。 它提供了大量的压缩后的数据，因为网络的每个节点对应于可能很大的数据点组，并且网络的边缘对应于这些子组的交叉点。 它还提供了大量功能，包括以下可能性：</p>
+<ul>
+<li>生成的网络布局，用于可视化和无监督分析。</li>
+<li>通过使用标准手势方法（例如套索）选择节点组就可以来选择数据集的子组的能力。</li>
+<li>给定一组或一系列的组，就可以确定该组与其余数据集的能够“解释变量”。</li>
+<li>通过将每个节点着色为对应于节点的集合中的点的数量的平均值，使感兴趣的数量着色网络的能力。</li>
+<li>给定外部定义的组，能够通过属于外部定义，给相应组的部分成员的每个节点着色。</li>
+<li>创建与网络结构相关的新功能。 这可以包括基于组的“碰撞功能”的类似物，图形距离中的中心度量等。</li>
+</ul>
+<img src="/2018/07/03/拓扑学针对神经网络建模/topoNetwork.png" alt="topoNetwork.png" title="">
+<p>在这个拓扑模型中，可以看到四个不同的白血病亚组（它们是橙色，绿色，黄色和绿蓝色。各种白血病类型都有编号，拓扑模型亚组用每组中白血病类型的平均值着色。 从左到右，橙色组主要包含ALL和B-ALL类型，绿色组几乎是纯CLL，黄色是AML和T-ALL衍生物，蓝绿色组是MDS和CML衍生物。</p>
+<p>这些TDL的原始功能可以相互结合使用，以创建以下方法：</p>
+<ul>
+<li>改进预测模型</li>
+<li>根据数据集的网络模型结构提供原则性降维</li>
+<li>开发热点分析，以了解数据集中感兴趣的数量或预定义组的分布</li>
+</ul>
+<p>至于解释性来说，给网络着色可以针对最具区别的变量从而进行类的区分。</p>
+<p>这里要做的主要观点是，数学建模不仅限于少量的数学技术应用，而应被视为通过各种信息数学模型来表示数据的科学（和艺术）。 实际上，所有数学学科都包含各种对象，可以作为各种领域的有用模型。 任何方法的关键在于它产生的洞察力，以及它在多大程度上支持和加速数据科学家试图从数据中提取知识的工作。</p>
 
       
 
@@ -1683,14 +1705,6 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Capsule架构</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">C++</a>
               </li>
              
@@ -1700,6 +1714,14 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">机械</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Capsule架构</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1739,19 +1761,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">网页</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Charles</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">抓包</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网页</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1779,6 +1801,10 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">模板</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flag</a>
               </li>
              
@@ -1795,15 +1821,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">查重</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">模板</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">规划</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">查重</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1827,6 +1849,10 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">主题</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -1835,15 +1861,7 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">主题</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">爬虫</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">CSRF</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1855,11 +1873,23 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">CSRF</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">西安</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">XSS</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javascript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1871,7 +1901,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color4">logistic</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">minecraft</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1883,27 +1917,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">numpy</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">科学计算</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">office</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">orm</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">peewee</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">PHPStorm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1919,11 +1937,23 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">图像处理</a>
+                <a href="javascript:void(0)" class="js-tag color1">numpy</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">XSS</a>
+                <a href="javascript:void(0)" class="js-tag color5">科学计算</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">office</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">PHPStorm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">图像处理</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1976,14 +2006,6 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">SVM</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">logistic</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">minecraft</a>
               </li>
              
               <li class="article-tag-list-item">

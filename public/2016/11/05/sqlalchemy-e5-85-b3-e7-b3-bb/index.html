@@ -198,7 +198,7 @@
 <p><code>&gt;&gt;&gt; jack.addresses = [
     ...                 Address(email_address=&#39;jack@google.com&#39;),
     ...                 Address(email_address=&#39;j25@yahoo.com&#39;)]</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">当使用bidirectional relationship时，通过其中一个方向的关系（如上例）会自动出现在另一个方向的关系上。</div></pre></td></tr></table></figure></p>
-<p>`&gt;&gt;&gt; jack.addresses[1]<br>    <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#x3a;&#65;&#100;&#x64;&#114;&#x65;&#115;&#115;&#40;&#101;&#109;&#97;&#105;&#x6c;&#95;&#97;&#x64;&#x64;&#114;&#x65;&#x73;&#115;&#x3d;&#x27;&#106;&#50;&#x35;&#64;&#121;&#x61;&#x68;&#x6f;&#x6f;&#x2e;&#99;&#111;&#109;&#x27;&#x29;">&#65;&#100;&#x64;&#114;&#x65;&#115;&#115;&#40;&#101;&#109;&#97;&#105;&#x6c;&#95;&#97;&#x64;&#x64;&#114;&#x65;&#x73;&#115;&#x3d;&#x27;&#106;&#50;&#x35;&#64;&#121;&#x61;&#x68;&#x6f;&#x6f;&#x2e;&#99;&#111;&#109;&#x27;&#x29;</a></p>
+<p>`&gt;&gt;&gt; jack.addresses[1]<br>    <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#x41;&#100;&#100;&#114;&#101;&#x73;&#115;&#40;&#x65;&#x6d;&#97;&#x69;&#108;&#x5f;&#97;&#x64;&#100;&#x72;&#101;&#x73;&#115;&#x3d;&#x27;&#106;&#50;&#53;&#x40;&#121;&#97;&#x68;&#111;&#x6f;&#x2e;&#99;&#x6f;&#109;&#x27;&#41;">&#x41;&#100;&#100;&#114;&#101;&#x73;&#115;&#40;&#x65;&#x6d;&#97;&#x69;&#108;&#x5f;&#97;&#x64;&#100;&#x72;&#101;&#x73;&#115;&#x3d;&#x27;&#106;&#50;&#53;&#x40;&#121;&#97;&#x68;&#111;&#x6f;&#x2e;&#99;&#x6f;&#109;&#x27;&#41;</a></p>
 <pre><code>&gt;&gt;&gt; jack.addresses[1].user
 &lt;User(name=&apos;jack&apos;, fullname=&apos;Jack Bean&apos;, password=&apos;gjffdd&apos;)&gt;`
 </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">让我们把jack添加进入`Session`。</div></pre></td></tr></table></figure>
@@ -846,14 +846,6 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Capsule架构</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">C++</a>
               </li>
              
@@ -863,6 +855,14 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">机械</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Capsule架构</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -902,19 +902,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Django</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">网页</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Charles</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">抓包</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Django</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网页</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -942,6 +942,10 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">模板</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">flag</a>
               </li>
              
@@ -958,15 +962,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">查重</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">模板</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">规划</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">查重</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -990,6 +990,10 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">主题</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">git</a>
               </li>
              
@@ -998,15 +1002,7 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">主题</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">爬虫</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">CSRF</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1018,11 +1014,23 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">CSRF</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">西安</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">XSS</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">javascript</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1034,7 +1042,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">jQuery</a>
+                <a href="javascript:void(0)" class="js-tag color4">logistic</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">minecraft</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1046,27 +1058,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">numpy</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">科学计算</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">office</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">orm</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">peewee</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">PHPStorm</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1082,11 +1078,23 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">图像处理</a>
+                <a href="javascript:void(0)" class="js-tag color1">numpy</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">XSS</a>
+                <a href="javascript:void(0)" class="js-tag color5">科学计算</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">office</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">PHPStorm</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">图像处理</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1139,14 +1147,6 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">SVM</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">logistic</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">minecraft</a>
               </li>
              
               <li class="article-tag-list-item">
