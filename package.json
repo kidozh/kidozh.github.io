@@ -20,6 +20,7 @@
     "hexo-math": "^3.0.4",
     "hexo-migrator-rss": "^0.1.2",
     "hexo-migrator-wordpress": "^0.1.2",
+    "hexo-render-pug": "^2.0.0",
     "hexo-renderer-ejs": "^0.2.0",
     "hexo-renderer-jade": "^0.3.0",
     "hexo-renderer-marked": "^0.3.0",
