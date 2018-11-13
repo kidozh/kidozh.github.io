@@ -106,7 +106,7 @@
 <meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/calculate_receptive_field.png">
 <meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/kaiming_example_SPP.png">
 <meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/mapping_relations.png">
-<meta property="og:updated_time" content="2018-11-13T08:36:36.193Z">
+<meta property="og:updated_time" content="2018-11-13T09:08:14.735Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SPP-Net介绍">
 <meta name="twitter:description" content="参考论文Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition 前言SPP-Net，即Spatial Pyramid Pooling，基本上来说是R-CNN的一个改进，其大幅度提高了R-CNN的训练速度和测试速度，同时算法的精度也上升了，后续的Fast R-CNN和Faster R-CNN都是这个思">
@@ -473,7 +473,7 @@
 </tbody>
 </table>
 <p>关系式如下： $$ W_2 = \frac{W_1-F+2P} {S}  + 1   ,   H_2 =\frac{H_1-F+2P}{S}  + 1 $$</p>
-<p>对其进行变换就可以反向计算上一层的感受野了：$$ W1=(W_2-1)S-2P+F $$ $$ H1=(H_2-1)S-2P+F $$</p>
+<p>对其进行变换就可以反向计算上一层的感受野了：$$ W1=(W_2-1)S-2P+F , H1=(H_2-1)S-2P+F $$</p>
 <p>下图显示了如何从后向前计算感受野的过程</p>
 <img src="/2018/11/13/SPP-Net介绍/receptive_field.png" alt="反向计算感受野" title="反向计算感受野">
 <p>感受野计算时有下面的几个情况需要说明：</p>
@@ -482,26 +482,26 @@
 <li>深层卷积层的感受野大小和它之前所有层的滤波器大小和步长有关系</li>
 <li>计算感受野大小时，忽略了图像边缘的影响，即不考虑padding的大小</li>
 </ul>
-<p>这里的每一个卷积层还有一个步长(strides)的概念，这个strides是之前所有层stride的乘积: $$ strides_i = stride_1 \cdot stride<em>2 \cdot \cdot \cdot  stride</em>{i-1} $$</p>
+<p>这里的每一个卷积层还有一个步长(strides)的概念，这个strides是之前所有层stride的乘积: $ strides_i = stride_1 \cdot stride_2 \cdot \cdot \cdot  stride_{i-1} $</p>
 <h2 id="基于感受野的特征映射"><a href="#基于感受野的特征映射" class="headerlink" title="基于感受野的特征映射"></a>基于感受野的特征映射</h2><p>通常，我们需要知道网络里面任意两个feature map之间的坐标映射关系（一般是中心点之间的映射），如下图，我们想得到map 3上的点p3映射回map 2所在的位置p2（橙色框的中心点）</p>
 
 <p>计算公式：</p>
 <ul>
-<li>对于卷积或者池化层来说 : $$ pi = s<em>i \cdot p</em>{i+1} +( \frac{k_i -1}{2} - padding) $$</li>
-<li>对于一般的神经层(ReLU/Sigmoid/..) : $$ p<em>I = p</em>{i+1} $$</li>
+<li>对于卷积或者池化层来说 : $ pi = s_i \cdot p_{i+1} +( \dfrac{k_i -1}{2} - padding) $</li>
+<li>对于一般的神经层(ReLU/Sigmoid/..) : $ p_I = p_{i+1} $</li>
 </ul>
 <p>上面是计算任意一个layer输入输出的坐标映射关系，如果是计算任意feature map之间的关系，只需要用简单的组合就可以得到，下图是一个简单的例子:</p>
 <img src="/2018/11/13/SPP-Net介绍/calculate_receptive_field.png" alt="计算感受野" title="计算感受野">
 <p>下图是Kaiming He 在ICCV15上的汇报用的PPT，讲解如何求解Receptive Field:</p>
 <img src="/2018/11/13/SPP-Net介绍/kaiming_example_SPP.png" alt="计算感受野的实例" title="计算感受野的实例">
 <p>何凯明在SPP-net中采用的方法。巧妙的化简一下公式 $ pi = s<em>i \cdot p</em>{i+1} +( (k_i -1)/2 - padding) $</p>
-<p>令每一层的padding都为 $ padding = \lfloor k_i /2 \rfloor \Rightarrow pi = s<em>i \cdot p</em>{i+1} +( (k_i -1)/2 -  \lfloor k_i /2 \rfloor) $</p>
+<p>令每一层的padding都为 $ padding = \lfloor k_i /2 \rfloor \Rightarrow pi = s_i \cdot p_{i+1} +( (k_i -1)/2 -  \lfloor k_i /2 \rfloor) $</p>
 <ul>
-<li>当 ki 为奇数 $ (k_i -1)/2 -  \lfloor k_i /2 \rfloor) = 0  \Rightarrow  p_i = s<em>i \cdot p</em>{i+1} $</li>
-<li>当ki 为偶数 $ ( (k_i -1)/2 -  \lfloor k_i /2 \rfloor) = -0.5 \Rightarrow p_i = s<em>i \cdot p</em>{i+1} -0.5 $</li>
+<li>当 ki 为奇数 $ (k_i -1)/2 -  \lfloor k_i /2 \rfloor) = 0  \Rightarrow  p_i = s_i \cdot p_{i+1} $</li>
+<li>当ki 为偶数 $ ( (k_i -1)/2 -  \lfloor k_i /2 \rfloor) = -0.5 \Rightarrow p_i = s_i \cdot p_{i+1} -0.5 $</li>
 <li>而 pi 是坐标值,不取小数,基本上认为pi=si⋅pi+1 。感受野中心点的坐标pi只跟前一层 pi+1 有关。</li>
 </ul>
-<p>其实就是把公式 $ pi = s<em>i \cdot p</em>{i+1} +( (k_i -1)/2 - padding) $级联消去整合一下</p>
+<p>其实就是把公式 $ pi = s_i \cdot p_{i+1} +( (k_i -1)/2 - padding) $ 级联消去整合一下</p>
 <h2 id="候选区域到feature-map的映射做法详解"><a href="#候选区域到feature-map的映射做法详解" class="headerlink" title="候选区域到feature map的映射做法详解"></a>候选区域到feature map的映射做法详解</h2><p>SPP-net 是把原始ROI的左上角和右下角 映射到 feature map上的两个对应点。 有了feature map上的两队角点就确定了 对应的 feature map 区域(下图中橙色)。</p>
 <img src="/2018/11/13/SPP-Net介绍/mapping_relations.png" alt="映射关系" title="映射关系">
 <p>如何映射？<br>左上角的点(x,y)映射到 feature map上的(x′,y′) :使得(x′,y′) 在原始图上感受野（上图绿色框）的中心点 与(x,y)尽可能接近。</p>
