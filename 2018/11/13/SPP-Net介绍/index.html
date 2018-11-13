@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="深度学习," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="参考论文Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition 前言SPP-Net，即Spatial Pyramid Pooling，基本上来说是R-CNN的一个改进，其大幅度提高了R-CNN的训练速度和测试速度，同时算法的精度也上升了，后续的Fast R-CNN和Faster R-CNN都是这个思">
+<meta name="keywords" content="深度学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SPP-Net介绍">
+<meta property="og:url" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/index.html">
+<meta property="og:site_name" content="kidozh">
+<meta property="og:description" content="参考论文Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition 前言SPP-Net，即Spatial Pyramid Pooling，基本上来说是R-CNN的一个改进，其大幅度提高了R-CNN的训练速度和测试速度，同时算法的精度也上升了，后续的Fast R-CNN和Faster R-CNN都是这个思">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/crop_wrap_fit_example.png">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/spatial_pyramid_pooling.png">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/spp_net_process_in_boxing.png">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/receptive_field.png">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/calculate_receptive_field.png">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/kaiming_example_SPP.png">
+<meta property="og:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/mapping_relations.png">
+<meta property="og:updated_time" content="2018-11-13T08:36:36.193Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SPP-Net介绍">
+<meta name="twitter:description" content="参考论文Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition 前言SPP-Net，即Spatial Pyramid Pooling，基本上来说是R-CNN的一个改进，其大幅度提高了R-CNN的训练速度和测试速度，同时算法的精度也上升了，后续的Fast R-CNN和Faster R-CNN都是这个思">
+<meta name="twitter:image" content="https://kidozh.github.io/2018/11/13/SPP-Net介绍/crop_wrap_fit_example.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":true,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://kidozh.github.io/2018/11/13/SPP-Net介绍/"/>
+
+
+
+
+
+  <title>SPP-Net介绍 | kidozh</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">kidozh</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">某不科学的kidozh</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://kidozh.github.io/2018/11/13/SPP-Net介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kido zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/11661760?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="kidozh">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">SPP-Net介绍</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-13T15:27:27+08:00">
+                2018-11-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/深度学习/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="参考论文"><a href="#参考论文" class="headerlink" title="参考论文"></a>参考论文</h1><p><a href="https://arxiv.org/pdf/1406.4729.pdf" target="_blank" rel="external">Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>SPP-Net，即Spatial Pyramid Pooling，基本上来说是R-CNN的一个改进，其大幅度提高了R-CNN的训练速度和测试速度，同时算法的精度也上升了，后续的Fast R-CNN和Faster R-CNN都是这个思路。</p>
+<p>快速在于：对于全部的图片，我们只需要计算一次Feature map,然后在任意一个区域（子区域）池化这个Feature得到同一个大小的表达式。最后进入训练的探测器。这一步，避免了重复计算卷积特征。这篇文章介绍的方法在Pascal VOC 2007,和ILSVRC上都取得了很好的效果。</p>
+<p>在SPP-Net中，其主要针对R-CNN做出下面的改进</p>
+<ul>
+<li>CNN网络后面接的FC层需要固定的输入大小，限制网络的输入大小</li>
+<li>候选区域会塞给CNN网络用于提取特征向量的，这会有大量的重复计算，造成的计算冗余</li>
+</ul>
+<h2 id="为什么CNN需要固定大小的输入？"><a href="#为什么CNN需要固定大小的输入？" class="headerlink" title="为什么CNN需要固定大小的输入？"></a>为什么CNN需要固定大小的输入？</h2><p>因为一个CNN一般分为两个部分，前面的部分是卷积层，后面的部分是FC层，卷积层不要求固定大小的输入;但是FC层在设计时就固定了神经元的个数，故需要固定长度的输入。这也就是CNN需要固定输入的问题所在。SPPNet的解决方案如下:</p>
+<table>
+<thead>
+<tr>
+<th>R-CNN模型</th>
+<th>SPPNet模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>将侯选区域送到CNN里面提取特征向量时，因为CNN的输入图像需要固定大小，而候选区域的长宽都是不固定的，故需要对候选区域做填充到固定大小，当我们对侯选区域做cropping或者warping操作，可能会让图片不完整包含物体，一些我们不想见到的几何失真，这都会造成识别精度损失。</td>
+<td>SPPNet的解决办法是使用“空间金字塔变换层”将接收任意大小的图像输入，输出固定长度的输出向量，这样就能让SPPNet可接受任意大小的输入图片，不需要对图像做crop/wrap操作。</td>
+</tr>
+</tbody>
+</table>
+<img src="/2018/11/13/SPP-Net介绍/crop_wrap_fit_example.png" alt="裁剪和重放带来的误差和改进方法" title="裁剪和重放带来的误差和改进方法">
+<h2 id="R-CNN模型候选区域在CNN重复计算"><a href="#R-CNN模型候选区域在CNN重复计算" class="headerlink" title="R-CNN模型候选区域在CNN重复计算"></a>R-CNN模型候选区域在CNN重复计算</h2><table>
+<thead>
+<tr>
+<th>R-CNN模型</th>
+<th>SPPNet模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>在R-CNN中，每个候选区域都要塞到CNN内提取特征向量，一张图片有2000个候选区域，也就是一张图片需要经过2000次CNN的前向传播，这2000重复计算过程会有大量的计算冗余，耗费大量的时间。</td>
+<td>SPPNet提出了一种从候选区域到全图的特征映射(feature map)之间的对应关系，通过此种映射关系可以直接获取到候选区域的特征向量，不需要重复使用CNN提取特征，从而大幅度缩短训练时间。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="我们通俗的理解一下R-CNN和SPPNet的实现过程"><a href="#我们通俗的理解一下R-CNN和SPPNet的实现过程" class="headerlink" title="我们通俗的理解一下R-CNN和SPPNet的实现过程"></a>我们通俗的理解一下R-CNN和SPPNet的实现过程</h2><table>
+<thead>
+<tr>
+<th>R-CNN模型</th>
+<th>SPPNet模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R-CNN是让每个候选区域经过crop/wrap等操作变换成固定大小的图像固定大小的图像塞给CNN。CNN输出获得固定大小的feature map,feature map传给后面的层做训练回归分类操作。这里每个候选区域是需要单独过一下CNN，2000个候选区域过2000次CNN，耗费时间啊</td>
+<td>SPPNet把全图塞给CNN得到全图的feature map让候选区域与feature map直接映射，得到候选区域的映射特征向量(这是映射来的，不需要过CNN)。映射过来的特征向量大小不固定，所以这些特征向量塞给SPP层(空间金字塔变换层)，SPP层接收任何大小的输入，输出固定大小的特征向量，再塞给FC层。经过映射+SPP转换，简化了计算，速度/精确度也上去了</td>
+</tr>
+</tbody>
+</table>
+<h1 id="原理介绍"><a href="#原理介绍" class="headerlink" title="原理介绍"></a>原理介绍</h1><p>先了解一下Spatial Pyramid Pooling，参考论文<a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=1641019" target="_blank" rel="external">Beyond bags of features: Spatial pyramid matching for recognizing natural scene categories[C]//CVPR 2006</a>。</p>
+<p>空间金字塔变换层(Spatial Pyramid Pooling,SPP)可以对图片提取特征，例如下图就是11，22，4*4大小的bin块，将一张图片以三种方式切割并提取特征，这样我们可以得到一共1+4+16=21种特征，这就是以不同的大小的bin块来提取特征的过程就是空间金字塔变换。</p>
+<img src="/2018/11/13/SPP-Net介绍/spatial_pyramid_pooling.png" alt="空间金字塔变换" title="空间金字塔变换">
+<p>然后使用不同大小的候选区域在feature map上的映射给SPP</p>
+<img src="/2018/11/13/SPP-Net介绍/spp_net_process_in_boxing.png" alt="SPP层在特征映射的变换" title="SPP层在特征映射的变换">
+<p>上图spp layer分成1x1(塔底)，2x2(塔中)，4x4（塔顶）三张子图，对每个子图的每个区域作max pooling(论文使用的)，出来的特征再连接到一起，就是(16+4+1)x256的特征向量。</p>
+<p>无论输入图像大小如何，出来的特征固定是(16+4+1)x256维度。这样就实现了不管图像尺寸如何，SPP层的输出永远是(16+4+1)x256特征向量。</p>
+<h1 id="把候选区域从全图的feature-map映射出特征向量"><a href="#把候选区域从全图的feature-map映射出特征向量" class="headerlink" title="把候选区域从全图的feature map映射出特征向量"></a>把候选区域从全图的feature map映射出特征向量</h1><h2 id="计算感受野"><a href="#计算感受野" class="headerlink" title="计算感受野"></a>计算感受野</h2><p>在CNN中感受野(receptive fields)是指某一层输出结果中一个元素所对应的上一层的区域大小.</p>
+<p>在卷积参数计算过程中，我们给出上一层/下一层/滤波器尺寸、步长和填充大小的关系:</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入尺寸</td>
+<td>W1×H1</td>
+</tr>
+<tr>
+<td>卷积核</td>
+<td>F×F</td>
+</tr>
+<tr>
+<td>输出尺寸</td>
+<td>W2×H2</td>
+</tr>
+<tr>
+<td>步长</td>
+<td>stride：$ S $</td>
+</tr>
+<tr>
+<td>填充大小</td>
+<td>padding:$ P $</td>
+</tr>
+</tbody>
+</table>
+<p>关系式如下： $$ W_2 = \frac{W_1-F+2P} {S}  + 1   ,   H_2 =\frac{H_1-F+2P}{S}  + 1 $$</p>
+<p>对其进行变换就可以反向计算上一层的感受野了：$$ W1=(W_2-1)S-2P+F $$ $$ H1=(H_2-1)S-2P+F $$</p>
+<p>下图显示了如何从后向前计算感受野的过程</p>
+<img src="/2018/11/13/SPP-Net介绍/receptive_field.png" alt="反向计算感受野" title="反向计算感受野">
+<p>感受野计算时有下面的几个情况需要说明：</p>
+<ul>
+<li>第一层卷积层的输出特征图像素的感受野的大小等于滤波器的大小</li>
+<li>深层卷积层的感受野大小和它之前所有层的滤波器大小和步长有关系</li>
+<li>计算感受野大小时，忽略了图像边缘的影响，即不考虑padding的大小</li>
+</ul>
+<p>这里的每一个卷积层还有一个步长(strides)的概念，这个strides是之前所有层stride的乘积: $$ strides_i = stride_1 \cdot stride<em>2 \cdot \cdot \cdot  stride</em>{i-1} $$</p>
+<h2 id="基于感受野的特征映射"><a href="#基于感受野的特征映射" class="headerlink" title="基于感受野的特征映射"></a>基于感受野的特征映射</h2><p>通常，我们需要知道网络里面任意两个feature map之间的坐标映射关系（一般是中心点之间的映射），如下图，我们想得到map 3上的点p3映射回map 2所在的位置p2（橙色框的中心点）</p>
+
+<p>计算公式：</p>
+<ul>
+<li>对于卷积或者池化层来说 : $$ pi = s<em>i \cdot p</em>{i+1} +( \frac{k_i -1}{2} - padding) $$</li>
+<li>对于一般的神经层(ReLU/Sigmoid/..) : $$ p<em>I = p</em>{i+1} $$</li>
+</ul>
+<p>上面是计算任意一个layer输入输出的坐标映射关系，如果是计算任意feature map之间的关系，只需要用简单的组合就可以得到，下图是一个简单的例子:</p>
+<img src="/2018/11/13/SPP-Net介绍/calculate_receptive_field.png" alt="计算感受野" title="计算感受野">
+<p>下图是Kaiming He 在ICCV15上的汇报用的PPT，讲解如何求解Receptive Field:</p>
+<img src="/2018/11/13/SPP-Net介绍/kaiming_example_SPP.png" alt="计算感受野的实例" title="计算感受野的实例">
+<p>何凯明在SPP-net中采用的方法。巧妙的化简一下公式 $ pi = s<em>i \cdot p</em>{i+1} +( (k_i -1)/2 - padding) $</p>
+<p>令每一层的padding都为 $ padding = \lfloor k_i /2 \rfloor \Rightarrow pi = s<em>i \cdot p</em>{i+1} +( (k_i -1)/2 -  \lfloor k_i /2 \rfloor) $</p>
+<ul>
+<li>当 ki 为奇数 $ (k_i -1)/2 -  \lfloor k_i /2 \rfloor) = 0  \Rightarrow  p_i = s<em>i \cdot p</em>{i+1} $</li>
+<li>当ki 为偶数 $ ( (k_i -1)/2 -  \lfloor k_i /2 \rfloor) = -0.5 \Rightarrow p_i = s<em>i \cdot p</em>{i+1} -0.5 $</li>
+<li>而 pi 是坐标值,不取小数,基本上认为pi=si⋅pi+1 。感受野中心点的坐标pi只跟前一层 pi+1 有关。</li>
+</ul>
+<p>其实就是把公式 $ pi = s<em>i \cdot p</em>{i+1} +( (k_i -1)/2 - padding) $级联消去整合一下</p>
+<h2 id="候选区域到feature-map的映射做法详解"><a href="#候选区域到feature-map的映射做法详解" class="headerlink" title="候选区域到feature map的映射做法详解"></a>候选区域到feature map的映射做法详解</h2><p>SPP-net 是把原始ROI的左上角和右下角 映射到 feature map上的两个对应点。 有了feature map上的两队角点就确定了 对应的 feature map 区域(下图中橙色)。</p>
+<img src="/2018/11/13/SPP-Net介绍/mapping_relations.png" alt="映射关系" title="映射关系">
+<p>如何映射？<br>左上角的点(x,y)映射到 feature map上的(x′,y′) :使得(x′,y′) 在原始图上感受野（上图绿色框）的中心点 与(x,y)尽可能接近。</p>
+<h3 id="对应的映射公式"><a href="#对应的映射公式" class="headerlink" title="对应的映射公式"></a>对应的映射公式</h3><ul>
+<li>就是前面每层都填充padding/2 得到的简化公式 $ p_i = s<em>i \cdot p</em>{i+1} $</li>
+<li>需要把上面公式进行级联得到 $ p<em>0 = S \cdot p</em>{i+1} $其中$ (S = \prod_{0}^{i} s_i) $ </li>
+<li>对于feature map 上的(x′,y′) 它在原始图的对应点为(x,y)=(Sx′,Sy′)</li>
+<li>论文中的最后做法：把原始图片中的ROI映射为 feature map中的映射区域（上图橙色区域）<ul>
+<li>左上角取：$ x’ =  \lfloor x/S \rfloor +1 $;  $ y’ =  \lfloor y/S \rfloor +1 $；</li>
+<li>右下角取：$ x’ =  \lceil x/S \rceil - 1 $;$ y’ =  \lceil y/S \rceil - 1 $。</li>
+</ul>
+</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到这里就算是把SPPNet的核心思想讲完了，SPPNet网络后面和R-CNN类似，训练SVM分类器和位置回归等。 SPPNet在R-CNN的基础上提出了改进，通过候选区域和feature map的映射，配合SPP层的使用，从而达到了CNN层的共享计算，减少了运算时间。后面的Fast R-CNN也是受SPPNet的启发，一次又一次的刷新物体检测的state-of-the-art。</p>
+<h1 id="参考博客"><a href="#参考博客" class="headerlink" title="参考博客"></a>参考博客</h1><p><a href="http://hellodfan.com/2017/09/30/%E7%89%A9%E4%BD%93%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87-SPPNet/" target="_blank" rel="external">http://hellodfan.com/2017/09/30/%E7%89%A9%E4%BD%93%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87-SPPNet/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    kido zhang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://kidozh.github.io/2018/11/13/SPP-Net介绍/" title="SPP-Net介绍">https://kidozh.github.io/2018/11/13/SPP-Net介绍/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/03/拓扑学针对神经网络建模/" rel="next" title="针对神经网络的拓扑学建模">
+                <i class="fa fa-chevron-left"></i> 针对神经网络的拓扑学建模
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://avatars1.githubusercontent.com/u/11661760?s=460&v=4"
+               alt="kido zhang" />
+          <p class="site-author-name" itemprop="name">kido zhang</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">112</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">77</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/kidozh" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/331837926Ji" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                    
+                      Twitter
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/kidozh" target="_blank" title="weibo">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      weibo
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/kidozh" target="_blank" title="douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      douban
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/kidozh" target="_blank" title="zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      zhihu
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考论文"><span class="nav-number">1.</span> <span class="nav-text">参考论文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么CNN需要固定大小的输入？"><span class="nav-number">2.1.</span> <span class="nav-text">为什么CNN需要固定大小的输入？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#R-CNN模型候选区域在CNN重复计算"><span class="nav-number">2.2.</span> <span class="nav-text">R-CNN模型候选区域在CNN重复计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#我们通俗的理解一下R-CNN和SPPNet的实现过程"><span class="nav-number">2.3.</span> <span class="nav-text">我们通俗的理解一下R-CNN和SPPNet的实现过程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原理介绍"><span class="nav-number">3.</span> <span class="nav-text">原理介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#把候选区域从全图的feature-map映射出特征向量"><span class="nav-number">4.</span> <span class="nav-text">把候选区域从全图的feature map映射出特征向量</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#计算感受野"><span class="nav-number">4.1.</span> <span class="nav-text">计算感受野</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于感受野的特征映射"><span class="nav-number">4.2.</span> <span class="nav-text">基于感受野的特征映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#候选区域到feature-map的映射做法详解"><span class="nav-number">4.3.</span> <span class="nav-text">候选区域到feature map的映射做法详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对应的映射公式"><span class="nav-number">4.3.1.</span> <span class="nav-text">对应的映射公式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考博客"><span class="nav-number">6.</span> <span class="nav-text">参考博客</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2014 &mdash; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kido zhang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+  </div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">
+    主题 &mdash;
+    <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+      NexT.Pisces
+    </a>
+  </div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
