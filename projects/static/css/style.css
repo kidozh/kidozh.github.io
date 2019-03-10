@@ -55,7 +55,7 @@ body{
 .project-item{
     padding: 1rem 2rem 1rem 2rem;
     border-radius: .5rem;
-    margin: 0.5rem 5rem 0.5rem 1rem;
+    margin: 0.5rem 3rem 0.5rem 1rem;
     border: none;
     transition: .35s all;
 }
@@ -126,10 +126,31 @@ background: linear-gradient(to right, #71B280, #134E5E); /* W3C, IE 10+/ Edge, F
 
 }
 
-.contact{
-    margin-top: 5rem;
+.digital-twins{
+    background: url("../images/window-941625_1920.jpg") no-repeat center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
-/* .project-portal .title-section{
-    border-left: 1rem #ffffff solid;
-} */
+.digital-twins:hover{
+    background: #ee0979;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #ff6a00, #ee0979);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #ff6a00, #ee0979); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+
+
+}
+
+.contact-section{
+    margin-top: 5rem;
+    border-top: #95a5a6 0.1rem dashed;
+    padding: 0.5rem 0 0 0;
+}
+
+.contact-section > .contact > li{
+    padding: 1rem;
+    background: #2c3e50;
+    color:#ecf0f1;
+    margin-top: 1rem;
+}

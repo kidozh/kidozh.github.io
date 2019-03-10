@@ -7,7 +7,8 @@
     <title>Projects Demo Of kidozh</title>
     <!-- bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <!-- custom CSS -->
     <link rel="stylesheet" href="static/css/style.css">
 
@@ -52,12 +53,29 @@
                 <h1>Project Homepage of kidozh</h1>
                 <p>This is <a href="https://kidozh.com/kidozh-cv/">My CV</a></p>
                 <p>I am looking for <strong>Ph.D admission</strong> in 2020 fall.</p>
-                <ul class="list-inline contact">
-                    <li class="list-inline-item"><a href="https://www.facebook.com/profile.php?id=100008677068879"><span class="fab fa-github fa-2x"></span></a></li>
-                    <li class="list-inline-item"><a href="https://www.facebook.com/profile.php?id=100008677068879"><span class="fab fa-facebook fa-2x"></span></a></li>
-                    <li class="list-inline-item"><a href="https://twitter.com/kido_zhang"><span class="fab fa-twitter fa-2x"></span></a></li>
-                    <li class="list-inline-item"><a href="https://www.zhihu.com/people/kidozh/"><span class="fab fa-zhihu fa-2x"></span></a></li>
-                </ul>
+                <div class="contact-section">
+                    <h5>Social Contact</h5>
+                    <ul class="list-inline contact">
+                        <li class="list-inline-item"><a href="mailto:kidozh@gmail.com"><span
+                                    class="fas fa-envelope fa-2x"></span></a></li>
+
+                        <li class="list-inline-item"><a
+                                href="https://www.facebook.com/profile.php?id=100008677068879"><span
+                                    class="fab fa-github fa-2x"></span></a></li>
+                        <li class="list-inline-item"><a
+                                href="https://www.facebook.com/profile.php?id=100008677068879"><span
+                                    class="fab fa-facebook fa-2x"></span></a></li>
+                        <li class="list-inline-item"><a
+                                href="https://www.facebook.com/profile.php?id=100008677068879"><span
+                                    class="fab fa-weibo fa-2x"></span></a></li>
+                        <li class="list-inline-item"><a href="https://twitter.com/kido_zhang"><span
+                                    class="fab fa-twitter fa-2x"></span></a></li>
+                        <li class="list-inline-item"><a href="https://www.zhihu.com/people/kidozh/"><span
+                                    class="fab fa-zhihu fa-2x"></span></a></li>
+
+                    </ul>
+                </div>
+
 
 
             </div>
@@ -67,7 +85,7 @@
                         <div class="col-md-12">
                             <div class="project-item card single-tool-wear">
                                 <div class="card-body">
-                                    <h3 class="card-title">Single machining tool wear </h3>
+                                    <h3 class="card-title">Single Machining Tool Wear Monitor</h3>
                                     <p class="card-title">A fast and accurate CNN model to monitor tool wear under the
                                         same
                                         machining condition </p>
@@ -84,9 +102,9 @@
 
                             <div class="project-item card multiple-tool-wear">
                                 <div class="card-body">
-                                    <h3 class="card-title">Multiple Machining Tool Wear </h3>
+                                    <h3 class="card-title">Multiple Machining Tool Wear Monitor</h3>
                                     <p class="card-title">One model for multiple machining condition and its easy
-                                        transfer
+                                        transferring
                                         to brand-new condition.</p>
 
                                 </div>
@@ -101,10 +119,10 @@
                         <div class="col-md-12">
                             <div class="project-item card visualization">
                                 <div class="card-body">
-                                    <h3 class="card-title">Visualization</h3>
-                                    <p class="card-title">Easy, intuitive and accurate way to demonstrate mechanism of
-                                        CNN
-                                        in processing 1D signal.</p>
+                                    <h3 class="card-title">Visualization Based on Topology Data Analysis by DBSCAN and Its Application</h3>
+                                    <p class="card-title">Easy, Intuitive and Accurate Way to Demonstrate Mechanism of
+                                        Convolutional Kernel
+                                        in Processing 1D Signal.</p>
 
                                 </div>
                             </div>
@@ -117,9 +135,24 @@
                         <div class="col-md-12">
                             <div class="project-item card tool-wear-forecast">
                                 <div class="card-body">
-                                    <h3 class="card-title">Tool Wear Forecast</h3>
-                                    <p class="card-title">The 1st forecasting model to predict tool wear in the next
-                                        following time.</p>
+                                    <h3 class="card-title">Tool Wear Forecast Based on Recurrent Neural Network</h3>
+                                    <p class="card-title">The 1st forecasting LSTM model to predict tool wear in the next
+                                        arbitrary following time.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="row">
+                    <a href="https://github.com/kidozh/digital_twin_by_GAN">
+                        <div class="col-md-12">
+                            <div class="project-item card digital-twins">
+                                <div class="card-body">
+                                    <h3 class="card-title">Digital Twins of Tool wear Based on Deep Convolutional Generative Adversial Networks</h3>
+                                    <p class="card-title">The 1st digital twin model to simulate tool wear in the certain wear status.</p>
+                                    <p class="card-title">The Homepage of this project is under maintained, you can visit project in github to retrieve first-hand indication.</p>
 
                                 </div>
                             </div>
@@ -148,7 +181,7 @@
     <!-- echarts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.js"
         integrity="sha256-5oGDDQdB95LVt6XQcCR1rIRWUIoDC9vtM/TmZFmmvHc=" crossorigin="anonymous"></script>
-        
+
 </body>
 
 </html>
