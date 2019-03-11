@@ -59,6 +59,8 @@ body{
     border: none;
     transition: .35s all;
     z-index: 1;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 .project-item:hover{
@@ -198,4 +200,23 @@ background: linear-gradient(to right, #71B280, #134E5E); /* W3C, IE 10+/ Edge, F
 
 .highlight-link {
     text-decoration: underline #ecf0f1;
+}
+
+.footer{
+    padding: 1rem 2rem 0 2rem;
+    background: #ecf0f1;  /* fallback for old browsers */
+}
+
+.footer h1,
+.footer h2,
+.footer h3,
+.footer h4,
+.footer h5,
+.footer h6,
+.footer p{
+    color: #34495e;
+}
+
+.footer a{
+    color: #2c3e50;
 }
