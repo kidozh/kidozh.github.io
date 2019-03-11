@@ -35,7 +35,7 @@ body{
 }
 
 .project-intro{
-    padding: 20rem 2rem 20rem 2rem;
+    padding: 3rem 2rem 3rem 2rem;
     font-family: 'Muli','Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
@@ -58,11 +58,13 @@ body{
     margin: 0.5rem 3rem 0.5rem 1rem;
     border: none;
     transition: .35s all;
+    z-index: 1;
 }
 
 .project-item:hover{
     border-radius: 1rem;
     transform: scale(1.2);
+    z-index: 10;
 }
 
 .single-tool-wear{
@@ -153,4 +155,47 @@ background: linear-gradient(to right, #71B280, #134E5E); /* W3C, IE 10+/ Edge, F
     background: #2c3e50;
     color:#ecf0f1;
     margin-top: 1rem;
+    transition: .5s all;
+}
+
+.contact-section > .contact > li:hover{
+    background: #ecf0f1;
+    color: #2c3e50;
+    transform: scale(1.2);
+}
+
+.contact-section > .contact > li:hover span{
+    color: #2c3e50;
+}
+
+.contact-section > .contact > .email:hover span{
+    color: #1abc9c;
+}
+
+.contact-section > .contact > .github:hover span{
+    color: #24282e;
+}
+
+.contact-section > .contact > .weibo:hover span{
+    color: #df2029;
+}
+
+.contact-section > .contact > .facebook:hover span{
+    color: #3b5999;
+}
+
+.contact-section > .contact > .twitter:hover span{
+    color: #55acee;
+}
+
+.contact-section > .contact > .linkedin:hover span{
+    color: #0077B5;
+}
+
+.contact-section > .contact > .zhihu:hover span{
+    color: #0284ff;
+}
+
+.highlight-link {
+    text-decoration: underline #ecf0f1;
 }
