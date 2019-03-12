@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400|Roboto|Muli:400,500');
+
+body,html{
+    font-family: 'Roboto',"Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",sans-serif;
+}
+
+.project-portal{
+    padding: 6rem 2rem 6rem 2rem;
+    background: #2c3e50;  /* fallback for old browsers */
+
+}
+
+.project-portal h1,
+.project-portal h2,
+.project-portal h3,
+.project-portal h4,
+.project-portal h5,
+.project-portal h6,
+.project-portal p{
+    color: #ffffff;
+    font-family: 'Muli', sans-serif;
+    font-weight: 500;
+
+}
+
+.project-intro{
+    /*background: url("../images/science.svg") no-repeat;*/
+    /*background-position: right center;*/
+
+}
+
+.project-title{
+    padding: 3rem 0 3rem 2rem;
+    font-size: 4rem;
+}
+
+.project-portal .sub-title{
+    font-weight: 300;
+    margin-top: 2rem;
+    font-size: 2rem;
+    font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+
+.project-portal .title{
+    font-weight: 500;
+}
+
+.project-portal .btn{
+    padding: 0.75em 2em;
+    border-radius: 0;
+    display: inline-block;
+    color: #fff;
+    background: #3498db;
+    transition: all .35s ease;
+    box-sizing: border-box;
+    border: none;
+    margin: 0.2rem 0.5rem 0.2rem 0.5rem;
+    align-content: center;
+    font-size: 1.2rem;
+    font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+
+.project-portal .btn:hover{
+    background: #ecf0f1;
+    color: #3498db !important;
+}
+
+.project-portal .btn+.btn-inverse{
+    background: transparent;
+    color: #3498db;
+    border: none;
+    transition: all .35s ease-in;
+}
+
+.project-portal .btn-inverse:hover {
+    color: #ecf0f1 !important;
+}
+
+.project-feature{
+    padding: 4rem 2rem 4rem 2rem;
+}
+
+.project-feature .title{
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.project-feature .paragraph{
+    font-family: 'Roboto', sans-serif;
+    margin-top: 2rem;
+}
+
+.project-principle{
+    padding: 3rem 2rem 2rem 2rem;
+    border-top: #7f8c8d solid 0.05rem;
+}
+
+.project-principle .title{
+    color: #2c3e50;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    margin-bottom: 2rem;
+}
+
+.project-principle .sub-title{
+    color: #34495e;
+    font-family: 'Roboto', sans-serif;
+}
+
+.project-principle p{
+    color: #2c3e50;
+    font-family: 'Muli', sans-serif;
+}
+
+.project-principle .caption{
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.component{
+    padding: 4rem 1rem 2rem 1rem;
+    border-top: 0.1rem dashed #7f8c8d;
+}
+
+.discriminator .title,
+.component .title{
+    color: #2c3e50;
+    font-family: 'Muli', sans-serif;
+    font-weight: 500;
+}
+

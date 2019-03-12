@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Digital Twins of Tool Wear by Deep Convolutional Generative Adversarial Network</title>
+    <!-- customize css-->
+    <link rel="stylesheet" href="./static/css/style.css">
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row project-portal">
+        <div class="col-md-10 offset-md-1 project-intro">
+            <h1 class="text-center project-title">Digital Twins of Machining Tool</h1>
+            <p class="text-center sub-title">By Deep Convolutional Generative Adversial Network</p>
+            <p class="text-center"><a class="btn">Read Paper</a> <a class="btn btn-inverse">Project &gt;</a> </p>
+        </div>
+
+    </div>
+    <div class="row project-feature">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h2 class="title">Unsupervised</h2>
+                    <p class="paragraph">DCGAN is an advanced unsupervised approach to clone the distribution of real signal data.
+                        Upsampling and Convolutional layer constitute transpose convolutional layer to generate hierarchy signal blueprint.
+                        By competition between discriminator and generator, it's easy to re-create realistic signal.
+                    </p>
+                    <p class="paragraph">Since the data is obtained by unsupervised approach, the final result could be not stable.
+                    In addition, because the optimization point is located at one saddle point of G-D tensor space, it make optimization
+                        even harder.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h2 class="title">End-to-end Design</h2>
+                    <p class="paragraph">
+                        Key to simplify model's design is to using end-to-end architecture. The hybrid of generative and discriminative network
+                        allows model to simplify both train and application process.
+                    </p>
+                    <p class="paragraph">
+                        Fed with high-dimensional random noise, GAN can give diverse signal sample which is hard for machine to recognize validity.
+                        By progressive deep-learning training, generative network is able to evolve itself. A remarkable signal could be obtained after
+                        proper epoch of deep learning training.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h2 class="title">General</h2>
+                    <p class="paragraph">
+                        There is no requirement for distribution of original data. It enable the widespread use of GAN in general circumstances. The
+                        only thing GAN need to do is clone the siblings of signal data. By introducing lantent space parameter(z), GAN can generate the
+                        corresponding signal. It could help us to reinforce data, diagnose failure and optimize the best machining parameters by searching
+                        z tensor space. It can be the fundamental ground research which enable network to handle realtime machining just like AlphaGo.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="container">
+            <div class="row project-principle">
+                <div class="col-md-12">
+                    <h1 class="title">Co-evolution</h1>
+                    <p>GAN training implements game theory that makes G and D network compete to exploit their performance.
+                    Generative network(G) tries to generate realistic signal to deceive discriminative network(D). D tries to
+                        identify the validity of given signal. Finally, both network achieve <strong>nash balance</strong> which means discriminator
+                        fails to recognize signal and generator can give sequence whose data distribution is the same as original sample.
+                    </p>
+                    <h4 class="sub-title">Nash balance</h4>
+                    <p>
+                        Since the limit of sample's size and optimization's location, training of GAN is hard. Also, because range in every dimension is
+                        different, the compound tensor may not be so accurate. But the tendency shows that GAN can clone data well.
+
+                    </p>
+                </div>
+                <div class="col-md-12">
+                    <p class="text-center"><img class="img-fluid" src="./static/images/gan_principle.svg"> </p>
+                    <p class="text-center caption">The architecture of Generative Adversial Network(GAN) and digital twins' relation to it</p>
+                </div>
+            </div>
+
+            <div class="row component">
+                <div class="col-md-8">
+                    <h1 class="title">Discriminative Network</h1>
+                    <p>
+                        The core of discriminator is classical post-activation design. By MLP architecture, discriminator can extract
+                        features of machining signal at every abstract level.
+                    </p>
+                    <p>
+                        The discriminator is fed with signal which may comes from real data and fake data generated by G-network. This
+                        network will output a binary value recognizing validity of given sequence. Trained with Adam optimization
+                        (learning rate 0.0001 and \( beta_1 \) 0.5), the discriminator will adapt itself to identify signal.
+                    </p>
+                    <h3 class="title">Loss function</h3>
+                    <p>The loss function is binary crossentropy which is used for binary recognition.</p>
+                    <p>
+                        $$  loss = -\sum_{i=1}^{n}\hat{y_i}logy_i+(1-\hat{y_i})log(1-y_i)\\ \frac {\partial loss} {\partial y} = -\sum_{i=1}^{n}\frac {\hat{y_i}} {y_i}-\frac {1-\hat{y_i}} {1-y_i} $$
+                    </p>
+
+                    <h3 class="title">Technical Tricks</h3>
+                    <p> In order to prevent sparse features, <strong>leaky rectified linear unit</strong>(LeakyRelu) activation is used.
+                        In practical training of GAN, discriminator can always easily recognize whether given signal is true or fake. In order
+                        to make competition stable, dropout layer with fair large dropout rate is applied. Because of prior success in monitoring
+                        realtime tool wear, a descending dimension is implement in convolutional layer.
+                    </p>
+
+                </div>
+                <div class="col-md-4">
+                    <p class="text-center"><img class="img-fluid" src="./static/images/discriminative_network_architecture.svg"> </p>
+                </div>
+            </div>
+            <div class="row component">
+                <div class="col-md-4">
+                    <p class="text-center"><img class="img-fluid" src="./static/images/discriminative_network_architecture.svg"> </p>
+                </div>
+                <div class="col-md-8">
+                    <h1 class="title">Generative Network</h1>
+                    <p>
+                        The core of generator is <strong>upsampling-convolutional</strong> deconvolution structure. This
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<!-- mathjax -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+</body>
+</html>
