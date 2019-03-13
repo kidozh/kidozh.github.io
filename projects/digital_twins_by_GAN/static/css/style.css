@@ -30,13 +30,13 @@ body,html{
 }
 
 .project-title{
-    padding: 3rem 0 3rem 2rem;
     font-size: 4rem;
 }
 
 .project-portal .sub-title{
     font-weight: 300;
     margin-top: 2rem;
+    margin-bottom: 1rem;
     font-size: 2rem;
     font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 }
@@ -112,7 +112,7 @@ body,html{
     font-family: 'Muli', sans-serif;
 }
 
-.project-principle .caption{
+.caption{
     font-size: 0.8rem;
     color: #7f8c8d;
     font-family: 'Open Sans', sans-serif;
@@ -130,3 +130,31 @@ body,html{
     font-weight: 500;
 }
 
+span + .upsampling{
+    color: #00bcd4;
+}
+
+span + .conv1d{
+    color: #3598db;
+}
+
+.machining-condition{
+    padding-left: 2rem;
+    border-left: #16a085 0.2rem solid;
+}
+
+.machining-condition .title{
+    color: #16a085;
+    border-bottom: 0.05rem dashed #95a5a6;
+    width: fit-content;
+}
+
+.machining-condition p{
+    margin-top: 1rem;
+}
+
+.highlight-text{
+    color: #16a085;
+    font-weight: 500;
+    font-size: 1.5rem;
+}

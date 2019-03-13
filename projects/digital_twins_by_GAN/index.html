@@ -18,8 +18,8 @@
     <div class="row project-portal">
         <div class="col-md-10 offset-md-1 project-intro">
             <h1 class="text-center project-title">Digital Twins of Machining Tool</h1>
-            <p class="text-center sub-title">By Deep Convolutional Generative Adversial Network</p>
-            <p class="text-center"><a class="btn">Read Paper</a> <a class="btn btn-inverse">Project &gt;</a> </p>
+            <p class="text-center sub-title">By Deep Conditional Convolutional Generative Adversial Network</p>
+            <p class="text-center"><a class="btn">Read Paper</a> <a href="https://github.com/kidozh/digital_twin_by_GAN" class="btn btn-inverse">Project &gt;</a> </p>
         </div>
 
     </div>
@@ -114,16 +114,103 @@
                 </div>
                 <div class="col-md-4">
                     <p class="text-center"><img class="img-fluid" src="./static/images/discriminative_network_architecture.svg"> </p>
+                    <p class="caption text-center">The discriminator's architecture. (This architecture may change according to latest development
+                        progress)</p>
                 </div>
             </div>
             <div class="row component">
-                <div class="col-md-4">
-                    <p class="text-center"><img class="img-fluid" src="./static/images/discriminative_network_architecture.svg"> </p>
-                </div>
+
                 <div class="col-md-8">
                     <h1 class="title">Generative Network</h1>
                     <p>
-                        The core of generator is <strong>upsampling-convolutional</strong> deconvolution structure. This
+                        The core of generator is <strong><span class="upsampling">upsampling</span>-<span class="conv1d">convolutional</span></strong>
+                        deconvolution structure. Upsampling enables signal to reshape and convolution allows information fusion at different time
+                        of sequence. InstanceNormalization can better normalize features and avoid sparse characteristics in generative model.
+                        LeakyRelu as the non-sparse activation function can reduce features' redundancy.
+                    </p>
+                    <p>
+                        The generator is fed with signal which combined both noise(Usually <span class="text-success">Gaussian distribution</span>) and machining condition(need rescale method).
+                        This network will yield a signal corresponding to given machining condition. Trained with Adam optimization (learning rate
+                        0.0001 and \( beta_1 \) 0.5), the generator will adapt itself to produce signal according to machining condition.
+                    </p>
+                    <h3 class="title">Rescale method</h3>
+                    <p>
+                        For different machining condition, a separate rescaling method should be taken for better GAN training.
+                    </p>
+                    <ul class="machining-condition">
+                        <li>
+                            <h5 class="title">For discrete machining condition</h5>
+                            <p>
+                                For many machining condition, the change is not continuous. For example, machining tool type, workpiece material and
+                                milling approach could all be considered discrete status. In this case, <b>embedding layer</b> should be taken into
+                                use. This layer can implicitly indicates the relation among different status and decrease calculation cost. In
+                                addition, if machining condition is complex and representing tensor is high dimensional, the sparse vector will increase
+                                unnecessary cost and impede further immigration to new machining condition.
+                            </p>
+                            <p>
+                                When network is trained, all embedding tensor will be updated. By calculating the similarity of different status,
+                                many features could be reused to increase accuracy and generality. It's also helpful when later transfer learning
+                                is applied.
+                            </p>
+                        </li>
+                        <li>
+                            <h5 class="title">For continuous machining condition</h5>
+                            <p>
+                                Continuous variables are also common in processing workpieces. For example, spindle speed, feed rate, machining temperature
+                                and cut depth could set at any given figure. In this case, <b>full connected layer</b> should be used to rescale parameters.
+                                In this layer, it can be simplified as a linear transformation \( y = a \times x + b \). If you know exact proper scaling
+                                methods, it's better to directly transform the variable before training model.
+                            </p>
+                        </li>
+
+                    </ul>
+                    <p>Later, processed machining factor will be multiplied with rescale factor as the input of generator. This is the reason why
+                        DCGAN is prefixed with <strong class="highlight-text">C</strong> which indicates conditional.
+                    </p>
+                    <h3 class="title">Technical tricks</h3>
+                    <p>
+                        The techniques applied in generative model are the same as discriminative one.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="text-center"><img class="img-fluid" src="./static/images/generative_network_architecture.svg"> </p>
+                    <p class="text-center caption">
+                        The generator's architecture(This architecture may change according to latest development progress).
+                        <span class="text-danger">×</span> rounded by red dot means <span class="text-danger">multiply</span>
+                        operation.
+                    </p>
+                </div>
+            </div>
+            <div class="row component">
+                <div class="col-md-6">
+                    <h1 class="title">Training Process</h1>
+                    <p>The ideal mode of training is that G and D network compete to achieve nash balance. The best condition is
+                     that accuracy of D is fluctuated around 50%. However, due to some reasons we have hardly known, D's accuracy is
+                        unusual high which means D is very smart to recognize signal's validity. Even we increase dropout and G's
+                        complexity, the phenomenon is still not apparent to see. But after exam generative signal with high-accurate ResNet,
+                        the signal could be accepted in a way. Also, by observing final signal sample, it seems like experimental
+                        signal.
+                    </p>
+
+                </div>
+                <div class="col-md-6">
+                    <p class="text-center"><img class="img-fluid" src="./static/images/loss_change_example.png"> </p>
+                    <p class="text-center caption">
+                        The training example of GAN. <span class="text-danger">The example is not related to this experiment!</span>
+                    </p>
+                </div>
+            </div>
+            <div class="row component">
+                <div class="col-md-6">
+                    <p class="text-center">
+                        <img src="./static/images/DCGAN_57000_epoch.svg" class="img-fluid">
+                    </p>
+                    <p class="text-center caption">
+                        The generated signal after 57000 epoch evaluated by ResNet. The tendency shows that generator can simulate tool wear tendency well.
+                        Due to my error, legend of this graph is not given. The <span class="text-info">x-axis</span> is
+                        <span class="text-info">given tool wear</span> and <span class="text-info">y-axis</span> is
+                        <span class="text-info">estimated value</span> examined by ResNet.
+
                     </p>
                 </div>
             </div>
