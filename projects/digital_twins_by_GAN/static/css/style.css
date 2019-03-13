@@ -206,3 +206,8 @@ span + .conv1d{
     color: #3498DB;
     text-decoration: underline;
 }
+
+.navbar {
+    font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+    font-weight: 400;
+}
