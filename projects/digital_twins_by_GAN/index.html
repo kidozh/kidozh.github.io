@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -201,20 +201,160 @@
                 </div>
             </div>
             <div class="row component">
-                <div class="col-md-6">
+                <div class="col-md-12">
+                    <h1 class="title">Result</h1>
+                    <h3 class="title">Pre-setup for evaluation</h3>
+                    <p>
+                        Because ResNet don't join GAN training, the evaluating result of Resnet could be regarded as convincing.
+                        The ResNet fed with reinforced data can predict tool wear well according to machining signal.
+                    </p>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>MSE (Mean Square Error)</th>
+                            <th>MAE (Mean Absolute Error)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>0.630 (\( \mu m^2 \))</td>
+                            <td>0.417 (\( \mu m^2 \))</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-center caption">
+                        More detailed information about this Resnet, you can visit <a class="text-success" href="../">single machining monitor</a>  to
+                        get more information
+                    </p>
+                    <h3 class="title">Evaluation</h3>
+                    <p>
+                        In the left figure, DCGAN can give corresponding signal by labels. Although there are many fluctuations
+                        with expected label, the tendency still prove the validity of cloned signal. Also, this error may comes
+                        from both evaluation error from Resnet and generative error from GAN.
+                    </p>
+                    <p>
+                        In most condition, the evaluation follows expected tendency. In interval 25-75, the gan reacts a false
+                        tendency, the most reason may be rescale problem. Also, that my GPU is too weak to train deep network
+                        may be the reason why GAN sucks.
+                    </p>
+                    <p>
+                        The initial GAN is not applied well in computer vision. But after two-year development, the deep fake and
+                        other technology have proven the strength of GAN. I may start badly but truly hope gan could simualte signal
+                        well one day.
+
+                    </p>
+                </div>
+                <div class="col-md-12 result-figure-caption ">
+                    <h3 class="text-center">Evaluation result of GAN after several epochs</h3>
+                    <p class="text-center caption">
+                        Due to my error, legend of this graph is not given. The <span class="text-danger">x-axis</span> is
+                        <span class="text-danger">given tool wear</span> and <span class="text-danger">y-axis</span> is
+                        <span class="text-danger">estimated value</span> examined by ResNet.
+                    </p>
+                </div>
+
+
+                <div class="col-md-4">
+
                     <p class="text-center">
                         <img src="./static/images/DCGAN_57000_epoch.svg" class="img-fluid">
                     </p>
                     <p class="text-center caption">
-                        The generated signal after 57000 epoch evaluated by ResNet. The tendency shows that generator can simulate tool wear tendency well.
-                        Due to my error, legend of this graph is not given. The <span class="text-info">x-axis</span> is
-                        <span class="text-info">given tool wear</span> and <span class="text-info">y-axis</span> is
-                        <span class="text-info">estimated value</span> examined by ResNet.
-
+                        The generated signal evaluated by ResNet after <span class="text-info">57000</span> epoch.
                     </p>
                 </div>
+                <div class="col-md-4">
+
+                    <p class="text-center">
+                        <img src="./static/images/DCGAN_62000_epoch.svg" class="img-fluid">
+                    </p>
+                    <p class="text-center caption">
+                        The generated signal evaluated by ResNet after <span class="text-info">62000</span> epoch.
+                    </p>
+                </div>
+                <div class="col-md-4">
+
+                    <p class="text-center">
+                        <img src="./static/images/DCGAN_148000_epoch.svg" class="img-fluid">
+                    </p>
+                    <p class="text-center caption">
+                        The generated signal evaluated by ResNet after <span class="text-info">148000</span> epoch.
+                    </p>
+                </div>
+
             </div>
+            <div class="row component" id="gan-demo">
+                <div class="col-md-12">
+                    <h1 class="title text-center">Generated signal sample at different tool status</h1>
+                    <p class="text-center">
+                        The following graph shows the generated signal in given tool wear label. Feel free to explore,
+                        you can't break it, we promise.
+
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <p>Select GAN's performance at given epoch</p>
+                            <select v-model="current_epoch" class="form-control" >
+                                <option v-for="epoch in epoch_list">{{epoch}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <p class="text-center">
+                        <img class="img-fluid" v-bind:src="evaluate_image_path">
+                    </p>
+                    <p class="caption text-center">
+                        Train evaluation at epoch <span class="text-danger">{{current_epoch}}</span>
+                    </p>
+                </div>
+                <div class="col-md-12" v-show="have_dimension_pic">
+                    <h3 class="text-center">
+                        Each channel of signal on epoch <span class="text-danger">{{current_epoch}}</span>
+                    </h3>
+                </div>
+                <div class="col-md-10 offset-md-1" v-show="! have_dimension_pic">
+                    <p class="text-center">Sorry, we can't provide dimensional data , since we only store dimensional
+                        sample every 2000 epoch.
+                        your selection, <span class="text-danger">{{current_epoch}}</span>, doesn't
+                        fit this regulation.
+                    </p>
+                </div>
+                <div class="col-md-4" v-for="data in images_path" v-show="have_dimension_pic">
+                    <p class="text-center">
+                        <img class="img-fluid" v-bind:src="data.path">
+
+                    </p>
+                    <p class="caption text-center">{{data.caption}}</p>
+                </div>
+            </div>
+
         </div>
+
+    </div>
+    <div class="row conclusion-section">
+        <div class="col-md-8 offset-md-1">
+            <h3 class="conclusion">
+                Given that more than 40000+ reinforced data, tool wear digital twins by GAN can clone machining signal and
+                be compatible with tool wear tendency. Furthermore, we hope that this technology can promote itself to achieve
+                higher accuracy. Then, this digital twins could be the reference when we can search this model to simulate real
+                machining process in data science way.
+            </h3>
+        </div>
+    </div>
+    <div class="row contact-section">
+        <div class="col-md-10 offset-md-1">
+            <h3 class="contact">If you have questions about our work, contact us at: kidozh@gmail.com</h3>
+        </div>
+    </div>
+
+    <div class="row footer">
+        <div class="col-md-12">
+            <h3 class="text-center">This project is licensed <a href="https://github.com/kidozh/keras_detect_tool_wear/blob/master/LICENSE">MIT</a>,
+                Docs <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
+            </h3>
+        </div>
+
     </div>
 
 </div>
@@ -227,6 +367,67 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <!-- mathjax -->
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#gan-demo',
+        data:{
+            current_epoch:148000,
+        },
+        computed:{
+            images_path:function () {
+                // add evaluation first
+                var current_epoch_string = this.current_epoch.toString();
+                var path_prefix = "./static/images/samples_and_evaluation/";
+                // var evaluation_name = "DCGAN_"+current_epoch_string+"_epoch.svg";
+                var image_path_list = [];
+                //image_path_list.push(path_prefix+evaluation_name);
+                for(let i=1; i<8; i++){
+                    var caption_str = "";
+                    var three_dimension_name_list = ["X","Y","Z"]
+                    if(i <= 3){
+                        caption_str = "Force (N) in " + three_dimension_name_list[(i-1)%3] + " dimension";
+                    }
+                    else if(i <= 6){
+                        caption_str = "Vibration (g) in " + three_dimension_name_list[(i-1)%3] + " dimension";
+                    }
+                    else{
+                        caption_str = "Acoustic Emission / AE-RMS (V)"
+                    }
+
+                    var channel_path = i.toString()+"/"+"channel_"+i.toString()+"_epoch_"+current_epoch_string+".png";
+                    var data = {
+                        path : path_prefix + channel_path,
+                        caption: caption_str
+                    };
+                    image_path_list.push(data);
+                }
+                return image_path_list;
+            },
+            evaluate_image_path:function () {
+                var current_epoch_string = this.current_epoch.toString();
+                var path_prefix = "./static/images/samples_and_evaluation/";
+                var evaluation_name = "DCGAN_"+current_epoch_string+"_epoch.svg";
+                return path_prefix+evaluation_name
+            },
+            have_dimension_pic:function () {
+                if(this.current_epoch % 2000 === 0) return true;
+                return false;
+            },
+            epoch_list :function () {
+                var epoch_list = [];
+                for(var i = 0; i<= 170000 ; i+= 1000 ){
+
+                    epoch_list.push(i);
+                }
+                return epoch_list;
+            }
+        }
+    });
+
+</script>
 
 </body>
 </html>

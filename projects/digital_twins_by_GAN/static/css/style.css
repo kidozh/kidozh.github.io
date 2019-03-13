@@ -130,8 +130,8 @@ body,html{
     font-weight: 500;
 }
 
-span + .upsampling{
-    color: #00bcd4;
+.upsampling{
+    color: #00bcd4 !important;
 }
 
 span + .conv1d{
@@ -157,4 +157,52 @@ span + .conv1d{
     color: #16a085;
     font-weight: 500;
     font-size: 1.5rem;
+}
+
+.result-figure-caption{
+    margin-top: 2rem;
+    padding-top: 0.5rem;
+    border-top: #bdc3c7 0.1rem dashed;
+}
+
+.conclusion-section{
+    background: #ecf0f1;
+    padding: 3rem 1rem 1rem 1rem;
+}
+
+.conclusion{
+    color: #2c3e50;
+    font-family: 'Muli', sans-serif;
+}
+
+.contact-section{
+    padding: 2rem 1rem 2rem 1rem;
+    background: #2c3e50;
+}
+
+.contact-section .contact{
+    color: #ffffff;
+    font-family: "Open Sans",sans-serif;
+    font-weight: 300;
+}
+
+.footer{
+    padding: 1rem 1rem 1rem 1rem;
+    background: #ECF0F1;
+}
+
+.footer h3{
+    color: #7F8C8D;
+}
+
+.footer a{
+    color: #7F8C8D;
+    transition: all .5s;
+    text-decoration: none;
+}
+
+.footer a:hover,
+.footer a:focus{
+    color: #3498DB;
+    text-decoration: underline;
 }
