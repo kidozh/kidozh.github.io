@@ -207,4 +207,6 @@ p + .btn-p{
 
 .download-section a{
     word-break: break-all;
+    color:#16a085;
+    text-decoration: underline;
 }
