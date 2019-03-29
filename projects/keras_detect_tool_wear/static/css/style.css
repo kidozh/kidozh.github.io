@@ -184,3 +184,27 @@ p{
     content: '';
     flex: 1;
 }
+
+p + .btn-p{
+    line-height: 0.5rem;
+}
+
+.btn-p .btn{
+    margin-bottom: 1rem;
+}
+
+.download-section{
+    margin: 5rem 0 5rem 0;
+}
+
+.download-section ul{
+    margin-left: 2rem;
+}
+
+.download-section p{
+    text-indent: 2rem;
+}
+
+.download-section a{
+    word-break: break-all;
+}
