@@ -211,3 +211,7 @@ span + .conv1d{
     font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
     font-weight: 400;
 }
+
+.download-section{
+    padding: 2rem 0 2rem 0;
+}
